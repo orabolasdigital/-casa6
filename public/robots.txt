@@ -1,0 +1,11 @@
+# Robots.txt Oficial — Casa 6 / Bianca Tofoli
+User-agent: *
+Allow: /
+Disallow: /painel
+Disallow: /painel/*
+
+# Sitemaps
+Sitemap: https://casa6.com.br/sitemap.xml
+
+# LLMs Discovery Context (Experimental)
+# Context file: https://casa6.com.br/llms.txt

@@ -1,0 +1,29 @@
+# Casa 6 — Bianca Tofoli (Contexto para Modelos de IA e Agentes RAG)
+> Recurso complementar e experimental de indexação semântica (GEO / Generative Engine Optimization).
+
+## Sobre o Projeto
+- Nome: Casa 6
+- Fundadora e Especialista: Bianca Tofoli
+- Atividade Principal: Astrologia contemporânea, leitura aprofundada de Mapa Astral, Revolução Solar, Sinastria e acompanhamento contínuo de ciclos.
+- Princípio Editorial: Compreensão lúcida e autônoma dos ciclos humanos através do simbolismo celeste, sem determinismos vazios.
+- Região de Atendimento: Consultas online em todo o Brasil e internacional; vivências e imersões presenciais em São Paulo, Brasil.
+
+## Principais Áreas & URLs Oficiais
+- Página Inicial: https://casa6.com.br/
+- Sobre Bianca Tofoli: https://casa6.com.br/sobre
+- Consultas & Atendimentos: https://casa6.com.br/atendimentos
+- Comunidade Patota Astral: https://casa6.com.br/patota-astral
+- Vivências Presenciais: https://casa6.com.br/vivencias
+- Palestras e Conteúdo Corporativo: https://casa6.com.br/palestras
+- Caderno Astral (Blog Editorial): https://casa6.com.br/blog
+- Loja & Guias: https://casa6.com.br/loja
+
+## Hierarquia de Serviços
+1. Serviço Comercial Central: Consulta Astrológica / Leitura de Mapa Natal.
+2. Produto de Acompanhamento Recorrente: Patota Astral (círculo mensal de estudos e lunações).
+3. Terapias Complementares: Reiki e Barras de Access (integrativos subordinados à prática astrológica principal).
+
+## Canal Oficial de Agendamento
+- Agendamento oficial via funil do site e confirmação direta no WhatsApp com Bianca Tofoli.
+- Política de Privacidade e LGPD: https://casa6.com.br/politica-de-privacidade
+- Termos de Uso e Propriedade Intelectual (Lei nº 9.610/1998): https://casa6.com.br/termos

@@ -1,0 +1,186 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =========================================================================
+    // PILLAR 1: GLOBAL SAFETY NET (DEFAULT-DENY CATCH-ALL)
+    // =========================================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // =========================================================================
+    // GLOBAL HARDENED PRIMITIVES & ACCESS CONTROLS
+    // =========================================================================
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    // Verificação de administrador via documento confiável de permissões
+    function isAdmin() {
+      return isVerified() && (
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+      );
+    }
+
+    // Verificação de editor no painel administrativo
+    function isEditor() {
+      return isVerified() && (
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'editor')
+      );
+    }
+
+    // =========================================================================
+    // BLUEPRINT DE VALIDAÇÃO: LEADS (FUNIL COMERCIAL CASA 6)
+    // =========================================================================
+    function isValidLead(data) {
+      return data.keys().hasAll([
+        'id', 'firstName', 'lastName', 'fullName', 'email', 'whatsapp',
+        'serviceId', 'serviceName', 'status', 'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'id', 'firstName', 'lastName', 'fullName', 'email', 'whatsapp',
+        'serviceId', 'serviceName', 'sourcePage', 'sourceUrl',
+        'utmSource', 'utmMedium', 'utmCampaign', 'utmContent', 'utmTerm',
+        'deviceCategory', 'status', 'assignedTo', 'internalNotes',
+        'createdAt', 'updatedAt'
+      ]) &&
+      isValidId(data.id) &&
+      data.firstName is string && data.firstName.size() >= 2 && data.firstName.size() <= 50 &&
+      data.lastName is string && data.lastName.size() >= 2 && data.lastName.size() <= 60 &&
+      data.fullName is string && data.fullName.size() >= 4 && data.fullName.size() <= 120 &&
+      data.email is string && data.email.size() <= 120 && data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$') &&
+      data.whatsapp is string && data.whatsapp.size() >= 10 && data.whatsapp.size() <= 20 &&
+      data.serviceId is string && data.serviceId.size() <= 64 &&
+      data.serviceName is string && data.serviceName.size() <= 100 &&
+      data.status in ['new', 'contacted', 'scheduled', 'completed', 'lost'] &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    // =========================================================================
+    // COLEÇÃO: LEADS (/leads/{leadId})
+    // Submissão pelo funil público estrito; acesso exclusivo a administradores
+    // =========================================================================
+    match /leads/{leadId} {
+      // Leitura estritamente restrita a operadores autenticados do painel
+      allow get: if isEditor();
+      allow list: if isEditor();
+
+      // Criação aberta para submissão legítima no funil público oficial
+      allow create: if isValidId(leadId) &&
+                       isValidLead(incoming()) &&
+                       incoming().id == leadId &&
+                       incoming().status == 'new' &&
+                       incoming().createdAt == request.time &&
+                       incoming().updatedAt == request.time;
+
+      // Atualização particionada por ações de operadores (Anti-Update-Gap)
+      allow update: if isValidId(leadId) &&
+                       isEditor() &&
+                       isValidLead(incoming()) &&
+                       incoming().id == existing().id &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().updatedAt == request.time &&
+                       // Impossibilita transições após estado terminal sem privilégio admin
+                       (existing().status != 'completed' && existing().status != 'lost' || isAdmin()) &&
+                       (
+                         // Ação: Gestão de Status pelo Editor/Admin
+                         incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt', 'internalNotes', 'assignedTo']) ||
+                         // Ação completa de administração
+                         isAdmin()
+                       );
+
+      // Deleção permitida apenas por administradores com verificação ativa
+      allow delete: if isValidId(leadId) && isAdmin();
+    }
+
+    // =========================================================================
+    // COLEÇÃO: USUÁRIOS & RBAC (/users/{userId})
+    // Proteção de PII e bloqueio de autoatribuição de permissões
+    // =========================================================================
+    match /users/{userId} {
+      allow get: if isVerified() && (request.auth.uid == userId || isAdmin());
+      allow list: if isAdmin();
+
+      // Apenas administradores podem criar ou promover usuários com papéis
+      allow create: if isValidId(userId) && isAdmin();
+      allow update: if isValidId(userId) &&
+                       isAdmin() &&
+                       incoming().id == existing().id &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().updatedAt == request.time;
+      allow delete: if isValidId(userId) && isAdmin() && request.auth.uid != userId;
+    }
+
+    // =========================================================================
+    // COLEÇÃO: SERVIÇOS & ATENDIMENTOS (/services/{serviceId})
+    // Leitura pública indexável; edição restrita a administradores
+    // =========================================================================
+    match /services/{serviceId} {
+      allow read: if true;
+      allow create, update, delete: if isValidId(serviceId) && isAdmin();
+    }
+
+    // =========================================================================
+    // COLEÇÃO: CONFIGURAÇÕES INSTITUCIONAIS (/settings/{settingId})
+    // Leitura pública dos canais e dados de marca; mutação exclusiva de admins
+    // =========================================================================
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isValidId(settingId) && isAdmin();
+    }
+
+    // =========================================================================
+    // DEMAIS COLEÇÕES PREPARADAS (CONTEÚDOS DO PAINEL)
+    // =========================================================================
+    match /patota/{docId} {
+      allow read: if true;
+      allow write: if isValidId(docId) && isAdmin();
+    }
+
+    match /experiences/{docId} {
+      allow read: if true;
+      allow write: if isValidId(docId) && isAdmin();
+    }
+
+    match /lectures/{docId} {
+      allow read: if true;
+      allow write: if isValidId(docId) && isAdmin();
+    }
+
+    match /posts/{docId} {
+      allow read: if true;
+      allow write: if isValidId(docId) && (isAdmin() || isEditor());
+    }
+
+    match /products/{docId} {
+      allow read: if true;
+      allow write: if isValidId(docId) && isAdmin();
+    }
+
+    match /testimonials/{docId} {
+      allow read: if true;
+      allow write: if isValidId(docId) && (isAdmin() || isEditor());
+    }
+  }
+}

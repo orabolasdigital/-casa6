@@ -1,0 +1,7 @@
+{
+  "name": "Casa 6 — Bianca Tofoli",
+  "description": "Fundação técnica e plataforma oficial da Casa 6 por Bianca Tofoli. Astrologia, Mapa Astral, Patota Astral e Vivências.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

@@ -1,0 +1,238 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   CASA 6 — BIANCA TOFOLI | NOVA PALETA OFICIAL CONGELADA (CORREÇÃO)
+   Referência visual: Céu noturno em tons azul-violeta, roxo e lavanda.
+   ========================================================================== */
+
+@theme {
+  /* Cores Institucionais Principais */
+  --color-brand-navy: #080C35;
+  --color-brand-primary: #22205A;
+  --color-brand-purple-deep: #372B69;
+  --color-brand-violet: #483474;
+  --color-brand-purple: #62437C;
+  --color-brand-lavender: #6F4D84;
+  --color-brand-lavender-light: #835787;
+
+  /* Cor de Destaque Oficial */
+  --color-brand-gold: #FFB63F;
+  --color-brand-gold-hover: #EAA329;
+
+  /* Neutros Oficiais */
+  --color-background-main: #F3EEE5;
+  --color-surface: #FCFAF7;
+  --color-surface-white: #FFFFFF;
+  --color-text-primary: #211D35;
+  --color-text-secondary: #534D6B;
+  --color-text-muted: #7A7394;
+  --color-text-on-dark: #FFFFFF;
+  --color-border-default: #DAD2C4;
+  --color-border-subtle: #E6DFD3;
+  --color-border-dark: #372B69;
+
+  /* Tipografia Oficial (Hatton para Títulos & Futura para Corpo/Navegação) */
+  --font-heading: 'Hatton', 'Playfair Display', Georgia, serif;
+  --font-sans: 'Futura', 'Futura PT', 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Futura', 'Futura PT', 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+:root {
+  /* Cores Institucionais Principais */
+  --brand-navy: #080C35;             /* Azul noite profundo */
+  --brand-primary: #22205A;          /* Azul-violeta institucional principal */
+  --brand-purple-deep: #372B69;      /* Roxo profundo secundário */
+  --brand-violet: #483474;           /* Violeta intermediário */
+  --brand-purple: #62437C;           /* Roxo médio suave */
+  --brand-lavender: #6F4D84;         /* Lavanda escura */
+  --brand-lavender-light: #835787;   /* Lavanda clara / roxo rosado */
+
+  /* Cor de Destaque */
+  --brand-gold: #FFB63F;             /* Dourado oficial Casa 6 */
+  --brand-gold-hover: #EAA329;
+
+  /* Neutros e Superfícies */
+  --background-main: #F3EEE5;        /* 40-45% Creme quente principal */
+  --surface: #FCFAF7;                /* Off-white */
+  --surface-white: #FFFFFF;          /* 10-15% Branco puro */
+  --text-primary: #211D35;           /* Texto principal sobre claro */
+  --text-secondary: #534D6B;         /* Texto secundário (contraste > 7:1) */
+  --text-muted: #7A7394;             /* Texto terciário */
+  --text-on-dark: #FFFFFF;           /* Texto sobre azul-violeta / roxo */
+  --border-default: #DAD2C4;         /* Borda neutra aquecida */
+  --border-subtle: #E6DFD3;
+  --border-dark: #372B69;
+
+  /* Gradientes Oficiais do Céu Noturno */
+  --gradient-night-sky: linear-gradient(135deg, #080C35 0%, #22205A 35%, #483474 68%, #835787 100%);
+  --gradient-institutional: linear-gradient(180deg, #080C35 0%, #22205A 100%);
+  --gradient-purple-deep: linear-gradient(135deg, #22205A 0%, #372B69 50%, #483474 100%);
+  --gradient-lavender-accent: linear-gradient(135deg, #372B69 0%, #483474 50%, #6F4D84 100%);
+
+  /* Overlays e Foco */
+  --overlay-dark: rgba(8, 12, 53, 0.78);
+  --focus-ring: #FFB63F;
+
+  /* Tipografia Oficial (Font Stacks com Fallback Seguro) */
+  --font-heading: 'Hatton', 'Playfair Display', Georgia, serif;
+  --font-body: 'Futura', 'Futura PT', 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Touch-Target Mínimo Mobile-First */
+  --touch-target-min: 44px;
+}
+
+/* --------------------------------------------------------------------------
+   ESTRUTURA DE FONTES LOCAIS (STATUS: PENDENTE de arquivos licenciados .woff2)
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Hatton';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Hatton Regular'), local('Hatton-Regular');
+}
+
+@font-face {
+  font-family: 'Hatton';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Hatton Medium'), local('Hatton-Medium');
+}
+
+@font-face {
+  font-family: 'Hatton';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Hatton Bold'), local('Hatton-Bold');
+}
+
+@font-face {
+  font-family: 'Futura';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Futura'), local('Futura-Regular');
+}
+
+@font-face {
+  font-family: 'Futura';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: local('Futura Medium'), local('Futura-Medium');
+}
+
+@font-face {
+  font-family: 'Futura';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Futura Bold'), local('Futura-Bold');
+}
+
+/* --------------------------------------------------------------------------
+   BASE STYLES & TIPOGRAFIA
+   -------------------------------------------------------------------------- */
+html, body {
+  font-family: var(--font-body);
+  background-color: var(--background-main);
+  color: var(--text-primary);
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: var(--font-heading);
+  letter-spacing: -0.015em;
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+/* Mobile Touch Target Discipline */
+button, a, input, select, textarea {
+  min-height: var(--touch-target-min);
+  touch-action: manipulation;
+}
+
+/* Classes Utilitárias para Gradientes Noturnos */
+.bg-night-sky {
+  background: var(--gradient-night-sky);
+}
+
+.bg-institutional-gradient {
+  background: var(--gradient-institutional);
+}
+
+.bg-purple-deep-gradient {
+  background: var(--gradient-purple-deep);
+}
+
+.bg-lavender-accent-gradient {
+  background: var(--gradient-lavender-accent);
+}
+
+/* --------------------------------------------------------------------------
+   CAMADA ANTICÓPIA (PÚBLICA) — BEST EFFORT & ACESSIBILIDADE
+   Protege textos e imagens públicas contra cópia acidental / arrasto.
+   Permite explicitamente seleção em campos de formulário e painel admin.
+   -------------------------------------------------------------------------- */
+.protected-content {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Elementos onde a seleção de texto DEVE ser mantida sem exceção */
+input,
+textarea,
+select,
+[contenteditable="true"],
+.allow-select,
+.admin-scope,
+.admin-scope * {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+}
+
+/* Bloqueio de arraste de imagens institucionais públicas */
+img.protected-img {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  pointer-events: auto;
+}
+
+/* --------------------------------------------------------------------------
+   ESTILO DE IMPRESSÃO (@media print) — Proteção contra reprodução não autorizada
+   -------------------------------------------------------------------------- */
+@media print {
+  body::before {
+    content: "© Casa 6 — Bianca Tofoli. Conteúdo protegido nos termos da Lei Federal nº 9.610/1998. Reprodução não autorizada proibida. Acesse https://casa6.com.br";
+    display: block;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    font-size: 11pt;
+    font-weight: bold;
+    color: #22205A;
+    border: 1px solid #22205A;
+    text-align: center;
+  }
+
+  .no-print,
+  nav,
+  footer,
+  .modal-backdrop,
+  .admin-sidebar {
+    display: none !important;
+  }
+}

@@ -1,0 +1,246 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Perfil de usuário administrativo da Casa 6 com controle de acesso baseado em funções (RBAC).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "UID do usuário no Firebase Auth.",
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "E-mail do administrador ou editor.",
+          "maxLength": 120
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Nome de exibição.",
+          "maxLength": 100
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "editor"],
+          "description": "Nível de permissão no painel."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Data de criação do perfil."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Data de atualização do perfil."
+        }
+      },
+      "required": ["id", "email", "role", "createdAt", "updatedAt"]
+    },
+    "Lead": {
+      "title": "Lead",
+      "description": "Lead capturado no funil comercial oficial da Casa 6 via modal de agendamento.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "maxLength": 128,
+          "description": "Identificador único do lead."
+        },
+        "firstName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 50,
+          "description": "Primeiro nome do cliente."
+        },
+        "lastName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 60,
+          "description": "Sobrenome do cliente."
+        },
+        "fullName": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 120,
+          "description": "Nome completo formatado."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 120,
+          "description": "E-mail de contato."
+        },
+        "whatsapp": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 20,
+          "pattern": "^[0-9+() -]+$",
+          "description": "Número de WhatsApp com DDD."
+        },
+        "serviceId": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Identificador do serviço selecionado (ex: mapa-astral)."
+        },
+        "serviceName": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Nome do serviço selecionado."
+        },
+        "sourcePage": {
+          "type": "string",
+          "maxLength": 120,
+          "description": "Página interna onde o CTA foi acionado."
+        },
+        "sourceUrl": {
+          "type": "string",
+          "maxLength": 300,
+          "description": "URL completa no momento do clique."
+        },
+        "utmSource": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Parâmetro UTM Source se existente."
+        },
+        "utmMedium": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Parâmetro UTM Medium se existente."
+        },
+        "utmCampaign": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Parâmetro UTM Campaign se existente."
+        },
+        "utmContent": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Parâmetro UTM Content se existente."
+        },
+        "utmTerm": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Parâmetro UTM Term se existente."
+        },
+        "deviceCategory": {
+          "type": "string",
+          "enum": ["mobile", "tablet", "desktop", "unknown"],
+          "description": "Categoria do dispositivo do visitante."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["new", "contacted", "scheduled", "completed", "lost"],
+          "description": "Status operacional do lead no CRM."
+        },
+        "assignedTo": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "ID do membro responsável no painel."
+        },
+        "internalNotes": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Anotações internas reservadas à equipe."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp de submissão do formulário."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp da última atualização."
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "fullName",
+        "email",
+        "whatsapp",
+        "serviceId",
+        "serviceName",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Service": {
+      "title": "Service",
+      "description": "Serviço ou atendimento oferecido por Bianca Tofoli (ex: Consulta Astrológica / Mapa Astral).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "maxLength": 64
+        },
+        "slug": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "shortDescription": {
+          "type": "string",
+          "maxLength": 280
+        },
+        "category": {
+          "type": "string",
+          "enum": ["astrologia_principal", "recorrente", "complementar"]
+        },
+        "isPrimary": {
+          "type": "boolean"
+        },
+        "order": {
+          "type": "number"
+        },
+        "isActive": {
+          "type": "boolean"
+        }
+      },
+      "required": ["id", "slug", "title", "category", "isPrimary", "order", "isActive"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Configurações institucionais globais da Casa 6.",
+      "type": "object",
+      "properties": {
+        "brandName": { "type": "string", "maxLength": 80 },
+        "tagline": { "type": "string", "maxLength": 160 },
+        "whatsappNumber": { "type": "string", "maxLength": 20 },
+        "emailContact": { "type": "string", "format": "email", "maxLength": 120 },
+        "instagram": { "type": "string", "maxLength": 80 },
+        "instagramBianca": { "type": "string", "maxLength": 80 }
+      },
+      "required": ["brandName", "whatsappNumber", "emailContact"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Coleção de perfis com permissões RBAC."
+    },
+    "/leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Coleção segura de leads capturados no funil comercial oficial."
+    },
+    "/services/{serviceId}": {
+      "schema": "Service",
+      "description": "Catálogo oficial de atendimentos e serviços da Casa 6."
+    },
+    "/settings/{settingId}": {
+      "schema": "Settings",
+      "description": "Parâmetros institucionais e canais oficiais da Casa 6."
+    }
+  }
+}
