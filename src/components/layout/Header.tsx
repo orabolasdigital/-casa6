@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import { Menu, X, ShoppingBag, User, Calendar } from 'lucide-react';
+import { Menu, X, ShoppingBag, User, MessageCircle } from 'lucide-react';
 import { SITE_CONFIG } from '../../config/site';
 
 interface HeaderProps {
@@ -102,13 +102,17 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate, onOpenB
             <span className="hidden sm:inline font-medium">Login</span>
           </button>
 
-          <button
-            onClick={() => onOpenBooking()}
-            className="hidden sm:flex items-center gap-1.5 rounded-full bg-[#FFB63F] px-4 py-1.5 text-xs font-bold text-[#080C35] shadow hover:bg-[#EAA329] transition-all transform active:scale-95"
+          {/* Contato Direto via WhatsApp Oficial (Sem formulário) */}
+          <a
+            href={`https://wa.me/${SITE_CONFIG.whatsappNumberRaw}?text=${encodeURIComponent('Olá, vim pelo site.')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Contato direto via WhatsApp"
+            className="hidden sm:inline-flex items-center gap-2 rounded-full border border-[#25D366]/40 bg-[#080C35] px-3.5 py-1.5 text-xs font-semibold text-[#25D366] hover:bg-[#25D366]/10 transition-colors shadow-xs"
           >
-            <Calendar className="h-3.5 w-3.5" />
-            <span>Agendar</span>
-          </button>
+            <MessageCircle className="h-4 w-4 text-[#25D366] fill-[#25D366]/20" />
+            <span className="tracking-wide">{SITE_CONFIG.whatsappNumberFormatted}</span>
+          </a>
 
           {/* Hambúrguer Mobile */}
           <button
@@ -141,17 +145,17 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate, onOpenB
               </button>
             );
           })}
-          <div className="pt-2 border-t border-[#22205A]">
-            <button
-              onClick={() => {
-                onOpenBooking();
-                setMobileMenuOpen(false);
-              }}
-              className="w-full flex items-center justify-center gap-2 rounded-full bg-[#FFB63F] py-2.5 text-xs font-bold text-[#080C35]"
+          <div className="pt-3 border-t border-[#22205A]/80">
+            <a
+              href={`https://wa.me/${SITE_CONFIG.whatsappNumberRaw}?text=${encodeURIComponent('Olá, vim pelo site.')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 rounded-full border border-[#25D366]/50 bg-[#080C35] py-2.5 text-xs font-bold text-[#25D366]"
             >
-              <Calendar className="h-4 w-4" />
-              <span>Agendar Consulta</span>
-            </button>
+              <MessageCircle className="h-4 w-4 text-[#25D366]" />
+              <span>WhatsApp: {SITE_CONFIG.whatsappNumberFormatted}</span>
+            </a>
           </div>
         </div>
       )}

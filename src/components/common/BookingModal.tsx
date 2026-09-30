@@ -1,17 +1,21 @@
 /**
  * @license
  * Casa 6 — Bianca Tofoli
- * Formulário Global Reutilizável de Agendamento (Modal Oficial)
+ * Popup Global de Agendamento (Inspiração Visual WhatsApp)
  * 
- * Regra Arquitetural Absoluta:
- * Contém EXCLUSIVAMENTE 5 campos: Nome, Sobrenome, WhatsApp, E-mail, Tipo de atendimento.
- * Sem campo de mensagem, observações ou texto livre.
- * Atualizado com a paleta oficial de céu noturno (Azul-violeta, Roxo profundo e Dourado).
+ * Requisitos Oficiais:
+ * - Header verde (#075E54 / #128C7E) com identificação Casa 6 / Bianca Tofoli
+ * - Sensação de chat acolhedor
+ * - Título: "Agende sua consulta"
+ * - Subtexto: "Preencha seus dados e continue a conversa com Bianca pelo WhatsApp."
+ * - Exatamente 5 campos: Nome, Sobrenome, WhatsApp, E-mail, Tipo de atendimento.
+ * - Botão de ação verde WhatsApp (#25D366).
+ * - Sem campo de mensagem, observações ou texto livre.
  */
 
 import React, { useState, useEffect } from 'react';
-import { X, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
-import { OFFICIAL_SERVICES } from '../../config/site';
+import { X, CheckCircle, AlertCircle, ArrowRight, MessageCircle, ShieldCheck } from 'lucide-react';
+import { OFFICIAL_SERVICES, SITE_CONFIG } from '../../config/site';
 import { LeadFormInput } from '../../types';
 import { submitLeadBooking } from '../../services/leads';
 
@@ -41,7 +45,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [whatsappRedirectUrl, setWhatsappRedirectUrl] = useState('');
 
-  // Atualiza serviço selecionado quando a modal abre com contexto
+  // Atualiza serviço selecionado dinamicamente quando a modal abre
   useEffect(() => {
     if (preselectedServiceId) {
       setFormData((prev) => ({ ...prev, serviceId: preselectedServiceId }));
@@ -72,10 +76,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       setWhatsappRedirectUrl(result.whatsappUrl);
       setSubmitSuccess(true);
 
-      // Redirecionamento suave para o WhatsApp oficial
+      // Redireciona diretamente para o WhatsApp após gravar lead no CRM
       setTimeout(() => {
         window.open(result.whatsappUrl, '_blank', 'noopener,noreferrer');
-      }, 1200);
+      }, 1000);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Ocorreu um erro ao processar seu agendamento.';
       setErrors({ form: msg });
@@ -93,193 +97,228 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080C35]/80 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#080C35]/80 backdrop-blur-xs animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-booking-title"
     >
-      <div className="relative w-full max-w-lg rounded-xl bg-[#FCFAF7] p-6 md:p-8 shadow-2xl border border-[#DAD2C4]">
-        {/* Botão Fechar */}
-        <button
-          onClick={handleResetAndClose}
-          className="absolute right-4 top-4 rounded-full p-2 text-[#534D6B] hover:bg-[#F3EEE5] hover:text-[#22205A] transition-colors"
-          aria-label="Fechar formulário"
-        >
-          <X className="h-5 w-5" />
-        </button>
-
-        {submitSuccess ? (
-          <div className="text-center py-6 space-y-4">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#372B69]/15 text-[#372B69]">
-              <CheckCircle className="h-8 w-8 text-[#FFB63F]" />
+      <div className="relative w-full max-w-lg rounded-2xl bg-[#FCFAF7] shadow-2xl border border-[#DAD2C4] overflow-hidden flex flex-col max-h-[92vh]">
+        
+        {/* HEADER INSPIRADO NO WHATSAPP (#075E54 / #128C7E) */}
+        <div className="bg-[#075E54] text-white px-5 py-4 flex items-center justify-between border-b border-[#128C7E] shrink-0">
+          <div className="flex items-center gap-3">
+            {/* Avatar / Foto de Bianca Tofoli */}
+            <div className="relative h-11 w-11 rounded-full border-2 border-white/80 overflow-hidden shadow-sm shrink-0">
+              <img
+                src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80"
+                alt="Bianca Tofoli"
+                className="h-full w-full object-cover"
+              />
+              <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-[#25D366] border-2 border-[#075E54]" />
             </div>
-            <h3 className="font-heading text-xl font-bold text-[#22205A]">
-              Solicitação Registrada com Sucesso!
-            </h3>
-            <p className="text-sm text-[#534D6B] leading-relaxed">
-              Você está sendo direcionado(a) para o WhatsApp oficial da Bianca Tofoli com a mensagem pré-formatada.
-            </p>
-            {whatsappRedirectUrl && (
-              <a
-                href={whatsappRedirectUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded bg-[#22205A] px-5 py-2.5 text-sm font-bold text-[#FFB63F] shadow hover:bg-[#372B69] transition-colors border border-[#FFB63F]/30"
-              >
-                <span>Abrir WhatsApp Agora</span>
-                <ArrowRight className="h-4 w-4" />
-              </a>
-            )}
-            <div className="pt-2">
-              <button
-                onClick={handleResetAndClose}
-                className="text-xs text-[#534D6B] hover:underline"
-              >
-                Fechar esta janela
-              </button>
+
+            <div className="leading-tight">
+              <div className="flex items-center gap-1.5">
+                <span className="font-heading font-bold text-base text-white tracking-wide">
+                  Casa 6 — Bianca Tofoli
+                </span>
+                <MessageCircle className="h-4 w-4 text-[#25D366] fill-[#25D366]" />
+              </div>
+              <span className="text-[11px] text-[#25D366] font-medium flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#25D366] inline-block animate-pulse" />
+                Online agora • Atendimento Oficial
+              </span>
             </div>
           </div>
-        ) : (
-          <div>
-            <div className="mb-6 space-y-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#6F4D84]">
-                Atendimento Oficial
-              </span>
-              <h2 id="modal-booking-title" className="font-heading text-2xl font-bold text-[#22205A]">
-                Agendar Consulta
-              </h2>
-              <p className="text-xs text-[#534D6B]">
-                Preencha seus dados para conectar diretamente com a Bianca Tofoli.
+
+          <button
+            onClick={handleResetAndClose}
+            className="rounded-full p-2 text-white/80 hover:text-white hover:bg-white/10 transition-colors focus:outline-none"
+            aria-label="Fechar formulário"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* CORPO DO FORMULÁRIO COM SENSAÇÃO DE CHAT */}
+        <div className="p-5 sm:p-6 overflow-y-auto flex-1 bg-[#F3EEE5]/40 space-y-4">
+          
+          {submitSuccess ? (
+            <div className="text-center py-6 space-y-4">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366]/20 text-[#25D366]">
+                <CheckCircle className="h-8 w-8 text-[#25D366]" />
+              </div>
+              <h3 className="font-heading text-xl font-bold text-[#22205A]">
+                Solicitação Registrada com Sucesso!
+              </h3>
+              <p className="text-xs sm:text-sm text-[#534D6B] leading-relaxed max-w-sm mx-auto">
+                Seus dados foram salvos com segurança. Você está sendo direcionado(a) para a conversa no WhatsApp oficial da Bianca.
               </p>
-            </div>
-
-            {errors.form && (
-              <div className="mb-4 flex items-center gap-2 rounded bg-red-50 p-3 text-xs text-[#B71C1C] border border-red-200">
-                <AlertCircle className="h-4 w-4 shrink-0" />
-                <span>{errors.form}</span>
-              </div>
-            )}
-
-            {/* FORMULÁRIO ESTREITO COM EXCLUSIVAMENTE OS 5 CAMPOS REGULAMENTADOS */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Campo 1: Nome */}
-              <div>
-                <label htmlFor="firstName" className="block text-xs font-semibold text-[#22205A] mb-1">
-                  Nome *
-                </label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  required
-                  placeholder="Seu primeiro nome"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className="w-full rounded border border-[#DAD2C4] bg-white px-3 py-2 text-sm text-[#211D35] placeholder-[#7A7394] focus:border-[#FFB63F] focus:outline-none focus:ring-1 focus:ring-[#FFB63F]"
-                />
-                {errors.firstName && <p className="mt-1 text-[11px] text-[#B71C1C]">{errors.firstName}</p>}
-              </div>
-
-              {/* Campo 2: Sobrenome */}
-              <div>
-                <label htmlFor="lastName" className="block text-xs font-semibold text-[#22205A] mb-1">
-                  Sobrenome *
-                </label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  required
-                  placeholder="Seu sobrenome"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className="w-full rounded border border-[#DAD2C4] bg-white px-3 py-2 text-sm text-[#211D35] placeholder-[#7A7394] focus:border-[#FFB63F] focus:outline-none focus:ring-1 focus:ring-[#FFB63F]"
-                />
-                {errors.lastName && <p className="mt-1 text-[11px] text-[#B71C1C]">{errors.lastName}</p>}
-              </div>
-
-              {/* Campo 3: WhatsApp */}
-              <div>
-                <label htmlFor="whatsapp" className="block text-xs font-semibold text-[#22205A] mb-1">
-                  WhatsApp (com DDD) *
-                </label>
-                <input
-                  type="tel"
-                  id="whatsapp"
-                  name="whatsapp"
-                  required
-                  placeholder="Ex: 11 99999-9999"
-                  value={formData.whatsapp}
-                  onChange={handleChange}
-                  className="w-full rounded border border-[#DAD2C4] bg-white px-3 py-2 text-sm text-[#211D35] placeholder-[#7A7394] focus:border-[#FFB63F] focus:outline-none focus:ring-1 focus:ring-[#FFB63F]"
-                />
-                {errors.whatsapp && <p className="mt-1 text-[11px] text-[#B71C1C]">{errors.whatsapp}</p>}
-              </div>
-
-              {/* Campo 4: E-mail */}
-              <div>
-                <label htmlFor="email" className="block text-xs font-semibold text-[#22205A] mb-1">
-                  E-mail *
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  placeholder="seuemail@exemplo.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full rounded border border-[#DAD2C4] bg-white px-3 py-2 text-sm text-[#211D35] placeholder-[#7A7394] focus:border-[#FFB63F] focus:outline-none focus:ring-1 focus:ring-[#FFB63F]"
-                />
-                {errors.email && <p className="mt-1 text-[11px] text-[#B71C1C]">{errors.email}</p>}
-              </div>
-
-              {/* Campo 5: Tipo de Atendimento (Select) */}
-              <div>
-                <label htmlFor="serviceId" className="block text-xs font-semibold text-[#22205A] mb-1">
-                  Tipo de Atendimento *
-                </label>
-                <select
-                  id="serviceId"
-                  name="serviceId"
-                  required
-                  value={formData.serviceId}
-                  onChange={handleChange}
-                  className="w-full rounded border border-[#DAD2C4] bg-white px-3 py-2 text-sm text-[#211D35] focus:border-[#FFB63F] focus:outline-none focus:ring-1 focus:ring-[#FFB63F]"
+              {whatsappRedirectUrl && (
+                <a
+                  href={whatsappRedirectUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#25D366] hover:bg-[#20ba5a] px-6 py-3 text-xs sm:text-sm font-bold text-white shadow-md transition-colors"
                 >
-                  {OFFICIAL_SERVICES.map((srv) => (
-                    <option key={srv.id} value={srv.id}>
-                      {srv.title} {srv.categoryGroup ? `(${srv.categoryGroup.toUpperCase()})` : ''}
-                    </option>
-                  ))}
-                </select>
-                {errors.serviceId && <p className="mt-1 text-[11px] text-[#B71C1C]">{errors.serviceId}</p>}
-              </div>
-
-              {/* Botão de Envio Oficial */}
+                  <MessageCircle className="h-4 w-4 fill-white" />
+                  <span>Continuar no WhatsApp</span>
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+              )}
               <div className="pt-2">
                 <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full flex items-center justify-center gap-2 rounded bg-[#FFB63F] py-3 text-sm font-bold text-[#080C35] shadow hover:bg-[#EAA329] disabled:opacity-50 transition-colors"
+                  onClick={handleResetAndClose}
+                  className="text-xs text-[#534D6B] hover:underline cursor-pointer"
                 >
-                  {isSubmitting ? (
-                    <span>Processando solicitação...</span>
-                  ) : (
-                    <>
-                      <span>SOLICITAR AGENDAMENTO</span>
-                      <ArrowRight className="h-4 w-4" />
-                    </>
-                  )}
+                  Fechar janela
                 </button>
               </div>
+            </div>
+          ) : (
+            <div>
+              {/* Balão de Acolhimento estilo Chat */}
+              <div className="relative mb-5 p-3.5 sm:p-4 rounded-2xl bg-white border border-[#DAD2C4] shadow-xs space-y-1">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#075E54] uppercase tracking-wider">
+                  <ShieldCheck className="h-3.5 w-3.5 text-[#25D366]" />
+                  <span>Agende sua consulta</span>
+                </div>
+                <p className="text-xs text-[#534D6B] leading-relaxed">
+                  Preencha seus dados abaixo e continue a conversa diretamente com Bianca Tofoli pelo WhatsApp para alinhar datas e horários.
+                </p>
+              </div>
 
-              <p className="text-[10px] text-center text-[#7A7394]">
-                Seus dados serão tratados com sigilo conforme a LGPD e enviados diretamente para o contato de WhatsApp de Bianca Tofoli.
-              </p>
-            </form>
-          </div>
-        )}
+              {errors.form && (
+                <div className="mb-4 flex items-center gap-2 rounded-xl bg-red-50 p-3 text-xs text-[#B71C1C] border border-red-200">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  <span>{errors.form}</span>
+                </div>
+              )}
+
+              {/* FORMULÁRIO COM EXCLUSIVAMENTE OS 5 CAMPOS REGULAMENTADOS */}
+              <form onSubmit={handleSubmit} className="space-y-3.5">
+                
+                {/* Linha 1: Nome e Sobrenome */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="firstName" className="block text-[11px] font-bold uppercase tracking-wider text-[#22205A] mb-1">
+                      Nome *
+                    </label>
+                    <input
+                      type="text"
+                      id="firstName"
+                      name="firstName"
+                      required
+                      placeholder="Seu primeiro nome"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      className="w-full rounded-xl border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-sm text-[#211D35] placeholder-[#7A7394] focus:border-[#25D366] focus:outline-none focus:ring-1 focus:ring-[#25D366]"
+                    />
+                    {errors.firstName && <p className="mt-1 text-[11px] text-[#B71C1C]">{errors.firstName}</p>}
+                  </div>
+
+                  <div>
+                    <label htmlFor="lastName" className="block text-[11px] font-bold uppercase tracking-wider text-[#22205A] mb-1">
+                      Sobrenome *
+                    </label>
+                    <input
+                      type="text"
+                      id="lastName"
+                      name="lastName"
+                      required
+                      placeholder="Seu sobrenome"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      className="w-full rounded-xl border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-sm text-[#211D35] placeholder-[#7A7394] focus:border-[#25D366] focus:outline-none focus:ring-1 focus:ring-[#25D366]"
+                    />
+                    {errors.lastName && <p className="mt-1 text-[11px] text-[#B71C1C]">{errors.lastName}</p>}
+                  </div>
+                </div>
+
+                {/* Campo 3: WhatsApp */}
+                <div>
+                  <label htmlFor="whatsapp" className="block text-[11px] font-bold uppercase tracking-wider text-[#22205A] mb-1">
+                    WhatsApp (com DDD) *
+                  </label>
+                  <input
+                    type="tel"
+                    id="whatsapp"
+                    name="whatsapp"
+                    required
+                    placeholder="Ex: 11 99999-9999"
+                    value={formData.whatsapp}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-sm text-[#211D35] placeholder-[#7A7394] focus:border-[#25D366] focus:outline-none focus:ring-1 focus:ring-[#25D366]"
+                  />
+                  {errors.whatsapp && <p className="mt-1 text-[11px] text-[#B71C1C]">{errors.whatsapp}</p>}
+                </div>
+
+                {/* Campo 4: E-mail */}
+                <div>
+                  <label htmlFor="email" className="block text-[11px] font-bold uppercase tracking-wider text-[#22205A] mb-1">
+                    E-mail *
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    placeholder="seuemail@exemplo.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-sm text-[#211D35] placeholder-[#7A7394] focus:border-[#25D366] focus:outline-none focus:ring-1 focus:ring-[#25D366]"
+                  />
+                  {errors.email && <p className="mt-1 text-[11px] text-[#B71C1C]">{errors.email}</p>}
+                </div>
+
+                {/* Campo 5: Tipo de Atendimento (Select Obrigatório) */}
+                <div>
+                  <label htmlFor="serviceId" className="block text-[11px] font-bold uppercase tracking-wider text-[#22205A] mb-1">
+                    Tipo de Atendimento *
+                  </label>
+                  <select
+                    id="serviceId"
+                    name="serviceId"
+                    required
+                    value={formData.serviceId}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-sm text-[#211D35] focus:border-[#25D366] focus:outline-none focus:ring-1 focus:ring-[#25D366]"
+                  >
+                    {OFFICIAL_SERVICES.map((srv) => (
+                      <option key={srv.id} value={srv.id}>
+                        {srv.title} {srv.categoryGroup ? `[${srv.categoryGroup.toUpperCase()}]` : ''}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.serviceId && <p className="mt-1 text-[11px] text-[#B71C1C]">{errors.serviceId}</p>}
+                </div>
+
+                {/* Botão de Envio Verde WhatsApp */}
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full flex items-center justify-center gap-2 rounded-full bg-[#25D366] hover:bg-[#20ba5a] py-3.5 text-sm font-extrabold text-white shadow-md disabled:opacity-50 transition-all cursor-pointer transform active:scale-98"
+                  >
+                    <MessageCircle className="h-5 w-5 fill-white" />
+                    {isSubmitting ? (
+                      <span>Gravando e conectando...</span>
+                    ) : (
+                      <>
+                        <span>CONTINUAR NO WHATSAPP</span>
+                        <ArrowRight className="h-4 w-4" />
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <p className="text-[10px] text-center text-[#7A7394] leading-relaxed pt-1">
+                  Seus dados são protegidos conforme a LGPD. Ao clicar, a mensagem pré-formatada será aberta no WhatsApp da Bianca.
+                </p>
+              </form>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

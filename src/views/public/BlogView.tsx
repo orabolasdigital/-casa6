@@ -8,6 +8,7 @@
 import React from 'react';
 import { Calendar, User, ArrowRight, BookOpen, Clock } from 'lucide-react';
 import { BlogPost } from '../../types';
+import { TarotCard } from '../../components/common/TarotCard';
 
 interface BlogViewProps {
   onNavigate: (path: string) => void;
@@ -87,58 +88,20 @@ export const BlogView: React.FC<BlogViewProps> = ({ onNavigate }) => {
         </p>
       </div>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-        {posts.map((post) => (
-          <article
-            key={post.id}
-            className="flex flex-col justify-between rounded-2xl bg-[#FCFAF7] border border-[#DAD2C4] overflow-hidden shadow-xs hover:shadow-lg transition-all group"
-          >
-            <div>
-              <div className="relative aspect-[16/9] overflow-hidden border-b border-[#DAD2C4]">
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 protected-img"
-                  draggable={false}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#080C35]/75 via-transparent to-transparent pointer-events-none" />
-                <span className="absolute top-3 left-3 text-[10px] text-[#FFB63F] font-heading">✦</span>
-                <span className="absolute bottom-3 left-3 text-[11px] text-white/90 font-semibold tracking-wider">
-                  {post.category}
-                </span>
-              </div>
-
-              <div className="p-6 space-y-3">
-                <div className="flex items-center gap-3 text-xs text-[#7A7394]">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="h-3.5 w-3.5" />
-                    <span>{post.publishedAt}</span>
-                  </span>
-                  <span>•</span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-3.5 w-3.5" />
-                    <span>{post.readTime}</span>
-                  </span>
-                </div>
-
-                <h2 className="font-heading text-xl sm:text-2xl font-bold text-[#22205A] leading-snug group-hover:text-[#6F4D84] transition-colors">
-                  {post.title}
-                </h2>
-
-                <p className="text-xs sm:text-sm text-[#534D6B] leading-relaxed">
-                  {post.excerpt}
-                </p>
-              </div>
-            </div>
-
-            <div className="p-6 pt-0 border-t border-[#DAD2C4]/40 mt-4 flex items-center justify-between text-xs font-bold text-[#22205A]">
-              <span className="text-[#6F4D84]">Por Bianca Tofoli</span>
-              <span className="inline-flex items-center gap-1 text-[#22205A] group-hover:text-[#FFB63F] transition-colors">
-                <span>LER ARTIGO</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </span>
-            </div>
-          </article>
+      {/* Grid de Leituras em Cartas de Tarô Verticais (Proporção 5:8) */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {posts.map((post, idx) => (
+          <div key={post.id} className="w-full max-w-[340px] mx-auto sm:max-w-none">
+            <TarotCard
+              romanNumeral={idx === 0 ? 'I' : idx === 1 ? 'II' : idx === 2 ? 'III' : 'IV'}
+              categoryBadge={post.category.toUpperCase()}
+              title={post.title}
+              subtitle={post.excerpt}
+              imageUrl={post.image}
+              actionLabel="LER ARTIGO"
+              onAction={() => onNavigate(`/leituras`)}
+            />
+          </div>
         ))}
       </div>
     </div>

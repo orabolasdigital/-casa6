@@ -143,8 +143,8 @@ export async function submitLeadBooking(
   });
 
   // 3. Geração Automática da Mensagem de WhatsApp oficial da Bianca Tofoli
-  // Mensagem padronizada estrita conforme diretriz oficial da especificação
-  const whatsappMessage = `Olá Bianca, meu nome é ${newLead.fullName}.\nAcabei de solicitar pelo site um agendamento para ${serviceName}.`;
+  // Mensagem padronizada estrita conforme diretriz oficial da especificação (Requisito 19)
+  const whatsappMessage = `Olá, Bianca! Vim pelo site e gostaria de agendar ${serviceName}.\n\nMeu nome é ${newLead.fullName}.`;
   const whatsappUrl = `https://wa.me/${SITE_CONFIG.whatsappNumberRaw}?text=${encodeURIComponent(whatsappMessage)}`;
 
   return {
