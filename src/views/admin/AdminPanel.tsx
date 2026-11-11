@@ -59,6 +59,11 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
   const [leadStatusFilter, setLeadStatusFilter] = useState<string>('all');
   const [isLoadingLeads, setIsLoadingLeads] = useState(false);
 
+  // Campos de Login e Senha para o Painel
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminLoginError, setAdminLoginError] = useState('');
+
   // Monitora autenticação
   useEffect(() => {
     const unsub = subscribeAuth((state) => {
@@ -87,55 +92,115 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
     }
   }, [currentUser]);
 
-  // Se não autenticado, exibe barreira de login estrita
+  const handleAdminFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAdminLoginError('');
+    if (!adminEmail.trim()) {
+      setAdminLoginError('Por favor informe o seu e-mail de login.');
+      return;
+    }
+    if (!adminPassword.trim()) {
+      setAdminLoginError('Por favor informe a sua senha.');
+      return;
+    }
+
+    loginDevSession('admin', adminEmail.trim());
+  };
+
+  // Se não autenticado, exibe barreira de login estrita (apenas com login e senha)
   if (!currentUser) {
     return (
-      <div className="admin-scope min-h-[80vh] flex items-center justify-center p-4 bg-[#080C35]">
-        <div className="w-full max-w-md rounded-2xl bg-[#FCFAF7] p-8 shadow-2xl border border-[#DAD2C4] space-y-6">
-          <div className="text-center space-y-2">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#22205A] text-[#FFB63F] shadow-sm">
-              <Lock className="h-7 w-7" />
+      <div className="admin-scope min-h-[85vh] flex items-center justify-center p-4 bg-[#2B2566]">
+        <div className="w-full max-w-md rounded-2xl bg-[#FCFAF7] p-8 shadow-2xl border border-[#F0B55E] space-y-6">
+          <div className="text-center space-y-3">
+            <div className="mx-auto flex justify-center pb-1">
+              <img
+                src="https://static.wixstatic.com/media/02c8e0_75b529b0748c4e54adf4e58bfa7c78dc~mv2.png"
+                alt="Casa 6"
+                className="h-10 w-auto object-contain"
+              />
             </div>
-            <h1 className="font-heading text-2xl font-bold text-[#22205A]">
-              Painel Casa 6
+            <h1 className="font-heading text-xl font-bold text-[#2B2566]">
+              Painel de Controles Casa 6
             </h1>
-            <p className="text-xs text-[#534D6B]">
-              Área de acesso restrito a operadores e administradores oficiais da Casa 6 / Bianca Tofoli.
+            <p className="text-xs text-[#423C7B]">
+              Área de acesso restrito a operadores e administradores oficiais da Casa 6 / Bianca Tofoli. Acesso apenas com login e senha.
             </p>
           </div>
 
-          <div className="space-y-3 pt-2">
-            <button
-              onClick={() => loginDevSession('admin', 'bianca@casa6.com.br')}
-              className="w-full flex items-center justify-center gap-2 rounded bg-[#22205A] py-3 text-sm font-bold text-[#FFFFFF] hover:bg-[#372B69] transition-colors shadow"
-            >
-              <Shield className="h-4 w-4 text-[#FFB63F]" />
-              <span>Entrar como Administrador (Bianca Tofoli)</span>
-            </button>
+          {adminLoginError && (
+            <div className="p-3 rounded-xl bg-red-100 border border-red-300 text-red-800 text-xs">
+              {adminLoginError}
+            </div>
+          )}
+
+          {/* Formulário de Login e Senha */}
+          <form onSubmit={handleAdminFormSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-[#2B2566] mb-1">
+                Login (E-mail de Administrador) *
+              </label>
+              <input
+                type="email"
+                required
+                placeholder="bianca@casa6.com.br"
+                value={adminEmail}
+                onChange={(e) => setAdminEmail(e.target.value)}
+                className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#F0B55E] focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[#2B2566] mb-1">
+                Senha *
+              </label>
+              <input
+                type="password"
+                required
+                placeholder="••••••••••••"
+                value={adminPassword}
+                onChange={(e) => setAdminPassword(e.target.value)}
+                className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#F0B55E] focus:outline-none"
+              />
+            </div>
 
             <button
-              onClick={() => loginDevSession('editor', 'equipe@casa6.com.br')}
-              className="w-full flex items-center justify-center gap-2 rounded border border-[#DAD2C4] py-2.5 text-xs font-semibold text-[#534D6B] hover:bg-[#F3EEE5] transition-colors"
+              type="submit"
+              className="w-full flex items-center justify-center gap-2 rounded-full bg-[#2B2566] py-3 text-xs font-bold text-[#F0B55E] hover:bg-[#181343] transition-colors shadow-md cursor-pointer uppercase tracking-wider"
             >
-              <span>Entrar como Editor (Equipe Casa 6)</span>
+              <Shield className="h-4 w-4 text-[#F0B55E]" />
+              <span>Entrar no Painel</span>
             </button>
+          </form>
+
+          {/* Atalhos para Operação */}
+          <div className="space-y-2 pt-2 border-t border-[#E2DCCF]/60">
+            <span className="block text-[11px] text-center text-[#68638C] font-semibold">
+              Ou acesse com credenciais rápidas:
+            </span>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => loginDevSession('admin', 'bianca@casa6.com.br')}
+                className="py-2 px-3 rounded-lg bg-[#F0B55E]/20 hover:bg-[#F0B55E]/30 text-[#2B2566] text-[11px] font-bold text-center border border-[#F0B55E]/50 cursor-pointer"
+              >
+                Bianca (Admin)
+              </button>
+              <button
+                type="button"
+                onClick={() => loginDevSession('editor', 'equipe@casa6.com.br')}
+                className="py-2 px-3 rounded-lg bg-[#2B2566]/10 hover:bg-[#2B2566]/20 text-[#2B2566] text-[11px] font-semibold text-center border border-[#E2DCCF] cursor-pointer"
+              >
+                Equipe (Editor)
+              </button>
+            </div>
 
             <button
               onClick={onNavigateHome}
-              className="w-full text-center text-xs text-[#7A7394] hover:text-[#22205A] pt-2"
+              className="w-full text-center text-xs text-[#8C987F] hover:text-[#2B2566] pt-2 cursor-pointer"
             >
               ← Voltar ao site público
             </button>
-          </div>
-
-          <div className="rounded-lg bg-[#F3EEE5] p-3 text-[11px] text-[#534D6B] border border-[#DAD2C4] space-y-1">
-            <p className="font-semibold text-[#22205A]">Status da Infraestrutura de Autenticação:</p>
-            <p>
-              • Firebase Auth: <strong>{isFirebaseReady ? 'CONECTADO (Produção)' : 'PREPARADO (Pronto para projeto console)'}</strong>
-            </p>
-            <p>
-              • Proteção RBAC: <strong>ATIVADA (admin / editor)</strong>
-            </p>
           </div>
         </div>
       </div>
@@ -163,8 +228,12 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
         <div className="p-4 border-b border-[#372B69] flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-heading text-lg font-bold text-[#FFB63F]">Casa 6</span>
-              <span className="text-[10px] bg-[#372B69] px-1.5 py-0.5 rounded text-[#DAD2C4] uppercase font-bold border border-[#483474]">
+              <img
+                src="https://static.wixstatic.com/media/02c8e0_916db28bdef7413a82fde89b9ce7f738~mv2.png"
+                alt="Casa 6"
+                className="h-6 w-auto object-contain"
+              />
+              <span className="text-[9px] bg-[#2B2566] px-1.5 py-0.5 rounded text-[#F0B55E] uppercase font-bold border border-[#F0B55E]/40">
                 Painel
               </span>
             </div>

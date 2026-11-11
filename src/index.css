@@ -1,95 +1,120 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   CASA 6 — BIANCA TOFOLI | NOVA PALETA OFICIAL CONGELADA (CORREÇÃO)
-   Referência visual: Céu noturno em tons azul-violeta, roxo e lavanda.
+   CASA 6 — BIANCA TOFOLI | NOVA IDENTIDADE VISUAL OFICIAL (BRAND GUIDE)
+   Paleta: Noite (#2B2566), Lua (#F4EFE6), Névoa (#E6E3F1), Oliva (#8C987F), Sol (#F0B55E)
+   Tipografia: Cormorant Garamond (Display & Títulos), Jost (Texto & Rótulos)
+   Destaque Serifado: Cormorant / Hatton itálico dourado Sol
    ========================================================================== */
 
 @theme {
-  /* Cores Institucionais Principais */
-  --color-brand-navy: #080C35;
-  --color-brand-primary: #22205A;
-  --color-brand-purple-deep: #372B69;
-  --color-brand-violet: #483474;
-  --color-brand-purple: #62437C;
-  --color-brand-lavender: #6F4D84;
-  --color-brand-lavender-light: #835787;
+  /* Cores Oficiais do Guia de Identidade Visual */
+  --color-brand-noite: #2B2566;       /* Profundidade, a casa */
+  --color-brand-navy: #2B2566;        /* Sinônimo de Noite */
+  --color-brand-primary: #2B2566;
+  --color-brand-lua: #F4EFE6;         /* Rotina e cuidado. O fundo de tudo */
+  --color-brand-nevoa: #E6E3F1;       /* Respiro. Faixas, papelaria, stories */
+  --color-brand-oliva: #8C987F;       /* Mercúrio, regente da Casa 6. Detalhes e ícones */
+  --color-brand-sol: #F0B55E;         /* Direção. O acento: pontos, disco, destaques */
+  --color-brand-gold: #F0B55E;        /* Sinônimo de Sol */
+  --color-brand-gold-hover: #dfa247;
 
-  /* Cor de Destaque Oficial */
-  --color-brand-gold: #FFB63F;
-  --color-brand-gold-hover: #EAA329;
-
-  /* Neutros Oficiais */
-  --color-background-main: #F3EEE5;
+  /* Neutros e Superfícies Oficiais */
+  --color-background-main: #F4EFE6;
   --color-surface: #FCFAF7;
   --color-surface-white: #FFFFFF;
-  --color-text-primary: #211D35;
-  --color-text-secondary: #534D6B;
-  --color-text-muted: #7A7394;
+  --color-text-primary: #2B2566;
+  --color-text-secondary: #423C7B;
+  --color-text-muted: #68638C;
   --color-text-on-dark: #FFFFFF;
-  --color-border-default: #DAD2C4;
-  --color-border-subtle: #E6DFD3;
-  --color-border-dark: #372B69;
+  --color-border-default: #E2DCCF;
+  --color-border-subtle: #F4EFE6;
+  --color-border-dark: #2B2566;
 
-  /* Tipografia Oficial (Hatton para Títulos & Futura para Corpo/Navegação) */
-  --font-heading: 'Hatton', 'Playfair Display', Georgia, serif;
-  --font-sans: 'Futura', 'Futura PT', 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-body: 'Futura', 'Futura PT', 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Tipografia Oficial: HATTON ultra bold 800 / bold 700 para Títulos & Subtítulos, Jost para Texto/Rótulos */
+  --font-heading: 'Hatton', 'PP Hatton', 'Cormorant Garamond', Georgia, serif;
+  --font-highlight: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  --font-sans: 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 :root {
-  /* Cores Institucionais Principais */
-  --brand-navy: #080C35;             /* Azul noite profundo */
-  --brand-primary: #22205A;          /* Azul-violeta institucional principal */
-  --brand-purple-deep: #372B69;      /* Roxo profundo secundário */
-  --brand-violet: #483474;           /* Violeta intermediário */
-  --brand-purple: #62437C;           /* Roxo médio suave */
-  --brand-lavender: #6F4D84;         /* Lavanda escura */
-  --brand-lavender-light: #835787;   /* Lavanda clara / roxo rosado */
+  /* Cores Institucionais Oficiais */
+  --brand-noite: #2B2566;             /* Noite: Profundidade, a casa */
+  --brand-navy: #2B2566;
+  --brand-primary: #2B2566;
+  --brand-lua: #F4EFE6;               /* Lua: Fundo de tudo */
+  --brand-nevoa: #E6E3F1;             /* Névoa: Respiro */
+  --brand-oliva: #8C987F;             /* Oliva: Discernimento, ícones e detalhes */
+  --brand-sol: #F0B55E;               /* Sol: O acento, pontos, caligrafia */
+  --brand-gold: #F0B55E;
+  --brand-gold-hover: #dfa247;
 
-  /* Cor de Destaque */
-  --brand-gold: #FFB63F;             /* Dourado oficial Casa 6 */
-  --brand-gold-hover: #EAA329;
+  /* Superfícies e Textos */
+  --background-main: #F4EFE6;        /* Fundo Lua */
+  --surface: #FCFAF7;
+  --surface-white: #FFFFFF;
+  --text-primary: #2B2566;
+  --text-secondary: #423C7B;
+  --text-muted: #68638C;
+  --text-on-dark: #FFFFFF;
+  --border-default: #E2DCCF;
+  --border-subtle: #F4EFE6;
+  --border-dark: #2B2566;
 
-  /* Neutros e Superfícies */
-  --background-main: #F3EEE5;        /* 40-45% Creme quente principal */
-  --surface: #FCFAF7;                /* Off-white */
-  --surface-white: #FFFFFF;          /* 10-15% Branco puro */
-  --text-primary: #211D35;           /* Texto principal sobre claro */
-  --text-secondary: #534D6B;         /* Texto secundário (contraste > 7:1) */
-  --text-muted: #7A7394;             /* Texto terciário */
-  --text-on-dark: #FFFFFF;           /* Texto sobre azul-violeta / roxo */
-  --border-default: #DAD2C4;         /* Borda neutra aquecida */
-  --border-subtle: #E6DFD3;
-  --border-dark: #372B69;
-
-  /* Gradientes Oficiais do Céu Noturno */
-  --gradient-night-sky: linear-gradient(135deg, #080C35 0%, #22205A 35%, #483474 68%, #835787 100%);
-  --gradient-institutional: linear-gradient(180deg, #080C35 0%, #22205A 100%);
-  --gradient-purple-deep: linear-gradient(135deg, #22205A 0%, #372B69 50%, #483474 100%);
-  --gradient-lavender-accent: linear-gradient(135deg, #372B69 0%, #483474 50%, #6F4D84 100%);
+  /* Gradientes Sutis Harmonizados */
+  --gradient-night-sky: linear-gradient(135deg, #2B2566 0%, #211B55 50%, #362E7A 100%);
+  --gradient-institutional: linear-gradient(180deg, #2B2566 0%, #1E194D 100%);
+  --gradient-purple-deep: linear-gradient(135deg, #2B2566 0%, #362E7A 50%, #4E4496 100%);
+  --gradient-lavender-accent: linear-gradient(135deg, #2B2566 0%, #8C987F 50%, #F0B55E 100%);
 
   /* Overlays e Foco */
-  --overlay-dark: rgba(8, 12, 53, 0.78);
-  --focus-ring: #FFB63F;
+  --overlay-dark: rgba(43, 37, 102, 0.88);
+  --focus-ring: #F0B55E;
 
-  /* Tipografia Oficial (Font Stacks com Fallback Seguro) */
-  --font-heading: 'Hatton', 'Playfair Display', Georgia, serif;
-  --font-body: 'Futura', 'Futura PT', 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Tipografia Oficial: HATTON ultra bold 800 / bold 700 para Títulos & Subtítulos */
+  --font-heading: 'Hatton', 'PP Hatton', 'Cormorant Garamond', Georgia, serif;
+  --font-highlight: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  --font-body: 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* Touch-Target Mínimo Mobile-First */
   --touch-target-min: 44px;
 }
 
 /* --------------------------------------------------------------------------
-   ESTRUTURA DE FONTES LOCAIS (STATUS: PENDENTE de arquivos licenciados .woff2)
+   ESTRUTURA DE FONTES LOCAIS — PP HATTON OFICIAL (PANGRAM PANGRAM / DOWNLOADFONTS.IO)
+   Arquivos instalados em /fonts/hatton/
    -------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Hatton';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url('/fonts/hatton/PPHatton-Ultralight-200.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Hatton';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/hatton/PPHatton-Ultralight-200.otf') format('opentype');
+}
+
 @font-face {
   font-family: 'Hatton';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: local('Hatton Regular'), local('Hatton-Regular');
+  src: url('/fonts/hatton/PPHatton-Medium-500.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Hatton';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/hatton/PPHatton-Medium-500.otf') format('opentype');
 }
 
 @font-face {
@@ -97,7 +122,7 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: local('Hatton Medium'), local('Hatton-Medium');
+  src: url('/fonts/hatton/PPHatton-Medium-500.otf') format('opentype');
 }
 
 @font-face {
@@ -105,7 +130,64 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: local('Hatton Bold'), local('Hatton-Bold');
+  src: url('/fonts/hatton/PPHatton-Bold-700.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Hatton';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/hatton/PPHatton-Bold-700.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Hatton';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('/fonts/hatton/PPHatton-Bold-700.otf') format('opentype');
+}
+
+/* Aliases compatíveis para 'PP Hatton' */
+@font-face {
+  font-family: 'PP Hatton';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url('/fonts/hatton/PPHatton-Ultralight-200.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'PP Hatton';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/hatton/PPHatton-Medium-500.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'PP Hatton';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/hatton/PPHatton-Medium-500.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'PP Hatton';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/hatton/PPHatton-Bold-700.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'PP Hatton';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/hatton/PPHatton-Bold-700.otf') format('opentype');
 }
 
 @font-face {
@@ -147,6 +229,25 @@ html, body {
 h1, h2, h3, h4, h5, h6, .font-heading {
   font-family: var(--font-heading);
   letter-spacing: -0.015em;
+}
+
+/* Fonte Secundária Serifada Elegante (Cormorant Garamond) para Destaques em Amarelo Sol (ex: "para a", "depende", "rotina") */
+.font-highlight,
+.font-serif-italic,
+.font-heading span.italic,
+.font-heading em,
+h1 span.italic,
+h2 span.italic,
+h3 span.italic,
+span.italic.text-\[\#F0B55E\],
+span.font-heading.italic {
+  font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif !important;
+  font-style: italic !important;
+  font-weight: 600 !important;
+  font-size: 1.2em;
+  display: inline-block;
+  vertical-align: baseline;
+  line-height: 0.95;
 }
 
 .font-body {
@@ -264,3 +365,112 @@ img.protected-img {
     animation: none !important;
   }
 }
+
+/* --------------------------------------------------------------------------
+   SISTEMA DE ANIMAÇÃO E PROFUNDIDADE — CARTAS DE TARÔ CASA 6
+   -------------------------------------------------------------------------- */
+.tarot-collection-perspective {
+  perspective: 1000px;
+}
+
+.tarot-card-item {
+  transform-style: preserve-3d;
+  box-shadow: 0 8px 20px rgba(8, 12, 53, 0.06), 0 2px 6px rgba(8, 12, 53, 0.05);
+  transition:
+    transform 420ms cubic-bezier(0.25, 1, 0.35, 1),
+    box-shadow 420ms ease,
+    opacity 650ms cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform, opacity;
+}
+
+/* Hover estritamente para desktop com ponteiro fino (sem afetar touch / mobile) */
+@media (hover: hover) and (pointer: fine) {
+  .tarot-card-item:hover {
+    transform: translateY(-4px) rotateZ(var(--card-hover-tilt, -2deg)) rotateX(1deg) rotateY(var(--card-tilt-y, 0deg)) !important;
+    box-shadow: 0 14px 32px rgba(8, 12, 53, 0.10), 0 4px 10px rgba(8, 12, 53, 0.06) !important;
+  }
+}
+
+/* Parallax interno da imagem acelerado por GPU */
+.tarot-card-image-window {
+  position: relative;
+  overflow: hidden;
+}
+
+.tarot-card-image-parallax {
+  will-change: transform;
+  transform: translate3d(0, var(--parallax-y, 0px), 0);
+  transition: transform 120ms ease-out;
+}
+
+/* Suporte Mandatório a Prefers-Reduced-Motion */
+@media (prefers-reduced-motion: reduce) {
+  .tarot-card-item {
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .tarot-card-item:hover {
+    transform: none !important;
+    box-shadow: 0 8px 20px rgba(8, 12, 53, 0.06), 0 2px 6px rgba(8, 12, 53, 0.05) !important;
+  }
+  .tarot-card-image-parallax {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   SISTEMA DE FLIP CARD 3D — CARTAS DE TARÔ VIRADAS CASA 6
+   Face Inicial (Virada): Fundo escuro azul/roxo #1b1463 + detalhes dourados #fab03b
+   Ao passar o mouse ou tocar: vira 180° e revela arte astrológica + texto + botão
+   Velocidade Suave & Graciosa: 1.2s com curva de desaceleração fluida
+   -------------------------------------------------------------------------- */
+.tarot-flip-container {
+  perspective: 1200px;
+}
+
+.tarot-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 1.2s cubic-bezier(0.25, 1, 0.35, 1);
+  will-change: transform;
+}
+
+.tarot-flip-container:hover .tarot-flip-inner,
+.tarot-flip-container:focus-within .tarot-flip-inner,
+.tarot-flip-container.is-flipped .tarot-flip-inner {
+  transform: rotateY(180deg);
+}
+
+.tarot-face-back,
+.tarot-face-front {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: box-shadow 0.8s ease;
+}
+
+.tarot-face-back {
+  transform: rotateY(0deg);
+  z-index: 2;
+}
+
+.tarot-face-front {
+  transform: rotateY(180deg);
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarot-flip-inner {
+    transition: none !important;
+  }
+}
+

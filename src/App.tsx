@@ -9,7 +9,6 @@ import { APP_ROUTES } from './config/routes';
 import { RouteMeta } from './types';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
-import { BookingModal } from './components/common/BookingModal';
 import { SEOMeta } from './components/common/SEOMeta';
 import { CookieConsentBanner } from './components/common/CookieConsentBanner';
 import { AntiCopyBanner } from './components/common/AntiCopyBanner';
@@ -27,6 +26,9 @@ import { PalestrasView } from './views/public/PalestrasView';
 import { BlogView } from './views/public/BlogView';
 import { LojaView } from './views/public/LojaView';
 import { LegalView } from './views/public/LegalViews';
+import { BussulaView } from './views/public/BussulaView';
+import { MembrosView } from './views/public/MembrosView';
+import { WhatsAppFloatingChat } from './components/common/WhatsAppFloatingChat';
 
 // Visão Administrativa
 import { AdminPanel } from './views/admin/AdminPanel';
@@ -87,10 +89,12 @@ export default function App() {
     if (currentPath === '/sobre') return APP_ROUTES.sobre;
     if (currentPath === '/atendimentos') return APP_ROUTES.atendimentos;
     if (currentPath.startsWith('/atendimentos/')) return APP_ROUTES.atendimentoDetalhe;
+    if (currentPath === '/bussula' || currentPath === '/bussula-guia') return APP_ROUTES.bussula;
+    if (currentPath === '/membros' || currentPath === '/painel-membro') return APP_ROUTES.membros;
     if (currentPath === '/patota' || currentPath === '/patota-astral') return APP_ROUTES.patota;
     if (currentPath === '/vivencias') return APP_ROUTES.vivencias;
     if (currentPath.startsWith('/vivencias/')) return APP_ROUTES.vivenciaDetalhe;
-    if (currentPath === '/palestras') return APP_ROUTES.palestras;
+    if (currentPath === '/palestras' || currentPath === '/encontros') return APP_ROUTES.palestras;
     if (currentPath === '/leituras' || currentPath === '/blog') return APP_ROUTES.leituras;
     if (currentPath.startsWith('/leituras/') || currentPath.startsWith('/blog/')) return APP_ROUTES.blogDetalhe;
     if (currentPath === '/lojinha' || currentPath === '/loja') return APP_ROUTES.lojinha;
@@ -130,11 +134,15 @@ export default function App() {
           <SobreView onOpenBooking={() => handleOpenBooking()} />
         ) : currentPath === '/atendimentos' || currentPath.startsWith('/atendimentos/') ? (
           <AtendimentosView onOpenBooking={handleOpenBooking} />
+        ) : currentPath === '/bussula' || currentPath === '/bussula-guia' ? (
+          <BussulaView onOpenBooking={handleOpenBooking} />
+        ) : currentPath === '/membros' || currentPath === '/painel-membro' ? (
+          <MembrosView />
         ) : currentPath === '/patota' || currentPath === '/patota-astral' ? (
           <PatotaAstralView onOpenBooking={handleOpenBooking} />
         ) : currentPath === '/vivencias' || currentPath.startsWith('/vivencias/') ? (
           <VivenciasView onOpenBooking={() => handleOpenBooking()} />
-        ) : currentPath === '/palestras' ? (
+        ) : currentPath === '/palestras' || currentPath === '/encontros' ? (
           <PalestrasView onOpenBooking={() => handleOpenBooking()} />
         ) : currentPath === '/leituras' || currentPath === '/blog' || currentPath.startsWith('/leituras/') || currentPath.startsWith('/blog/') ? (
           <BlogView onNavigate={navigateTo} />
@@ -154,13 +162,14 @@ export default function App() {
       {/* Footer Público (Oculto no Painel Administrativo) */}
       {!isAdminRoute && <Footer onNavigate={navigateTo} />}
 
-      {/* Modal Global Único de Agendamento (Strict 5 fields) */}
-      <BookingModal
-        isOpen={bookingModalOpen}
-        onClose={() => setBookingModalOpen(false)}
-        preselectedServiceId={selectedServiceId}
-        sourcePageTitle={currentMeta.title}
-      />
+      {/* Formulário Master Flutuante de WhatsApp (No canto inferior direito) */}
+      {!isAdminRoute && (
+        <WhatsAppFloatingChat
+          initialServiceId={selectedServiceId}
+          isOpenExternal={bookingModalOpen}
+          onCloseExternal={() => setBookingModalOpen(false)}
+        />
+      )}
 
       {/* Banner de Consentimento LGPD */}
       {!isAdminRoute && <CookieConsentBanner />}

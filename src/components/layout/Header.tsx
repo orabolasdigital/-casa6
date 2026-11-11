@@ -1,12 +1,12 @@
 /**
  * @license
  * Casa 6 — Bianca Tofoli
- * Header Oficial alinhado com a referência visual exata
+ * Header Oficial alinhado à Nova Identidade Visual (Brand Guide 2026)
+ * Paleta: Noite (#2B2566), Sol (#F0B55E), Lua (#F4EFE6), Névoa (#E6E3F1), Oliva (#8C987F)
  */
 
 import React, { useState } from 'react';
-import { Menu, X, ShoppingBag, User, MessageCircle } from 'lucide-react';
-import { SITE_CONFIG } from '../../config/site';
+import { Menu, X, User, Settings } from 'lucide-react';
 
 interface HeaderProps {
   currentPath: string;
@@ -14,17 +14,19 @@ interface HeaderProps {
   onOpenBooking: (serviceId?: string) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate, onOpenBooking }) => {
+export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Ordem oficial exata em caixa alta conforme instrução:
+  // SOBRE -> ATENDIMENTOS -> ENCONTROS -> BÚSSOLA (com tag NEW) -> PATOTA -> LEITURAS -> LOJINHA
   const navLinks = [
-    { label: 'início', path: '/inicio' },
-    { label: 'atendimentos', path: '/atendimentos' },
-    { label: 'palestras', path: '/palestras' },
-    { label: 'vivências', path: '/vivencias' },
-    { label: 'patota', path: '/patota' },
-    { label: 'leituras', path: '/leituras' },
-    { label: 'lojinha', path: '/lojinha' }
+    { label: 'SOBRE', path: '/sobre' },
+    { label: 'ATENDIMENTOS', path: '/atendimentos' },
+    { label: 'ENCONTROS', path: '/encontros' },
+    { label: 'BÚSSOLA', path: '/bussola', hasNewBadge: true },
+    { label: 'PATOTA', path: '/patota' },
+    { label: 'LEITURAS', path: '/leituras' },
+    { label: 'LOJINHA', path: '/loja' }
   ];
 
   const handleLinkClick = (path: string) => {
@@ -34,90 +36,97 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate, onOpenB
 
   const isLinkActive = (path: string) => {
     if (path === '/inicio') return currentPath === '/inicio' || currentPath === '/';
+    if (path === '/sobre') return currentPath === '/sobre';
+    if (path === '/atendimentos') return currentPath === '/atendimentos' || currentPath.startsWith('/atendimentos/');
+    if (path === '/encontros') return currentPath === '/encontros' || currentPath === '/palestras';
+    if (path === '/bussola') return currentPath === '/bussola' || currentPath === '/bussula-guia';
     if (path === '/patota') return currentPath === '/patota' || currentPath === '/patota-astral';
     if (path === '/leituras') return currentPath === '/leituras' || currentPath === '/blog' || currentPath.startsWith('/leituras/') || currentPath.startsWith('/blog/');
-    if (path === '/lojinha') return currentPath === '/lojinha' || currentPath === '/loja' || currentPath.startsWith('/lojinha/') || currentPath.startsWith('/loja/');
-    if (path === '/atendimentos') return currentPath === '/atendimentos' || currentPath.startsWith('/atendimentos/');
-    if (path === '/vivencias') return currentPath === '/vivencias' || currentPath.startsWith('/vivencias/');
-    if (path === '/palestras') return currentPath === '/palestras';
+    if (path === '/loja') return currentPath === '/loja' || currentPath === '/lojinha' || currentPath.startsWith('/loja/') || currentPath.startsWith('/lojinha/');
+    if (path === '/membros') return currentPath === '/membros' || currentPath === '/painel-membro';
+    if (path === '/painel') return currentPath.startsWith('/painel');
     return currentPath === path;
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#080C35]/95 backdrop-blur-md text-[#FFFFFF] border-b border-[#22205A]/60 shadow-lg">
+    <header className="sticky top-0 z-40 w-full bg-[#2B2566]/98 backdrop-blur-md text-[#FFFFFF] border-b border-[#F0B55E]/20 shadow-lg">
       <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logotipo Oficial Casa 6 com símbolo lunar/solar */}
+        
+        {/* Logotipo Oficial Casa 6 (Horizontal Branco para Fundo Escuro) — Ao clicar vai para a página início */}
         <button
-          onClick={() => handleLinkClick('/')}
-          className="flex items-center gap-2.5 text-left focus:outline-none focus:ring-2 focus:ring-[#FFB63F] rounded-lg p-1 group"
-          aria-label="Página Inicial Casa 6"
+          onClick={() => handleLinkClick('/inicio')}
+          className="flex items-center text-left focus:outline-none focus:ring-2 focus:ring-[#F0B55E] rounded-lg p-1 group cursor-pointer"
+          aria-label="Página Inicial Casa 6 (Início)"
+          title="Casa 6 — Ir para Início"
         >
-          <div className="relative flex h-8 w-8 items-center justify-center rounded-full border border-[#FFB63F] bg-[#080C35] shadow-sm transition-transform group-hover:scale-105">
-            <div className="h-4 w-4 rounded-full bg-[#FFB63F]"></div>
-            <div className="absolute right-1.5 h-3.5 w-3.5 rounded-full bg-[#080C35]"></div>
-          </div>
-          <span className="font-heading text-2xl font-bold tracking-tight text-white group-hover:text-[#FFB63F] transition-colors">
-            casa6
-          </span>
+          <img
+            src="https://static.wixstatic.com/media/02c8e0_916db28bdef7413a82fde89b9ce7f738~mv2.png"
+            alt="Casa 6 — Bianca Tofoli"
+            className="h-9 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105"
+          />
         </button>
 
-        {/* Navegação Desktop */}
-        <nav className="hidden lg:flex items-center gap-7 text-xs tracking-wider lowercase font-normal" aria-label="Navegação Principal">
+        {/* Navegação Central Desktop em Caixa Alta */}
+        <nav className="hidden lg:flex items-center gap-6 text-[11px] tracking-[0.14em] uppercase font-medium" aria-label="Navegação Principal">
           {navLinks.map((link) => {
             const active = isLinkActive(link.path);
             return (
               <button
                 key={link.path}
                 onClick={() => handleLinkClick(link.path)}
-                className={`transition-colors py-1 hover:text-[#FFB63F] ${
-                  active ? 'text-[#FFB63F] font-semibold border-b border-[#FFB63F]' : 'text-[#DAD2C4]'
+                className={`relative py-1 transition-colors hover:text-[#F0B55E] cursor-pointer flex items-center gap-1.5 ${
+                  active ? 'text-[#F0B55E] font-bold border-b-2 border-[#F0B55E]' : 'text-[#E6E3F1]/85'
                 }`}
               >
-                {link.label}
+                <span>{link.label}</span>
+                {link.hasNewBadge && (
+                  <span className="px-1.5 py-0.2 rounded-full bg-[#F0B55E] text-[#2B2566] text-[8px] font-black uppercase tracking-tight shadow-xs">
+                    NEW
+                  </span>
+                )}
               </button>
             );
           })}
         </nav>
 
-        {/* Ações Direitas: Sacola, Login/Painel, CTA Agendar */}
-        <div className="flex items-center gap-4">
+        {/* Ações Direitas: Botão Membros com tonalidade suave do cabeçalho e Engrenagem isolada */}
+        <div className="flex items-center">
+          
+          {/* Botão com ícone escrito "Membros" com a mesma tonalidade de fundo do cabeçalho e estilo de fonte do menu */}
           <button
-            onClick={() => handleLinkClick('/lojinha')}
-            title="Lojinha Casa 6"
-            aria-label="Sacola de Compras"
-            className="p-1.5 rounded-full text-[#DAD2C4] hover:text-[#FFB63F] transition-colors"
+            onClick={() => handleLinkClick('/membros')}
+            title="Área de Membros (Login com E-mail e CPF)"
+            aria-label="Área de Membros"
+            className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.14em] transition-all cursor-pointer ${
+              isLinkActive('/membros')
+                ? 'border-[#F0B55E] text-[#F0B55E] bg-white/5 shadow-xs'
+                : 'border-[#F0B55E]/30 text-white/90 hover:border-[#F0B55E] hover:text-[#F0B55E] bg-transparent'
+            }`}
           >
-            <ShoppingBag className="h-4 w-4" />
+            <User className="h-3.5 w-3.5 text-[#F0B55E]" />
+            <span>MEMBROS</span>
           </button>
 
-          <button
-            onClick={() => handleLinkClick('/painel')}
-            title="Acesso Administrativo ao Painel"
-            aria-label="Login no Painel Administrativo"
-            className="flex items-center gap-1.5 text-xs text-[#DAD2C4] hover:text-[#FFB63F] transition-colors p-1"
-          >
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#22205A] text-[#DAD2C4] border border-[#372B69]">
-              <User className="h-3.5 w-3.5" />
-            </div>
-            <span className="hidden sm:inline font-medium">Login</span>
-          </button>
-
-          {/* Contato Direto via WhatsApp Oficial (Sem formulário) */}
-          <a
-            href={`https://wa.me/${SITE_CONFIG.whatsappNumberRaw}?text=${encodeURIComponent('Olá, vim pelo site.')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Contato direto via WhatsApp"
-            className="hidden sm:inline-flex items-center gap-2 rounded-full border border-[#25D366]/40 bg-[#080C35] px-3.5 py-1.5 text-xs font-semibold text-[#25D366] hover:bg-[#25D366]/10 transition-colors shadow-xs"
-          >
-            <MessageCircle className="h-4 w-4 text-[#25D366] fill-[#25D366]/20" />
-            <span className="tracking-wide">{SITE_CONFIG.whatsappNumberFormatted}</span>
-          </a>
+          {/* Botão com a engrenagem: FORA de qualquer box, afastado de membros para não confundir com o público */}
+          <div className="ml-4 sm:ml-6 pl-3 sm:pl-5 border-l border-white/15 flex items-center">
+            <button
+              onClick={() => handleLinkClick('/painel')}
+              title="Acesso Administrativo (Painel de Controles)"
+              aria-label="Painel de Controles"
+              className={`p-1.5 rounded-full transition-all duration-300 cursor-pointer focus:outline-none ${
+                isLinkActive('/painel')
+                  ? 'text-[#F0B55E]'
+                  : 'text-white/40 hover:text-[#F0B55E] hover:rotate-45'
+              }`}
+            >
+              <Settings className="h-4.5 w-4.5" />
+            </button>
+          </div>
 
           {/* Hambúrguer Mobile */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 lg:hidden text-white hover:text-[#FFB63F] focus:outline-none"
+            className="p-2 ml-3 lg:hidden text-white hover:text-[#F0B55E] focus:outline-none cursor-pointer"
             aria-expanded={mobileMenuOpen}
             aria-label="Menu"
           >
@@ -128,34 +137,45 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate, onOpenB
 
       {/* Menu Mobile */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-[#22205A] bg-[#080C35] px-4 pt-3 pb-6 space-y-2 shadow-2xl">
+        <div className="lg:hidden border-t border-white/10 bg-[#2B2566] px-4 pt-3 pb-6 space-y-1.5 shadow-2xl">
           {navLinks.map((link) => {
             const active = isLinkActive(link.path);
             return (
               <button
                 key={link.path}
                 onClick={() => handleLinkClick(link.path)}
-                className={`block w-full text-left py-2.5 px-3 rounded text-sm capitalize ${
+                className={`flex items-center justify-between w-full text-left py-2.5 px-3 rounded-lg text-xs uppercase tracking-wider font-medium cursor-pointer ${
                   active
-                    ? 'bg-[#22205A] text-[#FFB63F] font-bold'
-                    : 'text-[#DAD2C4] hover:bg-[#22205A] hover:text-[#FFB63F]'
+                    ? 'bg-[#181343] text-[#F0B55E] font-bold'
+                    : 'text-[#E6E3F1] hover:bg-[#181343] hover:text-[#F0B55E]'
                 }`}
               >
-                {link.label}
+                <span>{link.label}</span>
+                {link.hasNewBadge && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-[#F0B55E] text-[#2B2566] text-[8px] font-black">
+                    NEW
+                  </span>
+                )}
               </button>
             );
           })}
-          <div className="pt-3 border-t border-[#22205A]/80">
-            <a
-              href={`https://wa.me/${SITE_CONFIG.whatsappNumberRaw}?text=${encodeURIComponent('Olá, vim pelo site.')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full flex items-center justify-center gap-2 rounded-full border border-[#25D366]/50 bg-[#080C35] py-2.5 text-xs font-bold text-[#25D366]"
+          
+          <div className="pt-3 border-t border-white/10 flex items-center gap-3">
+            <button
+              onClick={() => handleLinkClick('/membros')}
+              className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-transparent border border-[#F0B55E]/35 py-2.5 text-[11px] font-medium uppercase tracking-[0.14em] text-white hover:text-[#F0B55E] cursor-pointer"
             >
-              <MessageCircle className="h-4 w-4 text-[#25D366]" />
-              <span>WhatsApp: {SITE_CONFIG.whatsappNumberFormatted}</span>
-            </a>
+              <User className="h-4 w-4 text-[#F0B55E]" />
+              <span>ÁREA DE MEMBROS</span>
+            </button>
+            <button
+              onClick={() => handleLinkClick('/painel')}
+              className="p-2.5 text-white/40 hover:text-[#F0B55E] cursor-pointer"
+              title="Painel de Controles"
+              aria-label="Painel de Controles"
+            >
+              <Settings className="h-5 w-5" />
+            </button>
           </div>
         </div>
       )}

@@ -170,7 +170,10 @@ export type AnalyticsEventName =
   | 'patota_click'
   | 'view_product'
   | 'blog_view'
-  | 'lecture_lead';
+  | 'lecture_lead'
+  | 'bussula_lead'
+  | 'checkout_start'
+  | 'checkout_complete';
 
 export interface AnalyticsPayload {
   eventName: AnalyticsEventName;
@@ -178,3 +181,57 @@ export interface AnalyticsPayload {
   page: string;
   properties?: Record<string, unknown>;
 }
+
+export interface BirthData {
+  birthDay: string;
+  birthMonth: string;
+  birthYear: string;
+  birthHour: string;
+  birthMinute: string;
+  city: string;
+  state: string;
+}
+
+export interface BussulaOrderInput {
+  firstName: string;
+  lastName: string;
+  email: string;
+  whatsapp: string;
+  birthData: BirthData;
+}
+
+export interface PatotaSubscriptionInput {
+  firstName: string;
+  lastName: string;
+  email: string;
+  whatsapp: string;
+  birthData: BirthData;
+}
+
+export interface MemberAccount {
+  id: string;
+  email: string;
+  cpf: string;
+  fullName: string;
+  whatsapp: string;
+  createdAt: string;
+}
+
+export interface OrderRecord {
+  id: string;
+  memberEmail: string;
+  memberCpf: string;
+  customerName: string;
+  whatsapp: string;
+  serviceType: 'bussula' | 'patota' | 'loja' | 'atendimento';
+  itemTitle: string;
+  amount: number;
+  status: 'approved' | 'pending' | 'in_process';
+  paymentMethod: 'pix' | 'credit_card' | 'ticket';
+  mpPaymentId?: string;
+  birthData?: BirthData;
+  reportHtml?: string;
+  pdfUrl?: string;
+  createdAt: string;
+}
+

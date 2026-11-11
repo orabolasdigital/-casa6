@@ -167,6 +167,26 @@ export const APP_ROUTES: Record<string, RouteMeta> = {
     section: 'Legal',
     isAdmin: false
   },
+  bussula: {
+    path: '/bussula',
+    title: 'Bússola Guia | Relatório Astral Mensal Personalizado — Casa 6',
+    description: 'Relatório astrológico mensal calculado individualmente a partir do seu mapa de nascimento. Entregue em PDF pelo WhatsApp e na Área de Membros.',
+    canonicalUrl: 'https://casa6.com.br/bussula',
+    section: 'Serviços',
+    isAdmin: false,
+    showInNav: true,
+    navLabel: 'bússola guia'
+  },
+  membros: {
+    path: '/membros',
+    title: 'Área de Membros | Casa 6 — Bianca Tofoli',
+    description: 'Acesse seus relatórios da Bússola Guia, status de assinaturas da Patota Astral e histórico de pedidos com seu e-mail e CPF.',
+    canonicalUrl: 'https://casa6.com.br/membros',
+    section: 'Membros',
+    isAdmin: false,
+    showInNav: true,
+    navLabel: 'membros'
+  },
   painel: {
     path: '/painel',
     title: 'Painel Administrativo | Casa 6 (Acesso Restrito)',
@@ -176,3 +196,4 @@ export const APP_ROUTES: Record<string, RouteMeta> = {
     isAdmin: true
   }
 };
+

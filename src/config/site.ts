@@ -26,6 +26,36 @@ export const SITE_CONFIG: SiteConfiguration = {
 };
 
 /**
+ * Ativos Oficiais de Marca da Casa 6
+ * Atualizados com as imagens oficiais enviadas
+ */
+export const BRAND_ASSETS = {
+  // Foto Bianca (usar no botão WhatsApp, e onde estiver falando de Bianca)
+  biancaPhoto: 'https://static.wixstatic.com/media/02c8e0_defbbc681ee8458ba9a2f91f33f4e6da~mv2.jpg',
+  biancaPhotoLocal: '/assets/brand/bianca-perfil.jpg',
+
+  // Logo horizontal branco (uso em fundos escuros: header, footer, etc.)
+  logoHorizontalBranco: 'https://static.wixstatic.com/media/02c8e0_916db28bdef7413a82fde89b9ce7f738~mv2.png',
+  logoHorizontalBrancoLocal: '/assets/brand/logo-horizontal-branco.png',
+
+  // Logo quadrado branco (uso em fundos escuros)
+  logoQuadradoBranco: 'https://static.wixstatic.com/media/02c8e0_ca7fa008704748b4a7569ca66a02a3bb~mv2.png',
+  logoQuadradoBrancoLocal: '/assets/brand/logo-quadrado-branco.png',
+
+  // Logo favicon branco (uso em fundos escuros / favicon)
+  logoFaviconBranco: 'https://static.wixstatic.com/media/02c8e0_bce65db1891746ca848f16f8403ddaed~mv2.png',
+  logoFaviconBrancoLocal: '/assets/brand/logo-favicon-branco.png',
+
+  // Logo horizontal escuro (uso em fundos claros: modais, documentos, etc.)
+  logoHorizontalEscuro: 'https://static.wixstatic.com/media/02c8e0_75b529b0748c4e54adf4e58bfa7c78dc~mv2.png',
+  logoHorizontalEscuroLocal: '/assets/brand/logo-horizontal-escuro.png',
+
+  // Logo quadrado escuro (uso em fundos claros)
+  logoQuadradoEscuro: 'https://static.wixstatic.com/media/02c8e0_4e719d8db5e24feea8da15812151a65a~mv2.png',
+  logoQuadradoEscuroLocal: '/assets/brand/logo-quadrado-escuro.png',
+};
+
+/**
  * Catálogo Oficial de Atendimentos da Casa 6
  * Estruturado nas categorias solicitadas:
  * - Contínuo

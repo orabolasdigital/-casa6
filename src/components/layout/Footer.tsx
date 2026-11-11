@@ -1,11 +1,11 @@
 /**
  * @license
  * Casa 6 — Bianca Tofoli
- * Footer Oficial alinhado com a referência visual exata
+ * Footer Oficial alinhado com a paleta oficial (#1b1463, #fab03b, #d8d6c8, #6a62b8)
  */
 
 import React from 'react';
-import { Instagram, Youtube, MessageCircle, Facebook } from 'lucide-react';
+import { Instagram, Youtube, MessageCircle } from 'lucide-react';
 import { SITE_CONFIG } from '../../config/site';
 
 interface FooterProps {
@@ -14,159 +14,157 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   return (
-    <footer className="relative w-full bg-[#080C35] text-[#FFFFFF] border-t border-[#22205A] overflow-hidden">
-      {/* Detalhe sutil de horizonte planetário cósmico no fundo */}
-      <div className="absolute right-0 bottom-0 w-96 h-96 rounded-full bg-gradient-to-t from-[#483474]/20 via-[#22205A]/10 to-transparent pointer-events-none blur-3xl transform translate-x-1/3 translate-y-1/3"></div>
-      
-      {/* Traço de órbita decorativo */}
-      <svg className="absolute right-12 bottom-8 w-48 h-48 pointer-events-none opacity-25" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="40" fill="none" stroke="#FFB63F" strokeWidth="0.5" strokeDasharray="2 3" />
-        <circle cx="78" cy="22" r="3" fill="#FFB63F" />
-      </svg>
+    <footer className="relative w-full bg-[#2B2566] text-[#FFFFFF] border-t border-[#F0B55E]/20 overflow-hidden">
+      {/* Órbitas decorativas de fundo conforme Brand Guide */}
+      <div className="absolute right-[-100px] bottom-[-100px] w-[500px] h-[500px] rounded-full border border-[#F0B55E]/10 pointer-events-none"></div>
+      <div className="absolute right-[-40px] bottom-[-40px] w-[380px] h-[380px] rounded-full border border-[#F0B55E]/15 pointer-events-none"></div>
+      <div className="absolute left-[-150px] top-[-150px] w-[450px] h-[450px] rounded-full border border-white/5 pointer-events-none"></div>
 
       <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
           
           {/* Coluna 1: Logo & Slogan Oficial */}
           <div className="md:col-span-4 space-y-3">
-            <div className="flex items-center gap-2.5">
-              <div className="relative flex h-8 w-8 items-center justify-center rounded-full border border-[#FFB63F] bg-[#080C35]">
-                <div className="h-4 w-4 rounded-full bg-[#FFB63F]"></div>
-                <div className="absolute right-1.5 h-3.5 w-3.5 rounded-full bg-[#080C35]"></div>
-              </div>
-              <span className="font-heading text-2xl font-bold tracking-tight text-white">
-                casa6
-              </span>
+            <div className="flex items-center">
+              <img
+                src="https://static.wixstatic.com/media/02c8e0_916db28bdef7413a82fde89b9ce7f738~mv2.png"
+                alt="Casa 6 — Bianca Tofoli"
+                className="h-10 w-auto object-contain"
+              />
             </div>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-[#DAD2C4]/80 font-medium">
-              ASTROLOGIA PARA UMA VIDA MAIS REAL
+            <p className="text-[11px] uppercase tracking-[0.22em] text-[#F0B55E] font-medium">
+              CLAREZA <span className="font-highlight italic text-[1.25em] font-semibold lowercase tracking-normal inline-block align-baseline ml-0.5">para a</span> VIDA REAL
+            </p>
+            <p className="text-xs text-[#E6E3F1]/75 leading-relaxed max-w-xs font-light">
+              Plataforma oficial de Bianca Tofoli: enfermeira, gestora, palestrante e astróloga. Consultas de Mapa Natal, Bússola Guia, Patota Astral e palestras corporativas.
             </p>
           </div>
 
-          {/* Coluna 2: Links em 2 sub-colunas */}
-          <div className="md:col-span-4 grid grid-cols-2 gap-6 text-xs uppercase tracking-wider text-[#DAD2C4]">
+          {/* Coluna 2: Navegação */}
+          <div className="md:col-span-4 grid grid-cols-2 gap-6 text-[11px] uppercase tracking-[0.16em] text-[#E6E3F1]">
             <ul className="space-y-2.5">
               <li>
-                <button onClick={() => onNavigate('/inicio')} className="hover:text-[#FFB63F] transition-colors">
+                <button onClick={() => onNavigate('/inicio')} className="hover:text-[#F0B55E] transition-colors cursor-pointer">
                   INÍCIO
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/sobre')} className="hover:text-[#FFB63F] transition-colors">
+                <button onClick={() => onNavigate('/sobre')} className="hover:text-[#F0B55E] transition-colors cursor-pointer">
                   SOBRE
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/atendimentos')} className="hover:text-[#FFB63F] transition-colors">
+                <button onClick={() => onNavigate('/atendimentos')} className="hover:text-[#F0B55E] transition-colors cursor-pointer">
                   ATENDIMENTOS
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/palestras')} className="hover:text-[#FFB63F] transition-colors">
-                  PALESTRAS
+                <button onClick={() => onNavigate('/encontros')} className="hover:text-[#F0B55E] transition-colors cursor-pointer">
+                  ENCONTROS
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('/bussola')} className="hover:text-[#F0B55E] transition-colors cursor-pointer text-[#F0B55E] font-bold">
+                  BÚSSOLA GUIA
                 </button>
               </li>
             </ul>
 
             <ul className="space-y-2.5">
               <li>
-                <button onClick={() => onNavigate('/vivencias')} className="hover:text-[#FFB63F] transition-colors">
-                  VIVÊNCIAS
+                <button onClick={() => onNavigate('/patota')} className="hover:text-[#F0B55E] transition-colors cursor-pointer">
+                  PATOTA ASTRAL
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/patota')} className="hover:text-[#FFB63F] transition-colors">
-                  PATOTA
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('/leituras')} className="hover:text-[#FFB63F] transition-colors">
+                <button onClick={() => onNavigate('/leituras')} className="hover:text-[#F0B55E] transition-colors cursor-pointer">
                   LEITURAS
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('/lojinha')} className="hover:text-[#FFB63F] transition-colors">
+                <button onClick={() => onNavigate('/loja')} className="hover:text-[#F0B55E] transition-colors cursor-pointer">
                   LOJINHA
                 </button>
               </li>
               <li>
-                <a href={`mailto:${SITE_CONFIG.emailContact}`} className="hover:text-[#FFB63F] transition-colors">
-                  CONTATO
-                </a>
+                <button onClick={() => onNavigate('/membros')} className="hover:text-[#F0B55E] transition-colors cursor-pointer font-bold text-[#F0B55E]">
+                  ÁREA DE MEMBROS
+                </button>
               </li>
             </ul>
 
-            {/* Ícones Sociais */}
-            <div className="col-span-2 pt-2 flex items-center gap-3 text-[#DAD2C4]">
+            {/* Redes Sociais */}
+            <div className="col-span-2 pt-2 flex items-center gap-3 text-[#E6E3F1]">
               <a
                 href={SITE_CONFIG.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                title="Instagram"
-                className="p-1.5 rounded-full border border-[#22205A] bg-[#080C35] hover:text-[#FFB63F] hover:border-[#FFB63F] transition-colors"
+                title="Instagram @tofoli.bianca"
+                className="p-2 rounded-full border border-white/20 bg-white/5 hover:text-[#F0B55E] hover:border-[#F0B55E] transition-colors"
               >
-                <Instagram className="h-3.5 w-3.5" />
+                <Instagram className="h-4 w-4" />
               </a>
               <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Facebook"
-                className="p-1.5 rounded-full border border-[#22205A] bg-[#080C35] hover:text-[#FFB63F] hover:border-[#FFB63F] transition-colors"
-              >
-                <Facebook className="h-3.5 w-3.5" />
-              </a>
-              <a
-                href="https://youtube.com"
+                href={SITE_CONFIG.youtubeUrl || 'https://youtube.com'}
                 target="_blank"
                 rel="noopener noreferrer"
                 title="YouTube"
-                className="p-1.5 rounded-full border border-[#22205A] bg-[#080C35] hover:text-[#FFB63F] hover:border-[#FFB63F] transition-colors"
+                className="p-2 rounded-full border border-white/20 bg-white/5 hover:text-[#F0B55E] hover:border-[#F0B55E] transition-colors"
               >
-                <Youtube className="h-3.5 w-3.5" />
+                <Youtube className="h-4 w-4" />
               </a>
               <a
                 href={`https://wa.me/${SITE_CONFIG.whatsappNumberRaw}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                title="WhatsApp"
-                className="p-1.5 rounded-full border border-[#22205A] bg-[#080C35] hover:text-[#FFB63F] hover:border-[#FFB63F] transition-colors"
+                title="WhatsApp Oficial"
+                className="p-2 rounded-full border border-[#8C987F]/40 bg-white/5 hover:text-[#F0B55E] hover:border-[#F0B55E] transition-colors"
               >
-                <MessageCircle className="h-3.5 w-3.5" />
+                <MessageCircle className="h-4 w-4 text-[#8C987F]" />
               </a>
             </div>
           </div>
 
-          {/* Coluna 3: Citação Poética */}
+          {/* Coluna 3: Citação Poética do Brand Guide */}
           <div className="md:col-span-4 md:text-right space-y-3">
-            <p className="font-heading italic text-lg sm:text-xl text-[#DAD2C4] leading-snug">
-              Astrologia é um convite<br />
-              para lembrar quem você é.
+            <p className="font-heading italic text-xl sm:text-2xl text-[#E6E3F1] leading-snug">
+              Na astrologia, a Casa 6 é a casa<br />
+              do trabalho, da rotina e do cuidado.
             </p>
-            <div className="w-12 h-0.5 bg-[#FFB63F] md:ml-auto"></div>
+            <div className="flex items-center gap-2 justify-end">
+              <span className="w-8 h-px bg-white/20"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#F0B55E]"></span>
+              <span className="w-8 h-px bg-white/20"></span>
+            </div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[#8C987F]">
+              Bianca Tofoli • Fundadora da Casa 6
+            </p>
           </div>
 
         </div>
 
-        {/* Linha Divisória */}
-        <div className="my-8 border-t border-[#22205A]"></div>
+        {/* Linha-Ponto Divisória Oficial do Brand Guide (———— • ————) */}
+        <div className="my-8 flex items-center justify-center gap-4">
+          <div className="flex-1 h-px bg-white/10"></div>
+          <div className="w-1.5 h-1.5 rounded-full bg-[#F0B55E]"></div>
+          <div className="flex-1 h-px bg-white/10"></div>
+        </div>
 
         {/* Cláusula Legal Obrigatória & Créditos */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-3 text-[11px] text-[#DAD2C4]/70">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-3 text-[11px] text-[#E6E3F1]/70">
           <p>
-            © {new Date().getFullYear()} Casa 6. Todos os direitos reservados. {SITE_CONFIG.legalNotice}
+            © {new Date().getFullYear()} Casa 6 — Bianca Tofoli. Todos os direitos reservados. CNPJ 41.077.732/0001-67.
           </p>
           <p>
             Desenvolvido por{' '}
             <a
-              href={SITE_CONFIG.developerCreditUrl}
+              href="https://instagram.com/orabolasdigital"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#FFB63F] hover:underline font-semibold"
+              className="text-[#F0B55E] hover:underline font-semibold"
             >
               @orabolasdigital
-            </a>{' '}
-            com estratégia humana e IA.
+            </a>
           </p>
         </div>
       </div>

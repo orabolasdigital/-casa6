@@ -40,7 +40,6 @@ service cloud.firestore {
       );
     }
 
-    // Verificação de editor no painel administrativo
     function isEditor() {
       return isVerified() && (
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
@@ -69,90 +68,88 @@ service cloud.firestore {
       data.lastName is string && data.lastName.size() >= 2 && data.lastName.size() <= 60 &&
       data.fullName is string && data.fullName.size() >= 4 && data.fullName.size() <= 120 &&
       data.email is string && data.email.size() <= 120 && data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$') &&
-      data.whatsapp is string && data.whatsapp.size() >= 10 && data.whatsapp.size() <= 20 &&
+      data.whatsapp is string && data.whatsapp.size() >= 8 && data.whatsapp.size() <= 25 &&
       data.serviceId is string && data.serviceId.size() <= 64 &&
       data.serviceName is string && data.serviceName.size() <= 100 &&
       data.status in ['new', 'contacted', 'scheduled', 'completed', 'lost'] &&
-      data.createdAt is timestamp &&
-      data.updatedAt is timestamp;
+      data.createdAt is string && data.createdAt.size() <= 50 &&
+      data.updatedAt is string && data.updatedAt.size() <= 50;
+    }
+
+    // =========================================================================
+    // BLUEPRINT DE VALIDAÇÃO: ORDERS / PEDIDOS MERCADO PAGO
+    // =========================================================================
+    function isValidOrder(data) {
+      return data.keys().hasAll([
+        'id', 'memberEmail', 'memberCpf', 'customerName', 'whatsapp',
+        'serviceType', 'itemTitle', 'amount', 'status', 'paymentMethod',
+        'createdAt'
+      ]) &&
+      isValidId(data.id) &&
+      data.memberEmail is string && data.memberEmail.size() <= 120 &&
+      data.memberCpf is string && data.memberCpf.size() <= 20 &&
+      data.customerName is string && data.customerName.size() <= 120 &&
+      data.serviceType in ['bussula', 'patota', 'loja', 'atendimento'] &&
+      data.amount is number && data.amount >= 0 &&
+      data.status in ['approved', 'pending', 'in_process'] &&
+      data.paymentMethod in ['pix', 'credit_card', 'ticket'] &&
+      data.createdAt is string && data.createdAt.size() <= 50;
     }
 
     // =========================================================================
     // COLEÇÃO: LEADS (/leads/{leadId})
-    // Submissão pelo funil público estrito; acesso exclusivo a administradores
     // =========================================================================
     match /leads/{leadId} {
-      // Leitura estritamente restrita a operadores autenticados do painel
-      allow get: if isEditor();
-      allow list: if isEditor();
-
-      // Criação aberta para submissão legítima no funil público oficial
+      allow get, list: if isEditor();
       allow create: if isValidId(leadId) &&
                        isValidLead(incoming()) &&
-                       incoming().id == leadId &&
-                       incoming().status == 'new' &&
-                       incoming().createdAt == request.time &&
-                       incoming().updatedAt == request.time;
-
-      // Atualização particionada por ações de operadores (Anti-Update-Gap)
+                       incoming().id == leadId;
       allow update: if isValidId(leadId) &&
                        isEditor() &&
                        isValidLead(incoming()) &&
-                       incoming().id == existing().id &&
-                       incoming().createdAt == existing().createdAt &&
-                       incoming().updatedAt == request.time &&
-                       // Impossibilita transições após estado terminal sem privilégio admin
-                       (existing().status != 'completed' && existing().status != 'lost' || isAdmin()) &&
-                       (
-                         // Ação: Gestão de Status pelo Editor/Admin
-                         incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt', 'internalNotes', 'assignedTo']) ||
-                         // Ação completa de administração
-                         isAdmin()
-                       );
-
-      // Deleção permitida apenas por administradores com verificação ativa
+                       incoming().id == existing().id;
       allow delete: if isValidId(leadId) && isAdmin();
     }
 
     // =========================================================================
+    // COLEÇÃO: ORDERS (/orders/{orderId})
+    // Acesso à Área de Membros e Persistência do Checkout Mercado Pago
+    // =========================================================================
+    match /orders/{orderId} {
+      // Leitura permitida para consulta de membros e administração
+      allow get, list: if true;
+      allow create: if isValidId(orderId) &&
+                       isValidOrder(incoming()) &&
+                       incoming().id == orderId;
+      allow update, delete: if isValidId(orderId) && isAdmin();
+    }
+
+    // =========================================================================
     // COLEÇÃO: USUÁRIOS & RBAC (/users/{userId})
-    // Proteção de PII e bloqueio de autoatribuição de permissões
     // =========================================================================
     match /users/{userId} {
       allow get: if isVerified() && (request.auth.uid == userId || isAdmin());
       allow list: if isAdmin();
-
-      // Apenas administradores podem criar ou promover usuários com papéis
       allow create: if isValidId(userId) && isAdmin();
       allow update: if isValidId(userId) &&
                        isAdmin() &&
-                       incoming().id == existing().id &&
-                       incoming().createdAt == existing().createdAt &&
-                       incoming().updatedAt == request.time;
+                       incoming().id == existing().id;
       allow delete: if isValidId(userId) && isAdmin() && request.auth.uid != userId;
     }
 
     // =========================================================================
-    // COLEÇÃO: SERVIÇOS & ATENDIMENTOS (/services/{serviceId})
-    // Leitura pública indexável; edição restrita a administradores
+    // DEMAIS COLEÇÕES PÚBLICAS E ADMINISTRATIVAS
     // =========================================================================
     match /services/{serviceId} {
       allow read: if true;
-      allow create, update, delete: if isValidId(serviceId) && isAdmin();
+      allow write: if isValidId(serviceId) && isAdmin();
     }
 
-    // =========================================================================
-    // COLEÇÃO: CONFIGURAÇÕES INSTITUCIONAIS (/settings/{settingId})
-    // Leitura pública dos canais e dados de marca; mutação exclusiva de admins
-    // =========================================================================
     match /settings/{settingId} {
       allow read: if true;
       allow write: if isValidId(settingId) && isAdmin();
     }
 
-    // =========================================================================
-    // DEMAIS COLEÇÕES PREPARADAS (CONTEÚDOS DO PAINEL)
-    // =========================================================================
     match /patota/{docId} {
       allow read: if true;
       allow write: if isValidId(docId) && isAdmin();
@@ -181,6 +178,11 @@ service cloud.firestore {
     match /testimonials/{docId} {
       allow read: if true;
       allow write: if isValidId(docId) && (isAdmin() || isEditor());
+    }
+
+    match /system/{docId} {
+      allow read: if true;
+      allow write: if false;
     }
   }
 }

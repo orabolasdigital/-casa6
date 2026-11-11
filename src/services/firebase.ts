@@ -1,17 +1,13 @@
 /**
  * @license
  * Casa 6 — Bianca Tofoli
- * Módulo de Integração Firebase (Status: PREPARADO / CONGELADO)
- * 
- * Cumpre as diretrizes da skill firebase-integration-rpc:
- * - Tratamento padronizado de erro FirestoreErrorInfo
- * - Detecção estrita de conectividade e credenciais
- * - Sem criação de credenciais falsas ou simulações opacas
+ * Módulo Oficial de Integração Firebase / Firestore
  */
 
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { getFirestore, Firestore, doc, getDocFromServer } from 'firebase/firestore';
+import firebaseConfig from '../../firebase-applet-config.json';
 
 export enum OperationType {
   CREATE = 'create',
@@ -39,51 +35,18 @@ export interface FirestoreErrorInfo {
   };
 }
 
-let appInstance: FirebaseApp | null = null;
-let firestoreInstance: Firestore | null = null;
-let authInstance: Auth | null = null;
-let isConfigured = false;
+const app: FirebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 
-// Verificação de ambiente para carregar configuração real se existente
-try {
-  // Verificação de variáveis de ambiente padrão do Vite
-  const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
-  const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID;
-
-  if (apiKey && projectId) {
-    const config = {
-      apiKey,
-      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || `${projectId}.firebaseapp.com`,
-      projectId,
-      storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || `${projectId}.appspot.com`,
-      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-      appId: import.meta.env.VITE_FIREBASE_APP_ID
-    };
-
-    if (!getApps().length) {
-      appInstance = initializeApp(config);
-    } else {
-      appInstance = getApps()[0];
-    }
-
-    firestoreInstance = getFirestore(appInstance);
-    authInstance = getAuth(appInstance);
-    isConfigured = true;
-  }
-} catch {
-  // Em fase de fundação / Etapa 1 sem projeto console vinculado, permanece em estado PREPARADO
-  isConfigured = false;
-}
-
-export const isFirebaseReady = isConfigured;
-export const db = firestoreInstance;
-export const auth = authInstance;
+// CRITICAL: Conforme exigência do skill, vincular ao firestoreDatabaseId provisionado
+export const db: Firestore = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+export const auth: Auth = getAuth(app);
+export const isFirebaseReady = Boolean(firebaseConfig.projectId && firebaseConfig.apiKey);
 
 /**
  * Lança erro estruturado conforme exigência formal do skill Firebase Integration
  */
 export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null): never {
-  const currentAuth = authInstance;
+  const currentAuth = auth;
   const currentUser = currentAuth?.currentUser;
 
   const errInfo: FirestoreErrorInfo = {
@@ -105,4 +68,18 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 
   console.error('[Casa6 Firestore Error]:', JSON.stringify(errInfo));
   throw new Error(JSON.stringify(errInfo));
+}
+
+// Teste de conexão seguro
+export async function testConnection(): Promise<boolean> {
+  try {
+    await getDocFromServer(doc(db, 'system', 'connection_test'));
+    return true;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('the client is offline')) {
+      console.warn('[Casa6 Firebase] Cliente offline ou aguardando sincronização.');
+      return false;
+    }
+    return true; // Se respondeu mesmo com permissão/not found, conexão com o backend Firestore foi estabelecida
+  }
 }
