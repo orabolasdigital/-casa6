@@ -1,11 +1,13 @@
 /**
  * @license
  * Casa 6 — Bianca Tofoli
- * Carta de Tarô com Efeito 3D Flip (Fundo Azul/Roxo Inicial Virado -> Revelação ao Hover/Click)
+ * Carta de Tarô com Efeito 3D Flip Oficial
+ * Suporta cartas roxas (#2B2566) e carta dourada especial (#F0B55E) para o Combo Anual.
+ * Exibe símbolos com fundo transparente no anverso e no verso.
  */
 
 import React, { useState } from 'react';
-import { ArrowRight, Sparkles, Star } from 'lucide-react';
+import { ArrowRight, Star } from 'lucide-react';
 
 interface FlipTarotCardProps {
   index: number;
@@ -13,7 +15,10 @@ interface FlipTarotCardProps {
   categoryBadge?: string;
   title: string;
   subtitle: string;
-  imageUrl: string;
+  imageUrl?: string;
+  iconUrl?: string;
+  priceFormatted?: string;
+  isGoldenCard?: boolean;
   actionLabel?: string;
   onAction?: () => void;
   onDetailClick?: () => void;
@@ -26,6 +31,9 @@ export const FlipTarotCard: React.FC<FlipTarotCardProps> = ({
   title,
   subtitle,
   imageUrl,
+  iconUrl,
+  priceFormatted,
+  isGoldenCard = false,
   actionLabel = 'AGENDAR CONSULTA',
   onAction,
   onDetailClick
@@ -35,6 +43,8 @@ export const FlipTarotCard: React.FC<FlipTarotCardProps> = ({
   const handleFlipToggle = () => {
     setIsFlipped(!isFlipped);
   };
+
+  const activeSymbol = iconUrl || imageUrl;
 
   return (
     <div
@@ -48,91 +58,194 @@ export const FlipTarotCard: React.FC<FlipTarotCardProps> = ({
       <div className="tarot-flip-inner w-full h-full">
         
         {/* =========================================================================
-            FACE TRASEIRA (INICIAL / CARTA VIRADA COM FUNDO NOITE #2B2566)
+            FACE 1 (INICIAL / CARTA VIRADA)
+            Roxa padrão (#2B2566) OU Dourada radiante para o Combo Anual
             ========================================================================= */}
-        <div className="tarot-face-back bg-[#2B2566] text-white p-6 sm:p-7 flex flex-col justify-between border-2 border-[#F0B55E]/40 shadow-xl rounded-2xl relative overflow-hidden">
+        <div
+          className={`tarot-face-back p-6 sm:p-7 flex flex-col justify-between shadow-xl rounded-2xl relative overflow-hidden ${
+            isGoldenCard
+              ? 'bg-gradient-to-br from-[#F5CA75] via-[#EFA63E] to-[#C9801C] text-[#2B2566] border-2 border-white/80 shadow-[0_12px_36px_rgba(239,166,62,0.4)]'
+              : 'bg-[#2B2566] text-white border-2 border-[#F0B55E]/40'
+          }`}
+        >
           {/* Órbitas e Linhas Circulares Sutis do Brand Guide */}
           <div className="absolute inset-0 opacity-20 pointer-events-none flex items-center justify-center">
             <svg className="w-80 h-80" viewBox="0 0 200 200" fill="none">
-              <circle cx="100" cy="100" r="90" stroke="#F0B55E" strokeWidth="0.8" strokeDasharray="3 3" />
-              <circle cx="100" cy="100" r="70" stroke="#F0B55E" strokeWidth="0.5" />
-              <circle cx="100" cy="100" r="45" stroke="#F0B55E" strokeWidth="0.8" strokeDasharray="2 4" />
+              <circle
+                cx="100"
+                cy="100"
+                r="90"
+                stroke={isGoldenCard ? '#2B2566' : '#F0B55E'}
+                strokeWidth="0.8"
+                strokeDasharray="3 3"
+              />
+              <circle
+                cx="100"
+                cy="100"
+                r="70"
+                stroke={isGoldenCard ? '#2B2566' : '#F0B55E'}
+                strokeWidth="0.5"
+              />
+              <circle
+                cx="100"
+                cy="100"
+                r="45"
+                stroke={isGoldenCard ? '#2B2566' : '#F0B55E'}
+                strokeWidth="0.8"
+                strokeDasharray="2 4"
+              />
             </svg>
           </div>
 
           {/* Borda Dupla Estilizada Clássica de Tarô */}
-          <div className="absolute inset-2.5 rounded-xl border border-[#F0B55E]/30 pointer-events-none" />
+          <div
+            className={`absolute inset-2.5 rounded-xl border pointer-events-none ${
+              isGoldenCard ? 'border-[#2B2566]/25' : 'border-[#F0B55E]/30'
+            }`}
+          />
 
-          {/* Topo: Número Romano e Categoria */}
-          <div className="relative z-10 flex items-center justify-between text-xs font-semibold text-[#F0B55E]">
-            <span className="font-heading tracking-widest text-sm">{romanNumeral}</span>
-            <span className="text-[10px] uppercase tracking-[0.25em] text-[#E6E3F1]/80">{categoryBadge}</span>
-            <Star className="h-3.5 w-3.5 fill-[#F0B55E] text-[#F0B55E]" />
+          {/* Topo: Número Romano, Categoria e Estrela */}
+          <div
+            className={`relative z-10 flex items-center justify-between text-xs font-semibold ${
+              isGoldenCard ? 'text-[#2B2566]' : 'text-[#F0B55E]'
+            }`}
+          >
+            <span className="font-heading tracking-widest text-sm font-bold">{romanNumeral}</span>
+            <span
+              className={`text-[10px] uppercase tracking-[0.25em] font-extrabold ${
+                isGoldenCard ? 'bg-white/40 text-[#2B2566] px-2 py-0.5 rounded-full' : 'text-[#E6E3F1]/80'
+              }`}
+            >
+              {categoryBadge}
+            </span>
+            <Star
+              className={`h-3.5 w-3.5 ${
+                isGoldenCard ? 'fill-[#2B2566] text-[#2B2566]' : 'fill-[#F0B55E] text-[#F0B55E]'
+              }`}
+            />
           </div>
 
-          {/* Centro: Símbolo Cósmico e Título com Cormorant/Hatton Font */}
-          <div className="relative z-10 text-center space-y-4 my-auto">
-            {/* Logo Quadrado Branco Oficial Casa 6 em Fundo Escuro */}
-            <div className="mx-auto w-20 h-16 flex items-center justify-center">
-              <img
-                src="https://static.wixstatic.com/media/02c8e0_ca7fa008704748b4a7569ca66a02a3bb~mv2.png"
-                alt="Casa 6"
-                className="max-h-14 max-w-full object-contain filter drop-shadow-[0_0_12px_rgba(240,181,94,0.3)]"
-              />
-            </div>
+          {/* Centro: Símbolo Oficial do Atendimento com Fundo Transparente */}
+          <div className="relative z-10 text-center space-y-3.5 my-auto">
+            {activeSymbol && (
+              <div className="mx-auto w-24 h-22 flex items-center justify-center p-1">
+                <img
+                  src={activeSymbol}
+                  alt={title}
+                  className={`max-h-20 max-w-full object-contain filter ${
+                    isGoldenCard
+                      ? 'drop-shadow-[0_4px_12px_rgba(43,37,102,0.3)]'
+                      : 'drop-shadow-[0_0_14px_rgba(240,181,94,0.4)]'
+                  }`}
+                  draggable={false}
+                />
+              </div>
+            )}
 
             <div className="space-y-1.5 px-2">
-              <h3 className="font-heading text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
+              <h3
+                className={`font-heading text-xl sm:text-2xl font-bold tracking-tight leading-snug ${
+                  isGoldenCard ? 'text-[#2B2566] font-black' : 'text-white'
+                }`}
+              >
                 {title}
               </h3>
               {/* Linha-Ponto do Brand Guide */}
               <div className="flex items-center justify-center gap-2 max-w-[120px] mx-auto pt-1">
-                <span className="flex-1 h-px bg-[#F0B55E]/40"></span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#F0B55E]"></span>
-                <span className="flex-1 h-px bg-[#F0B55E]/40"></span>
+                <span
+                  className={`flex-1 h-px ${isGoldenCard ? 'bg-[#2B2566]/35' : 'bg-[#F0B55E]/40'}`}
+                ></span>
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${isGoldenCard ? 'bg-[#2B2566]' : 'bg-[#F0B55E]'}`}
+                ></span>
+                <span
+                  className={`flex-1 h-px ${isGoldenCard ? 'bg-[#2B2566]/35' : 'bg-[#F0B55E]/40'}`}
+                ></span>
               </div>
             </div>
           </div>
 
           {/* Rodapé da Carta Virada: Instrução de Virar */}
-          <div className="relative z-10 text-center pt-2 border-t border-[#F0B55E]/20">
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#F0B55E] uppercase tracking-wider animate-pulse">
+          <div
+            className={`relative z-10 text-center pt-2 border-t ${
+              isGoldenCard ? 'border-[#2B2566]/20' : 'border-[#F0B55E]/20'
+            }`}
+          >
+            <span
+              className={`inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider ${
+                isGoldenCard ? 'text-[#2B2566]' : 'text-[#F0B55E] animate-pulse'
+              }`}
+            >
               <span>✦ Passe o mouse para desvendar ✦</span>
             </span>
           </div>
         </div>
 
         {/* =========================================================================
-            FACE FRONTAL (REVELADA NO HOVER / CLIQUE COM IMAGEM, TEXTO E BOTÃO)
+            FACE 2 (VERSO REVELADO AO VIRAR / HOVER)
+            Exibe o Símbolo Grande do Atendimento com Fundo Transparente
             ========================================================================= */}
-        <div className="tarot-face-front bg-[#FCFAF7] text-[#2B2566] p-5 sm:p-6 flex flex-col justify-between border-2 border-[#F0B55E] shadow-2xl rounded-2xl relative overflow-hidden">
-          
+        <div
+          className={`tarot-face-front p-5 sm:p-6 flex flex-col justify-between shadow-2xl rounded-2xl relative overflow-hidden ${
+            isGoldenCard
+              ? 'bg-gradient-to-b from-[#FFFDF9] via-[#FAF3E5] to-[#F7ECD4] text-[#2B2566] border-2 border-[#EFA63E]'
+              : 'bg-[#FCFAF7] text-[#2B2566] border-2 border-[#F0B55E]'
+          }`}
+        >
           {/* Topo Frontal: Número Romano e Tag */}
           <div className="flex items-center justify-between text-xs text-[#2B2566] pb-2 border-b border-[#E2DCCF]">
             <span className="font-heading font-bold text-[#2B2566]">{romanNumeral}</span>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#8C987F]">
+            <span
+              className={`text-[10px] font-bold uppercase tracking-widest ${
+                isGoldenCard ? 'text-[#B87314]' : 'text-[#8C987F]'
+              }`}
+            >
               {categoryBadge}
             </span>
-            <div className="w-2 h-2 rounded-full bg-[#F0B55E]" />
-          </div>
-
-          {/* Imagem Astrológica da Carta */}
-          <div className="relative my-3 w-full h-[45%] rounded-xl overflow-hidden border border-[#E2DCCF] shadow-inner group-hover:scale-[1.02] transition-transform">
-            <img
-              src={imageUrl}
-              alt={title}
-              className="w-full h-full object-cover protected-img"
-              draggable={false}
+            <div
+              className={`w-2 h-2 rounded-full ${isGoldenCard ? 'bg-[#EFA63E]' : 'bg-[#F0B55E]'}`}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#2B2566]/80 via-transparent to-transparent" />
-            <div className="absolute bottom-2 left-3 right-3 text-white text-xs font-heading font-bold drop-shadow-md">
-              {title}
-            </div>
           </div>
 
-          {/* Texto Base Explicativo Curto */}
-          <div className="space-y-1.5 flex-1 flex flex-col justify-center">
-            <p className="text-xs text-[#423C7B] leading-relaxed line-clamp-3 font-normal">
+          {/* Símbolo Grande do Atendimento com Fundo Transparente (Ou Imagem Retangular para Blog) */}
+          {iconUrl ? (
+            <div
+              className={`relative my-2 w-full h-[40%] rounded-xl flex items-center justify-center p-3 border transition-transform group-hover:scale-[1.03] ${
+                isGoldenCard
+                  ? 'bg-white/80 border-[#EFA63E]/30 shadow-xs'
+                  : 'bg-gradient-to-b from-[#2B2566]/5 via-[#F0B55E]/5 to-[#F4EFE6] border-[#E2DCCF]'
+              }`}
+            >
+              <img
+                src={iconUrl}
+                alt={title}
+                className="max-h-24 sm:max-h-28 max-w-[85%] object-contain filter drop-shadow-[0_8px_16px_rgba(43,37,102,0.18)]"
+                draggable={false}
+              />
+            </div>
+          ) : (
+            <div className="relative my-3 w-full h-[45%] rounded-xl overflow-hidden border border-[#E2DCCF] shadow-inner group-hover:scale-[1.02] transition-transform">
+              <img
+                src={imageUrl}
+                alt={title}
+                className="w-full h-full object-cover protected-img"
+                draggable={false}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#2B2566]/80 via-transparent to-transparent" />
+            </div>
+          )}
+
+          {/* Título Oficial Limpo + Preço + Descrição */}
+          <div className="space-y-1 text-center my-auto px-1">
+            <h4 className="font-heading font-bold text-lg sm:text-xl text-[#2B2566] tracking-tight">
+              {title}
+            </h4>
+            {priceFormatted && (
+              <div className="text-xs sm:text-sm font-bold text-[#B87314]">
+                {priceFormatted}
+              </div>
+            )}
+            <p className="text-xs text-[#423C7B] leading-relaxed line-clamp-2 font-normal pt-1">
               {subtitle}
             </p>
           </div>
@@ -145,7 +258,11 @@ export const FlipTarotCard: React.FC<FlipTarotCardProps> = ({
                 e.stopPropagation();
                 if (onAction) onAction();
               }}
-              className="w-full flex items-center justify-center gap-2 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] py-2.5 px-4 text-xs font-extrabold uppercase tracking-wider shadow-md transition-all cursor-pointer transform active:scale-98"
+              className={`w-full flex items-center justify-center gap-2 rounded-full py-2.5 px-4 text-xs font-extrabold uppercase tracking-wider shadow-md transition-all cursor-pointer transform active:scale-98 ${
+                isGoldenCard
+                  ? 'bg-[#2B2566] hover:bg-[#1E194D] text-[#F0B55E]'
+                  : 'bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566]'
+              }`}
             >
               <span>{actionLabel}</span>
               <ArrowRight className="h-3.5 w-3.5" />

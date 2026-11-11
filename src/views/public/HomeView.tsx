@@ -42,11 +42,56 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // 3 Atendimentos Centrais para a Sessão 3
-  const featuredServices = [
-    OFFICIAL_SERVICES.find((s) => s.id === 'mapa-natal-nascimento') || OFFICIAL_SERVICES[2],
-    OFFICIAL_SERVICES.find((s) => s.id === 'mapa-revolucao-solar') || OFFICIAL_SERVICES[4],
-    OFFICIAL_SERVICES.find((s) => s.id === 'combo-mapa-roda-revolucao') || OFFICIAL_SERVICES[5]
+  // 4 Atendimentos Oficiais para a Sessão 3 (Consultas Individuais)
+  const individualConsultations = [
+    {
+      id: 'pronto-socorro-astrologico',
+      roman: 'I',
+      category: 'ÚNICOS',
+      title: 'Pronto Socorro',
+      fullTitle: 'Pronto Socorro Astrológico',
+      subtitle: 'Atendimento rápido e objetivo para situações específicas do momento e tomadas de decisão.',
+      iconUrl: 'https://static.wixstatic.com/media/02c8e0_13450bc7d703418f86cbae1e89023ff7~mv2.png',
+      priceFormatted: 'R$ 97,00',
+      isGolden: false,
+      serviceRef: OFFICIAL_SERVICES.find((s) => s.id === 'pronto-socorro-astrologico') || OFFICIAL_SERVICES[0]
+    },
+    {
+      id: 'mapa-natal',
+      roman: 'II',
+      category: 'ÚNICOS',
+      title: 'Mapa Natal',
+      fullTitle: 'Mapa Natal',
+      subtitle: 'Fotografia do céu no seu nascimento para revelar sua personalidade, padrões e missão de vida.',
+      iconUrl: 'https://static.wixstatic.com/media/02c8e0_6f75e1ba77e0487b87f65a9c03f759a8~mv2.png',
+      priceFormatted: 'R$ 480,00',
+      isGolden: false,
+      serviceRef: OFFICIAL_SERVICES.find((s) => s.id === 'mapa-natal-nascimento') || OFFICIAL_SERVICES[2]
+    },
+    {
+      id: 'mapa-revolucao-solar',
+      roman: 'III',
+      category: 'ÚNICOS',
+      title: 'Revolução Solar',
+      fullTitle: 'Mapa Revolução Solar',
+      subtitle: 'Análise focada nas tendências, oportunidades e desafios dos seus próximos 12 meses.',
+      iconUrl: 'https://static.wixstatic.com/media/02c8e0_5cfca337104c4deaacf9d1fdbbd3204e~mv2.png',
+      priceFormatted: 'R$ 440,00',
+      isGolden: false,
+      serviceRef: OFFICIAL_SERVICES.find((s) => s.id === 'mapa-revolucao-solar') || OFFICIAL_SERVICES[4]
+    },
+    {
+      id: 'combo-mapa-roda-revolucao',
+      roman: 'IV',
+      category: 'COMBOS',
+      title: 'Combo Anual',
+      fullTitle: 'Mapa Natal + Roda Astrológica + Revolução Solar',
+      subtitle: 'Pacote completo: Mapa Natal, Roda Astrológica e previsões da Revolução Solar para seu ano.',
+      iconUrl: 'https://static.wixstatic.com/media/02c8e0_591c1874c36d498bb9a584c02efe3fe7~mv2.png',
+      priceFormatted: 'R$ 920,00',
+      isGolden: true,
+      serviceRef: OFFICIAL_SERVICES.find((s) => s.id === 'combo-mapa-roda-revolucao') || OFFICIAL_SERVICES[5]
+    }
   ];
 
   // Artigos Editoriais da Sessão 7 (Leituras Astrais)
@@ -315,20 +360,22 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             </button>
           </div>
 
-          {/* Grid com as Cartas Viradas 3D (FlipTarotCard) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            {featuredServices.map((service, index) => (
-              <div key={service.id} className="w-full">
+          {/* Grid com as Cartas Viradas 3D (FlipTarotCard) — 4 Atendimentos Oficiais */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-7">
+            {individualConsultations.map((item, index) => (
+              <div key={item.id} className="w-full">
                 <FlipTarotCard
                   index={index}
-                  romanNumeral={index === 0 ? 'I' : index === 1 ? 'II' : 'III'}
-                  categoryBadge={service.categoryGroup?.toUpperCase() || 'ATENDIMENTO'}
-                  title={service.title}
-                  subtitle={service.shortDescription}
-                  imageUrl={service.tarotImage || 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=600&q=80'}
+                  romanNumeral={item.roman}
+                  categoryBadge={item.category}
+                  title={item.title}
+                  subtitle={item.subtitle}
+                  iconUrl={item.iconUrl}
+                  priceFormatted={item.priceFormatted}
+                  isGoldenCard={item.isGolden}
                   actionLabel="VER ATENDIMENTO"
                   onAction={() => onNavigate('/atendimentos')}
-                  onDetailClick={() => setSelectedServiceForModal(service)}
+                  onDetailClick={() => setSelectedServiceForModal(item.serviceRef)}
                 />
               </div>
             ))}
