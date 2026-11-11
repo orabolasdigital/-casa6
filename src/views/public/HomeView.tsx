@@ -760,105 +760,113 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
       </section>
 
       {/* =========================================================================
-          SESSÃO 8: DESTAQUES DE MÍDIA — 2 BANNERS ROXOS: YOUTUBE & SPOTIFY
+          SESSÃO 8: DESTAQUES DE MÍDIA — BANNERS YOUTUBE & SPOTIFY
+          No mesmo estilo dos banners Patota Astral e Guia Bússola • Um em cada linha
+          Logos oficiais 3D grandes pulando para fora do box • Animações astrológicas e links diretos
           ========================================================================= */}
-      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] border-t border-[#E2DCCF] relative overflow-hidden">
-        {/* Órbitas Decorativas Hairline ao fundo */}
-        <div className="absolute right-[-100px] top-0 w-[500px] h-[500px] rounded-full border border-[#2B2566]/5 pointer-events-none"></div>
+      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] border-t border-[#E2DCCF] space-y-16 lg:space-y-24">
+        <div className="mx-auto max-w-7xl space-y-16 lg:space-y-24">
 
-        <div className="mx-auto max-w-7xl relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
-
-            {/* BANNER 1: YOUTUBE (FUNDO ROXO, SEM TAG, BOTÃO VERMELHO) */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2B2566] via-[#211B55] to-[#3D206B] border-2 border-[#F0B55E]/40 p-6 sm:p-8 lg:p-10 shadow-2xl flex flex-col justify-between text-white">
-              {/* Elementos Celestes de Fundo */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute -top-20 -left-20 w-60 h-60 rounded-full border border-[#F0B55E]/10"></div>
-                <div className="absolute top-6 right-8 text-[#F0B55E] opacity-50 text-xs">✦</div>
+          {/* BANNER 1: YOUTUBE (FUNDO ROXO NOITE CÓSMICA COM LOGO PULANDO PARA FORA) */}
+          <div className="relative pt-12 sm:pt-16 lg:pt-20">
+            <div className="relative rounded-3xl bg-gradient-to-r from-[#2B2566] via-[#211B55] to-[#3D206B] border border-[#F0B55E]/40 shadow-2xl p-6 sm:p-10 lg:p-14 overflow-visible text-white">
+              {/* Animação Astrológica de Fundo: Órbitas Girando e Cintilações */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+                <div className="absolute -left-20 -bottom-20 w-[460px] h-[460px] rounded-full border border-[#FF0000]/15 animate-celestial-orbit-slow" />
+                <div className="absolute -right-16 -top-20 w-[400px] h-[400px] rounded-full border border-dashed border-[#F0B55E]/20 animate-celestial-orbit-reverse" />
+                <div className="absolute top-12 left-1/3 text-[#F0B55E] opacity-35 text-xs animate-pulse">✦</div>
+                <div className="absolute bottom-10 right-1/4 text-[#FF4D4D] opacity-40 text-xs animate-pulse">★</div>
               </div>
 
-              <div className="space-y-4 relative z-10">
-                <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white leading-tight">
-                  Acompanhe a Casa 6 em Vídeo
-                </h3>
-                <p className="text-xs sm:text-sm text-[#E6E3F1]/90 leading-relaxed font-light">
-                  Análises astrológicas semanais, leituras das lunações, reflexões sobre os trânsitos contemporâneos e conversas inspiradoras com Bianca Tofoli.
-                </p>
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                {/* Logo Oficial 3D Grande Pulando Para Fora do Box */}
+                <div className="lg:col-span-5 flex justify-center lg:justify-start">
+                  <div className="-mt-20 sm:-mt-28 lg:-mt-36 -mb-4 lg:-mb-8 sm:-ml-4 lg:-ml-8 shrink-0">
+                    <img
+                      src="https://static.wixstatic.com/media/02c8e0_d34c417ab4f148fcaf82c0354538ae59~mv2.png"
+                      alt="Canal Casa 6 no YouTube — Bianca Tofoli"
+                      className="w-64 sm:w-80 lg:w-[400px] h-auto object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.5)] transition-transform duration-500 hover:scale-105"
+                      draggable={false}
+                    />
+                  </div>
+                </div>
 
-                {/* Player de Vídeo Incorporado */}
-                <div className="relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-[#F0B55E]/50 shadow-xl bg-black">
-                  <iframe
-                    className="w-full h-full"
-                    src="https://www.youtube.com/embed/dQw4w9WgXcQ?controls=1&rel=0"
-                    title="Canal Casa 6 — Bianca Tofoli no YouTube"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+                {/* Conteúdo: Título Grande, Texto e Botão Logo Abaixo */}
+                <div className="lg:col-span-7 space-y-4 text-white text-center lg:text-left">
+                  <h3 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.08]">
+                    Acompanhe a Casa 6 <span className="font-highlight italic text-[#FF4D4D] font-normal block sm:inline">em Vídeo no</span> YouTube
+                  </h3>
+                  <p className="text-sm sm:text-base text-[#E6E3F1]/90 leading-relaxed font-light max-w-2xl mx-auto lg:mx-0">
+                    Análises astrológicas semanais, leituras das lunações, reflexões sobre os trânsitos contemporâneos e conversas inspiradoras com Bianca Tofoli. Inscreva-se e ative as notificações para navegar com clareza.
+                  </p>
+                  <div className="pt-2">
+                    <a
+                      href={SITE_CONFIG.youtubeUrl || 'https://www.youtube.com/@biancatofoli'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[#FF0000] hover:bg-[#D90000] text-white px-8 py-4 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                    >
+                      <Play className="h-4 w-4 fill-white" />
+                      <span>ASSISTIR NO YOUTUBE</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </a>
+                  </div>
                 </div>
               </div>
-
-              {/* Botão Vermelho Oficial do YouTube */}
-              <div className="pt-6 relative z-10">
-                <a
-                  href={SITE_CONFIG.youtubeUrl || 'https://www.youtube.com'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2.5 w-full sm:w-auto rounded-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 px-8 text-xs uppercase tracking-wider shadow-xl transition-all cursor-pointer transform hover:-translate-y-0.5"
-                >
-                  <Play className="h-4 w-4 fill-white" />
-                  <span>ASSISTIR NO YOUTUBE</span>
-                </a>
-              </div>
             </div>
-
-            {/* BANNER 2: SPOTIFY (FUNDO ROXO, BOTÃO VERDE SPOTIFY) */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2B2566] via-[#211B55] to-[#3D206B] border-2 border-[#1DB954]/40 p-6 sm:p-8 lg:p-10 shadow-2xl flex flex-col justify-between text-white">
-              {/* Elementos Celestes de Fundo */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute -bottom-24 -right-24 w-60 h-60 rounded-full border border-[#1DB954]/10"></div>
-                <div className="absolute top-6 right-8 text-[#1DB954] opacity-50 text-xs">★</div>
-              </div>
-
-              <div className="space-y-4 relative z-10">
-                <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white leading-tight">
-                  Ouça no Spotify
-                </h3>
-                <p className="text-xs sm:text-sm text-[#E6E3F1]/90 leading-relaxed font-light">
-                  Episódios sobre os céus, rotina e autoconhecimento lúcido em formato de podcast para acompanhar onde estiver, no trânsito ou no trabalho.
-                </p>
-
-                {/* Player Oficial de Áudio do Spotify */}
-                <div className="relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-[#1DB954]/50 shadow-xl bg-[#121212]">
-                  <iframe
-                    src="https://open.spotify.com/embed/show/2vW3CknG8e7o8B0G12p1xQ?utm_source=generator&theme=0"
-                    width="100%"
-                    height="100%"
-                    frameBorder="0"
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                    loading="lazy"
-                    title="Podcast Casa 6 no Spotify"
-                    className="w-full h-full"
-                  />
-                </div>
-              </div>
-
-              {/* Botão Verde Oficial do Spotify */}
-              <div className="pt-6 relative z-10">
-                <a
-                  href={SITE_CONFIG.spotifyUrl || 'https://open.spotify.com'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2.5 w-full sm:w-auto rounded-full bg-[#1DB954] hover:bg-[#1aa34a] text-[#000000] font-black py-3.5 px-8 text-xs uppercase tracking-wider shadow-xl transition-all cursor-pointer transform hover:-translate-y-0.5"
-                >
-                  <svg className="h-4 w-4 fill-current text-black" viewBox="0 0 24 24">
-                    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
-                  </svg>
-                  <span>OUVIR NO SPOTIFY</span>
-                </a>
-              </div>
-            </div>
-
           </div>
+
+          {/* BANNER 2: SPOTIFY (FUNDO VERDE PROFUNDO / ROXO COM LOGO PULANDO PARA FORA) */}
+          <div className="relative pt-12 sm:pt-16 lg:pt-20">
+            <div className="relative rounded-3xl bg-gradient-to-r from-[#0E281E] via-[#133A2A] to-[#1E1B4B] border border-[#1DB954]/40 shadow-2xl p-6 sm:p-10 lg:p-14 overflow-visible text-white">
+              {/* Animação Astrológica de Fundo: Órbitas Girando e Cintilações */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+                <div className="absolute -right-20 -bottom-20 w-[460px] h-[460px] rounded-full border border-[#1DB954]/20 animate-celestial-orbit-slow" />
+                <div className="absolute -left-16 -top-20 w-[400px] h-[400px] rounded-full border border-dashed border-[#F0B55E]/15 animate-celestial-orbit-reverse" />
+                <div className="absolute top-12 right-1/3 text-[#1DB954] opacity-40 text-xs animate-pulse">✦</div>
+                <div className="absolute bottom-10 left-1/4 text-[#F0B55E] opacity-35 text-xs animate-pulse">★</div>
+              </div>
+
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                {/* Logo Oficial 3D Grande Pulando Para Fora do Box */}
+                <div className="lg:col-span-5 flex justify-center lg:justify-start">
+                  <div className="-mt-20 sm:-mt-28 lg:-mt-36 -mb-4 lg:-mb-8 sm:-ml-4 lg:-ml-8 shrink-0">
+                    <img
+                      src="https://static.wixstatic.com/media/02c8e0_ef5466f4282f4d28886ed7f8b0b0fff5~mv2.png"
+                      alt="Podcast Casa 6 no Spotify — Bianca Tofoli"
+                      className="w-64 sm:w-80 lg:w-[400px] h-auto object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.5)] transition-transform duration-500 hover:scale-105"
+                      draggable={false}
+                    />
+                  </div>
+                </div>
+
+                {/* Conteúdo: Título Grande, Texto e Botão Logo Abaixo */}
+                <div className="lg:col-span-7 space-y-4 text-white text-center lg:text-left">
+                  <h3 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.08]">
+                    Astrologia e Rotina <span className="font-highlight italic text-[#1ED760] font-normal block sm:inline">para Ouvir no</span> Spotify
+                  </h3>
+                  <p className="text-sm sm:text-base text-[#D1FAE5]/90 leading-relaxed font-light max-w-2xl mx-auto lg:mx-0">
+                    Episódios sobre os céus, rotina e autoconhecimento lúcido em formato de podcast para acompanhar onde você estiver — no trânsito, no trabalho ou em suas pausas diárias de autocuidado.
+                  </p>
+                  <div className="pt-2">
+                    <a
+                      href={SITE_CONFIG.spotifyUrl || 'https://open.spotify.com'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[#1DB954] hover:bg-[#1AA34A] text-[#052010] px-8 py-4 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                    >
+                      <svg className="h-4 w-4 fill-current text-[#052010]" viewBox="0 0 24 24">
+                        <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+                      </svg>
+                      <span>OUVIR NO SPOTIFY</span>
+                      <ArrowRight className="h-4 w-4 text-[#052010]" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
