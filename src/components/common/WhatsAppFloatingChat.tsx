@@ -148,7 +148,7 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
           {/* Foto oficial da Bianca no botão WhatsApp */}
           <div className="relative h-8 w-8 sm:h-9 sm:w-9 rounded-full border-2 border-white overflow-hidden shadow-xs shrink-0">
             <img
-              src="https://static.wixstatic.com/media/02c8e0_defbbc681ee8458ba9a2f91f33f4e6da~mv2.jpg"
+              src="https://static.wixstatic.com/media/02c8e0_54a33eeb476d45c49b7f4953c34177fc~mv2.jpeg"
               alt="Bianca Tofoli"
               className="h-full w-full object-cover"
             />
@@ -173,7 +173,7 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
             <div className="flex items-center gap-3">
               <div className="relative h-11 w-11 rounded-full border-2 border-white/90 overflow-hidden shadow-sm shrink-0">
                 <img
-                  src="https://static.wixstatic.com/media/02c8e0_defbbc681ee8458ba9a2f91f33f4e6da~mv2.jpg"
+                  src="https://static.wixstatic.com/media/02c8e0_54a33eeb476d45c49b7f4953c34177fc~mv2.jpeg"
                   alt="Bianca Tofoli"
                   className="h-full w-full object-cover"
                 />

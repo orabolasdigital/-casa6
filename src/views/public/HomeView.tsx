@@ -20,6 +20,7 @@ import { OFFICIAL_SERVICES, OFFICIAL_TESTIMONIALS, SITE_CONFIG } from '../../con
 import { FlipTarotCard } from '../../components/common/FlipTarotCard';
 import { ServiceDetailModal } from '../../components/common/ServiceDetailModal';
 import { ServiceItem } from '../../types';
+import { syncCatalogWithFirestore, CATALOG_BLOG_POSTS } from '../../services/catalogService';
 
 interface HomeViewProps {
   onOpenBooking: (serviceId?: string) => void;
@@ -31,6 +32,9 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
   const [selectedServiceForModal, setSelectedServiceForModal] = useState<ServiceItem | null>(null);
 
   useEffect(() => {
+    // Sincroniza coleções no Firestore
+    syncCatalogWithFirestore().catch(console.warn);
+
     const handleScroll = () => {
       setScrollY(window.scrollY);
     };
@@ -46,35 +50,15 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
   ];
 
   // Artigos Editoriais da Sessão 7 (Leituras Astrais)
-  const blogPosts = [
-    {
-      id: 'eclipse-lunar-em-peixes',
-      title: 'Eclipse Lunar em Peixes: O que essa energia desperta?',
-      excerpt: 'Dissolução de ilusões e o chamado para acolher a sensibilidade intuitiva nos ciclos reais.',
-      category: 'ECLIPSE',
-      roman: 'I',
-      imageUrl: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80',
-      date: '18 Setembro 2024'
-    },
-    {
-      id: 'mercurio-retrogrado-guia-consciente',
-      title: 'Mercúrio Retrógrado: Navegando com consciência',
-      excerpt: 'Por que a retrogradação é uma pausa biográfica necessária para revisar acordos e rotas.',
-      category: 'TRÂNSITOS',
-      roman: 'II',
-      imageUrl: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=800&q=80',
-      date: '02 Agosto 2024'
-    },
-    {
-      id: 'ano-novo-astrologico-renovacao',
-      title: 'Ano Novo Astrológico: Propósito e novos ciclos',
-      excerpt: 'O ingresso do Sol em Áries e a preparação para semear intenções duradouras.',
-      category: 'CICLOS',
-      roman: 'III',
-      imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
-      date: '20 Março 2024'
-    }
-  ];
+  const blogPosts = CATALOG_BLOG_POSTS.slice(0, 3).map((p, idx) => ({
+    id: p.id,
+    title: p.title,
+    excerpt: p.excerpt,
+    category: p.category,
+    roman: idx === 0 ? 'I' : idx === 1 ? 'II' : 'III',
+    imageUrl: p.imageUrl,
+    date: p.publishedAt
+  }));
 
   return (
     <div className="bg-[#F4EFE6] text-[#2B2566] overflow-x-hidden font-body">
@@ -212,7 +196,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
 
                 <div className="relative w-full h-full rounded-full overflow-hidden shadow-2xl border-4 border-white bg-white">
                   <img
-                    src="https://static.wixstatic.com/media/02c8e0_defbbc681ee8458ba9a2f91f33f4e6da~mv2.jpg"
+                    src="https://static.wixstatic.com/media/02c8e0_54a33eeb476d45c49b7f4953c34177fc~mv2.jpeg"
                     alt="Bianca Tofoli — Fundadora da Casa 6"
                     className="w-full h-full object-cover object-center protected-img"
                     draggable={false}

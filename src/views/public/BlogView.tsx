@@ -1,77 +1,56 @@
 /**
  * @license
  * Casa 6 — Bianca Tofoli
- * Visão Pública: /leituras (Blog)
- * Estrutura exata do print oficial: caixas retangulares com carta de tarô lateral esquerda
+ * Visão Pública: /leituras (Blog Oficial com SEO e GEO)
  */
 
 import React, { useState } from 'react';
-import { ArrowRight, X } from 'lucide-react';
-import { BlogPost } from '../../types';
+import { ArrowRight, X, Calendar, Clock, MapPin, Tag, ExternalLink } from 'lucide-react';
+import { CATALOG_BLOG_POSTS, BlogPostItem } from '../../services/catalogService';
 
 interface BlogViewProps {
-  onNavigate: (path: string) => void;
+  onNavigate?: (path: string) => void;
 }
 
-export const BlogView: React.FC<BlogViewProps> = ({ onNavigate }) => {
-  const [selectedPost, setSelectedPost] = useState<any | null>(null);
-
-  const posts = [
-    {
-      id: 'eclipse-lunar-em-peixes',
-      title: 'Eclipse Lunar em Peixes: O que essa energia desperta em você?',
-      excerpt: 'Uma leitura profunda sobre a dissolução de ilusões e o chamado cósmico para acolher a sensibilidade intuitiva sem perder os pés na matéria.',
-      authorName: 'Bianca Tofoli',
-      publishedAt: '18 Setembro 2024',
-      category: 'ECLIPSE',
-      roman: 'I',
-      readTime: '5 min de leitura',
-      image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80',
-      fullText: `Os eclipses no eixo Virgem-Peixes funcionam como aceleradores de destino. Enquanto Peixes nos convida a dissolver a rigidez, acolher a espiritualidade e confiar no fluxo invisível da vida, Virgem exige que aterrissamos esses insights na matéria, na rotina e na saúde do corpo. Durante este período, padrões de autosabotagem e ilusões afetivas tendem a vir à tona com força cristalina. A recomendação de Bianca Tofoli para este trânsito é priorizar o silêncio, a hidratação e evitar decisões definitivas sob a turbulência emocional do ápice do eclipse.`
-    },
-    {
-      id: 'mercurio-retrogrado-guia-consciente',
-      title: 'Mercúrio Retrógrado: Como navegar esse período com mais consciência',
-      excerpt: 'Por que a retrogradação não é um castigo cósmico, mas uma pausa biográfica necessária para revisar acordos, repensar palavras e recalcular rotas.',
-      authorName: 'Bianca Tofoli',
-      publishedAt: '02 Agosto 2024',
-      category: 'TRÂNSITOS',
-      roman: 'II',
-      readTime: '6 min de leitura',
-      image: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=800&q=80',
-      fullText: `Mercúrio é o mensageiro dos deuses, o regente da cognição, da palavra, das trocas comerciais e das conexões neurais. Três a quatro vezes ao ano, seu movimento aparente retrocede no céu. Em vez de temer falhas técnicas ou mal-entendidos, encare a retrogradação como um presente da natureza: um tempo sagrado para desacelerar o ritmo frenético, reler o que foi escrito, revisar contratos pendentes e reconciliar-se com pendências do passado.`
-    },
-    {
-      id: 'ano-novo-astrologico-renovacao',
-      title: 'Ano Novo Astrológico: Renovação, propósito e novos ciclos',
-      excerpt: 'O ingresso do Sol em Áries marca o verdadeiro despertar do zodíaco. Como preparar a mente e o corpo para semear intenções duradouras.',
-      authorName: 'Bianca Tofoli',
-      publishedAt: '20 Março 2024',
-      category: 'CICLOS',
-      roman: 'III',
-      readTime: '4 min de leitura',
-      image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
-      fullText: `Diferente do calendário civil de janeiro, o Ano Novo Astrológico tem início exato no Equinócio, momento em que o Sol ingressa no grau zero de Áries. É o fogo primal que rompe a casca da semente. Neste momento, todas as doze forças arquetípicas se renovam. É a hora ideal para realizar o seu Mapa de Revolução Solar ou planejar os grandes projetos que demandarão coragem e pioneirismo nos próximos doze meses.`
-    },
-    {
-      id: 'o-que-revela-a-casa-6',
-      title: 'O que revela a Casa 6 no Mapa Astral? Da rotina à maestria do corpo',
-      excerpt: 'Por que a Casa 6 é frequentemente mal interpretada como mero trabalho mecânico, quando na verdade é o território do refinamento e da presença cotidiana.',
-      authorName: 'Bianca Tofoli',
-      publishedAt: '15 Fevereiro 2024',
-      category: 'FUNDAMENTOS',
-      roman: 'IV',
-      readTime: '7 min de leitura',
-      image: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80',
-      fullText: `Na astrologia tradicional, a Casa 6 rege os hábitos diários, o trabalho instrumental, a saúde psicossomática e os pequenos ajustes que sustentam a vida. Foi inspirada nessa casa que nasceu o projeto Casa 6: um lembrete constante de que a sabedoria espiritual mais refinada não reside em abstrações inalcançáveis, mas no modo como você acorda, respira, cuida do seu corpo e organiza sua rotina no plano real.`
-    }
-  ];
+export const BlogView: React.FC<BlogViewProps> = () => {
+  const [selectedPost, setSelectedPost] = useState<BlogPostItem | null>(null);
 
   return (
     <div className="bg-[#F4EFE6] text-[#2B2566] min-h-screen py-12 sm:py-20 px-4 sm:px-6 lg:px-8 space-y-16">
       
+      {/* Schema.org Blog/Article JSON-LD para Indexação SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Blog',
+            name: 'Leituras Casa 6 — Bianca Tofoli',
+            description: 'Artigos autorais, estudos astrológicos e reflexões sobre autoconhecimento e rotina.',
+            publisher: {
+              '@type': 'Organization',
+              name: 'Casa 6',
+              logo: 'https://static.wixstatic.com/media/02c8e0_75b529b0748c4e54adf4e58bfa7c78dc~mv2.png'
+            },
+            spatialCoverage: 'São Paulo, Brasil',
+            blogPost: CATALOG_BLOG_POSTS.map((post) => ({
+              '@type': 'BlogPosting',
+              headline: post.title,
+              image: post.imageUrl,
+              datePublished: post.publishedAt,
+              author: {
+                '@type': 'Person',
+                name: post.authorName
+              },
+              articleBody: post.excerpt,
+              url: post.originalUrl
+            }))
+          })
+        }}
+      />
+
       {/* Header Institucional */}
-      <div className="text-center space-y-3 max-w-2xl mx-auto">
+      <div className="text-center space-y-3 max-w-3xl mx-auto">
         <div className="flex justify-center pb-1">
           <img
             src="https://static.wixstatic.com/media/02c8e0_75b529b0748c4e54adf4e58bfa7c78dc~mv2.png"
@@ -80,114 +59,152 @@ export const BlogView: React.FC<BlogViewProps> = ({ onNavigate }) => {
           />
         </div>
         <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#8C987F]">
-          EDITORIAL & CADERNO ASTRAL
+          CADERNO ASTRAL & ARTIGOS AUTORAIS
         </span>
         <h1 className="font-heading text-4xl sm:text-6xl font-extrabold text-[#2B2566] tracking-tight">
           Leituras Casa 6
         </h1>
         <p className="text-sm sm:text-base text-[#423C7B] leading-relaxed">
-          Artigos autorais, estudos dos céus e reflexões de Bianca Tofoli sobre a experiência humana iluminada pela astrologia contemporânea.
+          Artigos autorais, trânsitos celestes e reflexões práticas de Bianca Tofoli para integrar a astrologia ao seu autoconhecimento e rotina.
         </p>
       </div>
 
-      {/* Lista de Artigos no Formato de Caixas Retangulares com Carta de Tarô à Esquerda */}
+      {/* Grid Oficial dos 6 Artigos no Formato de Caixas Retangulares com Imagem à Esquerda */}
       <div className="max-w-5xl mx-auto space-y-6">
-        {posts.map((post) => (
-          <div
+        {CATALOG_BLOG_POSTS.map((post, idx) => (
+          <article
             key={post.id}
-            className="bg-[#FCFAF7] rounded-3xl border border-[#c7c5b6] shadow-md hover:border-[#fab03b] transition-all p-5 sm:p-7 grid grid-cols-1 md:grid-cols-12 gap-6 items-center"
+            className="bg-[#FCFAF7] rounded-sm border border-[#DAD2C4] shadow-md hover:shadow-xl hover:border-[#1b1463] transition-all p-5 sm:p-7 grid grid-cols-1 md:grid-cols-12 gap-6 items-center font-sans"
           >
-            {/* Imagem em Formato de Carta de Tarô à Esquerda */}
-            <div className="md:col-span-4 flex justify-center">
-              <div className="w-40 sm:w-48 aspect-[5/8] rounded-2xl overflow-hidden border-2 border-[#fab03b] shadow-xl relative group">
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="w-full h-full object-cover protected-img"
-                  draggable={false}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#1b1463] via-transparent to-transparent opacity-80" />
-                <div className="absolute top-2.5 left-2.5 text-[11px] font-bold text-[#fab03b] bg-[#1b1463]/90 px-2 py-0.5 rounded-full border border-[#fab03b]/40">
-                  {post.roman}
-                </div>
-                <div className="absolute bottom-3 left-3 right-3 text-white text-xs font-heading font-bold">
-                  {post.category}
-                </div>
-              </div>
+            {/* Thumbnail / Foto do Artigo */}
+            <div className="md:col-span-4 h-52 sm:h-56 rounded-sm overflow-hidden bg-[#2B2566]/5 border border-[#DAD2C4] relative group">
+              <img
+                src={post.imageUrl}
+                alt={post.title}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+              <span className="absolute top-2.5 left-2.5 bg-[#1b1463] text-[#F0B55E] text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider">
+                {post.category}
+              </span>
             </div>
 
-            {/* Conteúdo Editorial à Direita */}
+            {/* Conteúdo Editorial */}
             <div className="md:col-span-8 space-y-3">
-              <div className="flex items-center gap-2 text-[10px] font-bold text-[#6a62b8] uppercase tracking-wider">
-                <span>{post.category}</span>
+              <div className="flex flex-wrap items-center gap-3 text-xs text-[#8C987F]">
+                <span className="flex items-center gap-1">
+                  <Calendar className="h-3.5 w-3.5 text-[#F0B55E]" />
+                  <span>{post.publishedAt}</span>
+                </span>
                 <span>•</span>
-                <span>{post.publishedAt}</span>
+                <span className="flex items-center gap-1">
+                  <Clock className="h-3.5 w-3.5 text-[#F0B55E]" />
+                  <span>{post.readTime}</span>
+                </span>
                 <span>•</span>
-                <span>{post.readTime}</span>
+                <span className="flex items-center gap-1">
+                  <MapPin className="h-3.5 w-3.5 text-[#25D366]" />
+                  <span>{post.geoCoverage}</span>
+                </span>
               </div>
 
-              <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#1b1463] leading-snug">
+              <h2 className="font-heading text-xl sm:text-2xl font-bold text-[#1b1463] leading-snug">
                 {post.title}
               </h2>
 
-              <p className="text-xs sm:text-sm text-[#372B69] leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#423C7B] leading-relaxed line-clamp-3">
                 {post.excerpt}
               </p>
 
-              <div className="pt-2">
+              {/* Tags de SEO */}
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {post.seoKeywords.slice(0, 4).map((tag, tIdx) => (
+                  <span
+                    key={tIdx}
+                    className="inline-flex items-center gap-1 text-[10px] bg-white border border-[#DAD2C4] px-2 py-0.5 rounded-sm text-[#534D6B]"
+                  >
+                    <Tag className="h-2.5 w-2.5 text-[#8C987F]" />
+                    <span>#{tag}</span>
+                  </span>
+                ))}
+              </div>
+
+              {/* Botão de Ler Artigo Completo */}
+              <div className="pt-2 flex items-center gap-4">
                 <button
                   type="button"
                   onClick={() => setSelectedPost(post)}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#1b1463] text-[#fab03b] hover:bg-[#372B69] px-7 py-3 text-xs font-extrabold uppercase tracking-wider shadow-md transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-2 text-xs font-bold text-[#1b1463] hover:text-[#C2593F] transition-colors cursor-pointer group"
                 >
-                  <span>LER ARTIGO COMPLETO</span>
-                  <ArrowRight className="h-4 w-4" />
+                  <span className="underline underline-offset-4">Ler texto completo</span>
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                 </button>
+                <a
+                  href={post.originalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[11px] text-[#8C987F] hover:text-[#1b1463] inline-flex items-center gap-1"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  <span>Ver original</span>
+                </a>
               </div>
             </div>
-          </div>
+          </article>
         ))}
       </div>
 
-      {/* Modal Leitor de Artigo Completo */}
+      {/* Modal de Leitura Integral do Artigo */}
       {selectedPost && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-[#1b1463]/85 backdrop-blur-sm animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#080C35]/80 backdrop-blur-xs animate-in fade-in duration-200"
           role="dialog"
           aria-modal="true"
         >
-          <div className="relative w-full max-w-2xl rounded-3xl bg-[#FCFAF7] border-2 border-[#fab03b] shadow-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto space-y-6">
-            <button
-              onClick={() => setSelectedPost(null)}
-              className="absolute top-4 right-4 p-2 rounded-full text-[#1b1463] hover:bg-gray-100"
-              aria-label="Fechar"
-            >
-              <X className="h-6 w-6" />
-            </button>
-
-            <div className="space-y-2 border-b border-[#c7c5b6] pb-4">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#6a62b8]">
-                {selectedPost.category} • Por {selectedPost.authorName} • {selectedPost.publishedAt}
-              </span>
-              <h2 className="font-heading text-2xl sm:text-3xl font-bold text-[#1b1463]">
-                {selectedPost.title}
-              </h2>
-            </div>
-
-            <div className="rounded-2xl overflow-hidden aspect-video border border-[#c7c5b6]">
-              <img src={selectedPost.image} alt={selectedPost.title} className="w-full h-full object-cover" />
-            </div>
-
-            <div className="text-xs sm:text-sm text-[#372B69] leading-relaxed space-y-4">
-              <p>{selectedPost.fullText}</p>
-            </div>
-
-            <div className="pt-4 border-t border-[#c7c5b6] flex justify-end">
+          <div className="relative w-full max-w-3xl rounded-sm bg-[#FCFAF7] shadow-2xl border border-[#DAD2C4] overflow-hidden flex flex-col max-h-[90vh] font-sans">
+            {/* Header do Artigo */}
+            <div className="bg-[#1b1463] text-white p-5 flex items-center justify-between border-b border-[#F0B55E]/40 shrink-0">
+              <div className="space-y-1 pr-6">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#F0B55E] block">
+                  {selectedPost.category} • {selectedPost.publishedAt}
+                </span>
+                <h3 className="font-heading text-lg sm:text-xl font-bold text-white leading-snug">
+                  {selectedPost.title}
+                </h3>
+              </div>
               <button
+                type="button"
                 onClick={() => setSelectedPost(null)}
-                className="px-6 py-2.5 rounded-full bg-[#1b1463] text-[#fab03b] text-xs font-bold"
+                className="p-1.5 rounded-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                aria-label="Fechar artigo"
               >
-                Fechar Artigo
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Imagem de Capa do Artigo */}
+            <div className="w-full h-48 sm:h-64 overflow-hidden relative shrink-0">
+              <img
+                src={selectedPost.imageUrl}
+                alt={selectedPost.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Texto Integral */}
+            <div className="p-6 sm:p-8 overflow-y-auto space-y-4 text-xs sm:text-sm text-[#423C7B] leading-relaxed whitespace-pre-line">
+              {selectedPost.fullContent}
+            </div>
+
+            {/* Footer do Modal */}
+            <div className="p-4 bg-white border-t border-[#DAD2C4] flex items-center justify-between text-xs text-[#8C987F] shrink-0">
+              <span>Autoria: Bianca Tofoli • Casa 6</span>
+              <button
+                type="button"
+                onClick={() => setSelectedPost(null)}
+                className="px-4 py-1.5 rounded-sm bg-[#1b1463] text-white font-bold text-xs hover:bg-[#2B2566] transition-colors"
+              >
+                Fechar Leitura
               </button>
             </div>
           </div>

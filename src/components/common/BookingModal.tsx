@@ -154,7 +154,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             {/* Avatar / Foto de Bianca Tofoli */}
             <div className="relative h-11 w-11 rounded-full border-2 border-white/80 overflow-hidden shadow-sm shrink-0">
               <img
-                src="https://static.wixstatic.com/media/02c8e0_defbbc681ee8458ba9a2f91f33f4e6da~mv2.jpg"
+                src="https://static.wixstatic.com/media/02c8e0_54a33eeb476d45c49b7f4953c34177fc~mv2.jpeg"
                 alt="Bianca Tofoli"
                 className="h-full w-full object-cover"
               />

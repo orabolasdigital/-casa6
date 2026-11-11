@@ -29,7 +29,7 @@ export const SobreView: React.FC<SobreViewProps> = ({ onOpenBooking }) => {
 
               <div className="relative w-full h-full rounded-full overflow-hidden shadow-2xl border-4 border-white">
                 <img
-                  src="https://static.wixstatic.com/media/02c8e0_defbbc681ee8458ba9a2f91f33f4e6da~mv2.jpg"
+                  src="https://static.wixstatic.com/media/02c8e0_63e97f88890846189f1b1042d3ce08c1~mv2.jpeg"
                   alt="Bianca Tofoli"
                   className="w-full h-full object-cover protected-img"
                   draggable={false}
@@ -40,61 +40,83 @@ export const SobreView: React.FC<SobreViewProps> = ({ onOpenBooking }) => {
 
           <div className="lg:col-span-7 space-y-4 text-center lg:text-left">
             <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#6a62b8]">
-              BIOGRAFIA & FILOSOFIA
+              BIOGRAFIA & PROPÓSITO
             </span>
             <h1 className="font-heading text-4xl sm:text-5xl font-extrabold text-[#2B2566] tracking-tight">
-              Bianca Tofoli & Casa 6
+              Bianca Tofoli
             </h1>
             <p className="text-sm sm:text-base text-[#423C7B] leading-relaxed">
-              Uma prática astrológica contemporânea, lúcida e voltada para a compreensão dos ciclos humanos reais.
+              Sou Bianca Tofoli, enfermeira formada pela UNESP - Botucatu, com mais de 10 anos de experiência em gestão de saúde e liderança de equipes, chegando a coordenar nove unidades de atendimento em SP. Em 2021, segui um novo chamado e fiz minha transição de carreira para a astrologia, trazendo comigo o propósito de continuar cuidando de pessoas — agora, de um jeito diferente.
             </p>
             <div className="pt-2 pl-4 border-l-2 border-[#F0B55E] text-left">
               <p className="font-highlight italic text-base sm:text-lg text-[#2B2566]">
-                “A astrologia não serve para adivinhar futuros fictícios, mas para nos recordar da grandeza lúcida de quem já somos.”
+                “Para mim, tudo tem rachaduras — mas é por elas que entra a luz, se assim permitirmos!”
               </p>
             </div>
           </div>
         </div>
 
-        {/* Os 3 Pilares Oficiais */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-[#FCFAF7] p-6 rounded-2xl border border-[#c7c5b6] shadow-sm space-y-2">
-            <Sun className="h-6 w-6 text-[#fab03b]" />
-            <h3 className="font-heading font-bold text-base text-[#1b1463]">Autoconhecimento</h3>
-            <p className="text-xs text-[#372B69] leading-relaxed">
-              Mapeamento do mapa natal, desarmando armadilhas inconscientes e ativando talentos natos com autonomia.
+        {/* Pilares */}
+        <div className="space-y-6">
+          <div className="text-center max-w-2xl mx-auto space-y-2">
+            <h2 className="font-heading text-2xl sm:text-3xl font-bold text-[#1b1463]">
+              Pilares
+            </h2>
+            <p className="text-xs sm:text-sm text-[#423C7B] leading-relaxed">
+              Acreditamos que compreender a si mesmo é o primeiro passo para transformar sua vida. Quando você entende seus ciclos, padrões e potencialidades, é capaz de fazer escolhas mais alinhadas com o seu propósito e desenvolver relações mais saudáveis consigo e com os outros.
+            </p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[#6a62b8]">
+              Nosso trabalho é pautado em três pilares fundamentais:
             </p>
           </div>
 
-          <div className="bg-[#FCFAF7] p-6 rounded-2xl border border-[#c7c5b6] shadow-sm space-y-2">
-            <Moon className="h-6 w-6 text-[#6a62b8]" />
-            <h3 className="font-heading font-bold text-base text-[#1b1463]">Equilíbrio</h3>
-            <p className="text-xs text-[#372B69] leading-relaxed">
-              Harmonia entre o corpo físico, a respiração e os trânsitos cósmicos de cada fase da lua.
-            </p>
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-[#FCFAF7] p-6 rounded-2xl border border-[#c7c5b6] shadow-sm space-y-2">
+              <Sun className="h-6 w-6 text-[#fab03b]" />
+              <h3 className="font-heading font-bold text-base text-[#1b1463]">Autoconhecimento</h3>
+              <p className="text-xs text-[#372B69] leading-relaxed">
+                Ferramentas para que você se compreenda melhor e use esse conhecimento no seu dia a dia.
+              </p>
+            </div>
 
-          <div className="bg-[#FCFAF7] p-6 rounded-2xl border border-[#c7c5b6] shadow-sm space-y-2">
-            <Sparkles className="h-6 w-6 text-[#fab03b]" />
-            <h3 className="font-heading font-bold text-base text-[#1b1463]">Expansão</h3>
-            <p className="text-xs text-[#372B69] leading-relaxed">
-              Planejamento astral e coragem para fazer transições de carreira e relacionamentos lúcidos.
-            </p>
+            <div className="bg-[#FCFAF7] p-6 rounded-2xl border border-[#c7c5b6] shadow-sm space-y-2">
+              <Moon className="h-6 w-6 text-[#6a62b8]" />
+              <h3 className="font-heading font-bold text-base text-[#1b1463]">Equilíbrio</h3>
+              <p className="text-xs text-[#372B69] leading-relaxed">
+                Estratégias para harmonizar sua energia, rotina e relações.
+              </p>
+            </div>
+
+            <div className="bg-[#FCFAF7] p-6 rounded-2xl border border-[#c7c5b6] shadow-sm space-y-2">
+              <Sparkles className="h-6 w-6 text-[#fab03b]" />
+              <h3 className="font-heading font-bold text-base text-[#1b1463]">Expansão</h3>
+              <p className="text-xs text-[#372B69] leading-relaxed">
+                Conhecimento aplicado para que você possa evoluir de forma contínua e consciente.
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Seção Quem é Bianca e O que é a Casa 6 */}
         <section className="space-y-6 text-sm text-[#372B69] leading-relaxed">
-          <div className="rounded-3xl bg-[#FCFAF7] p-8 border border-[#c7c5b6] shadow-sm space-y-3">
+          <div className="rounded-3xl bg-[#FCFAF7] p-8 border border-[#c7c5b6] shadow-sm space-y-4">
+            <p>
+              Acredito que a astrologia é uma poderosa ferramenta de autoconhecimento e transformação. Meu objetivo é integrá-la ao dia a dia das pessoas, na rotina, ajudando-as a encontrar mais equilíbrio e realização em suas carreiras, relacionamentos, saúde e bem-estar. Quero que cada pessoa descubra sua própria essência e viva de forma mais consciente e alinhada com seus propósitos.
+            </p>
+            <p className="font-medium text-[#1b1463]">
+              A Casa 6 é a materialização desse propósito: um espaço onde você pode se compreender, alinhar sua energia e viver com mais autenticidade.
+            </p>
+          </div>
+
+          <div className="rounded-3xl bg-[#FCFAF7] p-8 border border-[#c7c5b6] shadow-sm space-y-4">
             <h2 className="font-heading text-2xl font-bold text-[#1b1463]">
-              Quem é Bianca Tofoli?
+              A Casa 6
             </h2>
             <p>
-              <strong className="text-[#1b1463]">Bianca Tofoli</strong> é astróloga, pesquisadora e fundadora da{' '}
-              <strong className="text-[#1b1463]">Casa 6</strong>. Com sólida formação em astrologia psicológica e simbologia arquetípica, Bianca desenvolve uma leitura de mapa que une a precisão dos cálculos celestes à sensibilidade humana acolhedora.
+              Nasceu com o propósito de promover o autoconhecimento, a expansão da consciência e o equilíbrio entre vida pessoal e profissional. Criamos um espaço seguro onde cada pessoa pode se reconectar consigo mesma e encontrar ferramentas para viver com mais clareza, propósito e bem-estar.
             </p>
             <p>
-              Além de consultas individuais, Bianca conduz workshops corporativos em consonância com a Norma Regulamentadora NR-1, mentorias contínuas na comunidade Patota Astral e vivências imersivas no Brasil.
+              Nosso trabalho é guiado pelo princípio de que o autoconhecimento é uma das chaves para uma vida mais harmoniosa. Unimos astrologia, terapias integrativas e consultorias personalizadas para oferecer suporte tanto no nível individual quanto no corporativo.
             </p>
           </div>
 

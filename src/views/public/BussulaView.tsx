@@ -78,16 +78,16 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
       
       {/* Hero da Bússola Guia */}
       <div className="max-w-4xl mx-auto text-center space-y-5">
-        <div className="flex justify-center pb-1">
+        <div className="flex justify-center pb-2">
           <img
-            src="https://static.wixstatic.com/media/02c8e0_75b529b0748c4e54adf4e58bfa7c78dc~mv2.png"
-            alt="Casa 6"
-            className="h-10 w-auto object-contain"
+            src="https://static.wixstatic.com/media/02c8e0_688edec712d4401984a6e1cf8afeb93e~mv2.png"
+            alt="Bússola Guia — Casa 6"
+            className="h-28 sm:h-36 w-auto object-contain transition-transform hover:scale-105"
           />
         </div>
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#2B2566] text-[#F0B55E] text-xs font-bold uppercase tracking-widest shadow-sm">
           <Compass className="h-4 w-4 text-[#F0B55E]" />
-          <span>NOVO SERVIÇO EXCLUSIVO</span>
+          <span>SERVIÇO DE ASSINATURA RECORRENTE</span>
         </div>
 
         <h1 className="font-heading text-4xl sm:text-6xl font-bold tracking-tight text-[#2B2566] leading-tight">
@@ -99,8 +99,14 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
         </p>
 
         <p className="text-sm sm:text-base text-[#423C7B] max-w-2xl mx-auto leading-relaxed">
-          Uma orientação lúcida calculada individualmente para o seu mapa de nascimento. Entenda os trânsitos que tocam suas casas astrológicas, as lunações do mês e as janelas de oportunidade para cada decisão.
+          Neste serviço você recebe um PDF com um relatório sobre o seu mês astrológico personalizado mensalmente no seu WhatsApp e tem acesso também à Área de Membros no site, onde acessa com seu e-mail e CPF para consultar seus trânsitos e previsões.
         </p>
+
+        <div className="inline-block bg-[#FCFAF7] border border-[#DAD2C4] px-6 py-2.5 rounded-sm shadow-xs">
+          <span className="text-xs font-bold text-[#8C987F] uppercase tracking-wider block">PLANO MENSAL</span>
+          <span className="font-heading text-2xl font-extrabold text-[#1b1463]">R$ 47,00</span>
+          <span className="text-xs text-[#534D6B]"> / mês (renovação automática)</span>
+        </div>
       </div>
 
       {/* Grid com os 3 Pilares da Bússola */}
@@ -342,16 +348,16 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
           <div className="pt-4">
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-3 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] py-4 px-8 text-sm font-extrabold uppercase tracking-wider shadow-xl transition-all cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
+              className="w-full flex items-center justify-center gap-3 rounded-sm bg-[#1b1463] hover:bg-[#2B2566] text-[#F0B55E] py-4 px-8 text-sm font-extrabold uppercase tracking-wider shadow-xl transition-all cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0 font-sans"
             >
               <ShieldCheck className="h-5 w-5" />
-              <span>IR PARA CHECKOUT MERCADO PAGO (R$ 68,00)</span>
+              <span>ASSINAR BÚSSOLA GUIA (R$ 47,00/MÊS)</span>
               <ArrowRight className="h-5 w-5" />
             </button>
           </div>
 
           <p className="text-[11px] text-center text-[#68638C]">
-            Pagamento seguro processado pelo Mercado Pago. Seus dados de certidão são estritamente confidenciais.
+            Pagamento seguro de assinatura processado pelo Mercado Pago com renovação automática mensal. Seus dados de certidão são estritamente confidenciais.
           </p>
         </form>
       </div>
@@ -361,8 +367,8 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
         isOpen={checkoutOpen}
         onClose={() => setCheckoutOpen(false)}
         serviceType="bussula"
-        itemTitle="Bússola Guia — Relatório Astral Mensal Personalizado"
-        amount={68.0}
+        itemTitle="Bússola Guia — Relatório Astral Mensal (Assinatura Recorrente)"
+        amount={47.0}
         customerData={{
           firstName,
           lastName,

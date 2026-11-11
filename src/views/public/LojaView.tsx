@@ -2,162 +2,145 @@
  * @license
  * Casa 6 — Bianca Tofoli
  * Visão Pública: /lojinha & /loja
- * Estrutura oficial idêntica ao print anexado com filtro lateral de preço e Checkout Mercado Pago
+ * Lojinha Oficial com Box Semeadura, Coleção Ritos do Universo e Checkout Mercado Pago
  */
 
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Package, Sparkles, CheckCircle2, ShieldCheck, ArrowRight, Truck } from 'lucide-react';
+import { CATALOG_LOJINHA, LojinhaProduct } from '../../services/catalogService';
 import { MercadoPagoCheckoutModal } from '../../components/common/MercadoPagoCheckoutModal';
 
 interface LojaViewProps {
-  onOpenBooking: () => void;
+  onOpenBooking?: () => void;
 }
 
-export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
-  const [maxPriceFilter, setMaxPriceFilter] = useState(120);
-  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+export const LojaView: React.FC<LojaViewProps> = () => {
+  const [selectedProduct, setSelectedProduct] = useState<LojinhaProduct | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
 
-  const products = [
-    {
-      id: 'ps-astral-outubro-novembro',
-      title: 'PS Astral — Outubro + Novembro',
-      price: 97.0,
-      priceFormatted: 'R$ 97,00',
-      shipping: 'Frete',
-      badge: null,
-      imageUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80'
-    },
-    {
-      id: 'patota-astral-lojinha',
-      title: 'PATOTA ASTRAL',
-      price: 53.0,
-      priceFormatted: 'R$ 53,00',
-      shipping: 'Frete',
-      badge: 'Assinatura',
-      imageUrl: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=600&q=80'
-    },
-    {
-      id: 'bussula-guia-lojinha',
-      title: 'BÚSSOLA GUIA (RELATÓRIO MENSAL)',
-      price: 68.0,
-      priceFormatted: 'R$ 68,00',
-      shipping: 'Frete',
-      badge: 'Novo',
-      imageUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=600&q=80'
-    }
-  ];
+  const product = CATALOG_LOJINHA[0];
 
-  const filteredProducts = products.filter((p) => p.price <= maxPriceFilter);
-
-  const handleAddToCart = (product: any) => {
-    setSelectedProduct(product);
+  const handleBuy = (item: LojinhaProduct) => {
+    setSelectedProduct(item);
     setCheckoutOpen(true);
   };
 
   return (
-    <div className="bg-[#F4EFE6] text-[#2B2566] min-h-screen py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="bg-[#F4EFE6] text-[#2B2566] min-h-screen py-12 sm:py-16 px-4 sm:px-6 lg:px-8 space-y-12">
+      <div className="max-w-6xl mx-auto space-y-12">
         
-        {/* Container Principal em Grid (Sidebar Filtrar + Grade de Produtos) */}
-        <div className="bg-[#FCFAF7] rounded-3xl border border-[#E2DCCF] shadow-xl p-6 sm:p-12 grid grid-cols-1 md:grid-cols-12 gap-10">
-          
-          {/* =========================================================================
-              COLUNA ESQUERDA: FILTRAR & SLIDER DE PREÇO (CONFORME PRINT OFICIAL)
-              ========================================================================= */}
-          <aside className="md:col-span-3 space-y-8 border-b md:border-b-0 md:border-r border-[#E2DCCF]/60 pb-8 md:pb-0 md:pr-8">
-            <h2 className="font-heading text-2xl font-normal text-[#2B2566]">
-              Filtrar
-            </h2>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between text-xs font-medium text-[#1b1463]">
-                <span>Preço</span>
-                <span>—</span>
-              </div>
-
-              {/* Slider de Preço */}
-              <div className="space-y-2">
-                <input
-                  type="range"
-                  min="50"
-                  max="120"
-                  step="1"
-                  value={maxPriceFilter}
-                  onChange={(e) => setMaxPriceFilter(Number(e.target.value))}
-                  className="w-full accent-[#1b1463] cursor-pointer"
-                />
-
-                <div className="flex items-center justify-between text-xs text-[#372B69]">
-                  <span>R$ 53</span>
-                  <span>Até R$ {maxPriceFilter}</span>
-                </div>
-              </div>
-            </div>
-          </aside>
-
-          {/* =========================================================================
-              COLUNA DIREITA: GRADE DE PRODUTOS & PAGINAÇÃO (CONFORME PRINT OFICIAL)
-              ========================================================================= */}
-          <main className="md:col-span-9 space-y-12">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProducts.map((product) => (
-                <div key={product.id} className="space-y-4 group">
-                  
-                  {/* Foto Quadrada com Badge */}
-                  <div className="relative aspect-square rounded-xl overflow-hidden border border-[#c7c5b6] shadow-xs bg-[#1b1463]">
-                    {product.badge && (
-                      <span className="absolute top-2 left-2 z-10 bg-[#d8d6c8] text-[#1b1463] text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded shadow-xs">
-                        {product.badge}
-                      </span>
-                    )}
-
-                    <img
-                      src={product.imageUrl}
-                      alt={product.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 protected-img"
-                      draggable={false}
-                    />
-                  </div>
-
-                  {/* Informações: Título, Preço e Frete */}
-                  <div className="space-y-1">
-                    <h3 className="font-heading font-medium text-sm sm:text-base text-[#1b1463] leading-snug">
-                      {product.title}
-                    </h3>
-                    <div className="w-6 h-0.5 bg-[#fab03b] my-1" />
-                    <p className="text-sm font-bold text-[#f58220]">
-                      {product.priceFormatted}
-                    </p>
-                    <p className="text-[11px] text-[#372B69]">
-                      {product.shipping}
-                    </p>
-                  </div>
-
-                  {/* Botão Oficial Laranja/Dourado: Adicionar ao carrinho */}
-                  <button
-                    onClick={() => handleAddToCart(product)}
-                    className="w-full py-3 px-4 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] text-xs font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer transform active:scale-98"
-                  >
-                    Adicionar ao carrinho
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            {/* Paginação do Print: < 1 > */}
-            <div className="flex items-center justify-center gap-4 text-xs text-[#372B69] pt-6 border-t border-[#c7c5b6]/40">
-              <button aria-label="Página anterior" className="p-1 hover:text-[#1b1463] cursor-pointer">
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <span className="font-bold text-[#1b1463]">1</span>
-              <button aria-label="Próxima página" className="p-1 hover:text-[#1b1463] cursor-pointer">
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          </main>
-
+        {/* Header Institucional */}
+        <div className="text-center space-y-3 max-w-3xl mx-auto">
+          <div className="flex justify-center pb-1">
+            <img
+              src="https://static.wixstatic.com/media/02c8e0_75b529b0748c4e54adf4e58bfa7c78dc~mv2.png"
+              alt="Casa 6"
+              className="h-10 w-auto object-contain"
+            />
+          </div>
+          <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#8C987F]">
+            LOJINHA OFICIAL CASA 6 • RITUAIS & OBJETOS
+          </span>
+          <h1 className="font-heading text-4xl sm:text-6xl font-extrabold text-[#2B2566] tracking-tight">
+            Lojinha Casa 6
+          </h1>
+          <p className="text-sm sm:text-base text-[#423C7B] leading-relaxed">
+            Curadorias rituais e amuletos desenhados para materializar os ciclos astrológicos na sua rotina com sensibilidade e presença.
+          </p>
         </div>
+
+        {/* Card Destaque: Box SEMEADURA */}
+        <div className="bg-[#FCFAF7] rounded-sm border border-[#DAD2C4] shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 font-sans">
+          
+          {/* Imagem Oficial da Box */}
+          <div className="lg:col-span-6 bg-[#2B2566]/5 relative flex items-center justify-center border-b lg:border-b-0 lg:border-r border-[#DAD2C4] p-6 sm:p-10">
+            <div className="relative w-full aspect-4/3 rounded-sm overflow-hidden shadow-lg border border-[#DAD2C4] bg-white">
+              <img
+                src={product.image}
+                alt={product.title}
+                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              />
+              <span className="absolute top-3 left-3 bg-[#1b1463] text-[#F0B55E] text-xs font-bold px-3 py-1 rounded-sm uppercase tracking-wider">
+                EDIÇÃO LIMITADA
+              </span>
+            </div>
+          </div>
+
+          {/* Detalhamento Completo da Box */}
+          <div className="lg:col-span-6 p-6 sm:p-10 space-y-6 flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#C2593F] block">
+                  {product.collectionName}
+                </span>
+                <h2 className="font-heading text-3xl sm:text-4xl font-extrabold text-[#1b1463] tracking-tight">
+                  {product.title}
+                </h2>
+                <div className="font-heading text-3xl font-extrabold text-[#1b1463] pt-1">
+                  {product.priceFormatted}
+                </div>
+              </div>
+
+              <p className="text-xs sm:text-sm text-[#423C7B] leading-relaxed">
+                {product.description}
+              </p>
+
+              {/* Coleção Ritos do Universo */}
+              <div className="bg-white p-4 rounded-sm border border-[#DAD2C4] space-y-1.5 text-xs text-[#534D6B]">
+                <p className="font-bold text-[#1b1463] uppercase tracking-wider text-[11px]">
+                  Sobre a {product.collectionName}:
+                </p>
+                <p className="leading-relaxed">
+                  {product.collectionDescription}
+                </p>
+              </div>
+
+              {/* Conteúdo da Box */}
+              <div className="space-y-2 pt-1">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#1b1463] flex items-center gap-1.5">
+                  <Package className="h-4 w-4 text-[#F0B55E]" />
+                  <span>CONTEÚDO DA BOX:</span>
+                </p>
+                <ul className="space-y-1.5 text-xs text-[#534D6B]">
+                  {product.boxItems.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-[#25D366] shrink-0 mt-0.5" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Ação de Compra */}
+            <div className="pt-6 border-t border-[#DAD2C4] space-y-3">
+              <div className="flex items-center gap-2 text-xs text-[#8C987F]">
+                <Truck className="h-4 w-4 text-[#1b1463]" />
+                <span>Envio para todo o Brasil com cálculo de frete por CEP na próxima etapa.</span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleBuy(product)}
+                className="w-full flex items-center justify-center gap-2.5 rounded-sm bg-[#1b1463] hover:bg-[#2B2566] text-[#F0B55E] py-4 px-8 text-sm font-extrabold uppercase tracking-wider shadow-lg transition-all cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
+              >
+                <Sparkles className="h-4 w-4 text-[#F0B55E]" />
+                <span>COMPRAR BOX SEMEADURA ({product.priceFormatted})</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Garantia e Informações de Entrega */}
+        <div className="rounded-sm bg-[#FCFAF7] border border-[#DAD2C4] p-5 text-center flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-[#534D6B] font-sans">
+          <ShieldCheck className="h-5 w-5 text-[#25D366] shrink-0" />
+          <span>
+            Compra 100% segura com <strong>Mercado Pago Oficial</strong>. Coleta de endereço com preenchimento automático por CEP e código de rastreamento enviado por e-mail e WhatsApp.
+          </span>
+        </div>
+
       </div>
 
       {/* Modal de Checkout Mercado Pago */}
@@ -166,7 +149,7 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
           isOpen={checkoutOpen}
           onClose={() => setCheckoutOpen(false)}
           serviceType="loja"
-          itemTitle={selectedProduct.title}
+          itemTitle={`${selectedProduct.title} — ${selectedProduct.collectionName}`}
           amount={selectedProduct.price}
           customerData={{
             firstName: '',
@@ -175,7 +158,7 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
             whatsapp: ''
           }}
           onSuccess={() => {
-            // Sucesso gravado
+            setCheckoutOpen(false);
           }}
         />
       )}
