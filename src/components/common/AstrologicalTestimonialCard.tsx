@@ -142,7 +142,7 @@ export const AstrologicalTestimonialCard: React.FC<AstrologicalTestimonialCardPr
 
   return (
     <div
-      className={`relative rounded-2xl bg-white text-[#2B2566] border border-[#E2DCCF] p-6 sm:p-7 shadow-[0_4px_20px_rgba(43,37,102,0.05)] ${accent.borderHover} ${accent.glowShadow} transition-all duration-300 flex flex-col justify-between overflow-hidden group select-text`}
+      className={`relative rounded-2xl bg-white text-[#2B2566] border border-[#E2DCCF] p-5 sm:p-5 lg:p-6 shadow-[0_4px_20px_rgba(43,37,102,0.05)] ${accent.borderHover} ${accent.glowShadow} transition-all duration-300 flex flex-col justify-between overflow-hidden group select-text h-full`}
     >
       {/* Marca D'Água Astrológica de Fundo */}
       {accent.watermark}
@@ -167,25 +167,26 @@ export const AstrologicalTestimonialCard: React.FC<AstrologicalTestimonialCardPr
       <div className="space-y-3 relative z-10">
         <div className="flex items-center justify-between gap-2">
           {/* Símbolo Astrológico Adornado */}
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-[#FAF7F2] border border-[#E2DCCF] flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#FAF7F2] border border-[#E2DCCF] flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
               {accent.svgMotif}
             </div>
-            <span className="text-[10px] uppercase font-bold tracking-widest text-[#B87314] font-heading">
+            {/* Texto ao lado do ícone na cor roxa/azul do sistema (#2B2566) */}
+            <span className="text-[10px] sm:text-[11px] uppercase font-bold tracking-wider text-[#2B2566] font-heading">
               {accent.symbolName}
             </span>
           </div>
 
-          {/* Badge do Tipo de Serviço / Consulta */}
+          {/* Badge/Tag com Fundo Sólido Roxo (#2B2566) e Texto Dourado Claro */}
           <span
-            className={`text-[9px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${accent.badgeBg} truncate max-w-[200px]`}
+            className="text-[8.5px] sm:text-[9px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-[#2B2566] text-[#F5CA75] border border-[#2B2566] shadow-xs truncate max-w-[140px] sm:max-w-[170px]"
           >
             {testimonial.serviceTitle}
           </span>
         </div>
 
         {/* Linha Fina Dourada com Estrelinha de Divisão */}
-        <div className="relative py-1">
+        <div className="relative py-0.5">
           <div className={`h-px w-full bg-gradient-to-r ${accent.goldLine}`} />
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-[9px] text-[#F0B55E] select-none">
             ✦
@@ -193,7 +194,7 @@ export const AstrologicalTestimonialCard: React.FC<AstrologicalTestimonialCardPr
         </div>
 
         {/* Texto do Depoimento com Aspas e Tipografia Editorial na Cor Roxa Padrão */}
-        <p className="font-heading italic text-sm sm:text-[14px] text-[#2B2566] leading-relaxed pt-1">
+        <p className="font-heading italic text-xs sm:text-[13px] text-[#2B2566] leading-relaxed pt-0.5">
           “{testimonial.content}”
         </p>
       </div>

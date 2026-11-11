@@ -169,16 +169,16 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
       setTestimonialGroupIndex(nextIndex);
       setTimeout(() => {
         setIsTestimonialsFading(false);
-      }, 50);
-    }, 200);
+      }, 60);
+    }, 450);
   };
 
-  // Troca automática periódica suave (pausa ao passar o mouse para permitir leitura confortável)
+  // Troca automática periódica suave a cada 7 segundos (pausa ao passar o mouse para permitir leitura confortável)
   useEffect(() => {
     if (isTestimonialsHovered) return;
     const timer = setInterval(() => {
       changeTestimonialGroup((testimonialGroupIndex + 1) % testimonialGroups.length);
-    }, 8500);
+    }, 7000);
     return () => clearInterval(timer);
   }, [isTestimonialsHovered, testimonialGroupIndex, testimonialGroups.length]);
 
@@ -452,14 +452,14 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
           </p>
         </div>
 
-        {/* Combo com 4 Depoimentos Atuais em Formato Retangular Horizontal (2x2) */}
+        {/* Combo com 4 Depoimentos na Mesma Linha (1x4) Sem Segunda Linha */}
         <div
-          className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 z-10"
+          className="relative mx-auto max-w-7xl xl:max-w-[1440px] px-4 sm:px-6 lg:px-8 z-10"
           onMouseEnter={() => setIsTestimonialsHovered(true)}
           onMouseLeave={() => setIsTestimonialsHovered(false)}
         >
           <div
-            className={`grid grid-cols-1 md:grid-cols-2 gap-5 transition-opacity duration-200 ease-in-out ${
+            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-5 transition-opacity duration-500 ease-in-out ${
               isTestimonialsFading ? 'opacity-0' : 'opacity-100'
             }`}
           >
@@ -469,23 +469,6 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                 testimonial={item}
                 cardIndex={idx}
                 groupIndex={testimonialGroupIndex}
-              />
-            ))}
-          </div>
-
-          {/* Indicadores Minimalistas e Suaves */}
-          <div className="flex items-center justify-center gap-2 pt-8">
-            {testimonialGroups.map((_, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => changeTestimonialGroup(idx)}
-                className={`transition-all duration-300 rounded-full cursor-pointer ${
-                  testimonialGroupIndex === idx
-                    ? 'w-7 h-1 bg-[#B87314]'
-                    : 'w-2 h-1 bg-[#2B2566]/20 hover:bg-[#2B2566]/45'
-                }`}
-                aria-label={`Visualizar grupo de depoimentos ${idx + 1} de 3`}
               />
             ))}
           </div>
