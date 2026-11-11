@@ -18,6 +18,9 @@
   --color-brand-sol: #F0B55E;         /* Direção. O acento: pontos, disco, destaques */
   --color-brand-gold: #F0B55E;        /* Sinônimo de Sol */
   --color-brand-gold-hover: #dfa247;
+  --color-brand-ocre: #B87314;        /* Amarelo ocre queimado para alto contraste em fundos claros */
+  --color-brand-ocre-hover: #9c600e;
+  --color-brand-purple: #3D206B;      /* Roxo institucional complementar */
 
   /* Neutros e Superfícies Oficiais */
   --color-background-main: #F4EFE6;
@@ -49,6 +52,8 @@
   --brand-sol: #F0B55E;               /* Sol: O acento, pontos, caligrafia */
   --brand-gold: #F0B55E;
   --brand-gold-hover: #dfa247;
+  --brand-ocre: #B87314;               /* Ocre queimado para fundos claros */
+  --brand-purple: #3D206B;
 
   /* Superfícies e Textos */
   --background-main: #F4EFE6;        /* Fundo Lua */

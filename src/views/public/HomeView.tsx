@@ -125,17 +125,20 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             <span>VIDA REAL</span>
           </div>
 
-          {/* Título Anterior Restaurado com Destaque em Fonte Secundária Itálica */}
-          <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.15] max-w-4xl text-balance">
-            Autoconhecimento, equilíbrio{' '}
-            <span className="font-highlight italic text-[#F0B55E] text-[1.26em] font-semibold inline-block align-baseline ml-1 sm:ml-2 tracking-normal">
-              e transformação
-            </span>{' '}
-            para sua vida.
+          {/* Título Oficial Casa 6 com Slogan e Toque Misterioso/Elegante */}
+          <h1 className="font-heading text-3xl sm:text-5xl lg:text-[3.5rem] font-bold text-white tracking-tight leading-[1.14] max-w-4xl text-balance">
+            A nossa casa de desenvolvimento pessoal:
+            <span className="block mt-1.5 sm:mt-2 text-white/95">
+              onde os mistérios do céu{' '}
+              <span className="font-highlight italic text-[#F0B55E] text-[1.22em] font-semibold inline-block align-baseline tracking-normal">
+                encontram a clareza
+              </span>{' '}
+              da sua vida real.
+            </span>
           </h1>
 
           <p className="text-base sm:text-lg text-[#E6E3F1]/90 leading-relaxed max-w-2xl font-light">
-            Descubra a Casa 6 e se conecte com a sua essência através da astrologia com um olhar lúcido e acolhedor.
+            Descubra a Casa 6 e se conecte com a sua essência através da astrologia com um olhar lúcido, contemporâneo e acolhedor.
           </p>
 
           <div className="pt-2 flex items-center">
@@ -149,17 +152,20 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
           </div>
         </div>
 
-        {/* Transição Orgânica Curva do Fundo Escuro para o Fundo Claro Lua (#F4EFE6) */}
-        <div className="absolute -bottom-px left-0 right-0 w-full overflow-hidden leading-none pointer-events-none z-10">
+        {/* Degradê Sutil de Transição para Suavizar o Fundo Escuro para a Sessão Clara */}
+        <div className="absolute inset-x-0 bottom-0 h-40 sm:h-52 bg-gradient-to-b from-transparent via-[#2B2566]/60 to-[#F4EFE6] pointer-events-none z-10" />
+
+        {/* Transição Orgânica Mais Arqueada entrando por baixo da imagem da Bianca */}
+        <div className="absolute -bottom-px left-0 right-0 w-full overflow-hidden leading-none pointer-events-none z-15">
           <svg
-            viewBox="0 0 1440 90"
+            viewBox="0 0 1440 140"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="w-full h-12 sm:h-18 lg:h-22 block text-[#F4EFE6]"
+            className="w-full h-20 sm:h-28 lg:h-36 block text-[#F4EFE6]"
             preserveAspectRatio="none"
           >
             <path
-              d="M0,0 C480,75 960,75 1440,0 L1440,90 L0,90 Z"
+              d="M0,0 C380,140 1060,140 1440,0 L1440,140 L0,140 Z"
               fill="#F4EFE6"
             />
           </svg>
@@ -215,20 +221,20 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
               <div className="space-y-3">
                 <p className="text-base sm:text-lg font-heading text-[#2B2566] leading-snug">
                   Na astrologia, a Casa 6 é a casa do{' '}
-                  <span className="font-highlight italic text-xl sm:text-2xl text-[#F0B55E] font-normal">trabalho</span>, da{' '}
-                  <span className="font-highlight italic text-xl sm:text-2xl text-[#F0B55E] font-normal">rotina</span> e do{' '}
-                  <span className="font-highlight italic text-xl sm:text-2xl text-[#F0B55E] font-normal">cuidado</span> com o corpo.
+                  <span className="font-highlight italic text-xl sm:text-2xl text-[#B87314] font-semibold">trabalho</span>, da{' '}
+                  <span className="font-highlight italic text-xl sm:text-2xl text-[#B87314] font-semibold">rotina</span> e do{' '}
+                  <span className="font-highlight italic text-xl sm:text-2xl text-[#B87314] font-semibold">cuidado</span> com o corpo.
                 </p>
                 <p className="text-xs sm:text-sm text-[#423C7B] leading-relaxed font-light text-balance">
                   É o território da Bianca: enfermeira, gestora, palestrante. A astrologia entra como origem do nome e como vocabulário de direção — casa, mapa, caminho — nunca como promessa mística. A marca fala de decisões reais: demandas e recursos na rotina, a pausa consciente antes de responder e o corpo que sustenta a trajetória com o apoio que precisa existir ao redor.
                 </p>
               </div>
 
-              {/* Frase em destaque serifada */}
-              <div className="pt-1 pl-5 border-l-2 border-[#F0B55E]">
+              {/* Frase em destaque serifada com tom ocre queimado para alto contraste em fundo claro */}
+              <div className="pt-1 pl-5 border-l-2 border-[#B87314]">
                 <blockquote className="font-heading text-lg sm:text-xl text-[#2B2566] leading-snug">
                   QUANDO TUDO{' '}
-                  <span className="font-highlight italic text-[1.25em] font-semibold text-[#F0B55E] inline-block align-baseline ml-1">
+                  <span className="font-highlight italic text-[1.25em] font-semibold text-[#B87314] inline-block align-baseline ml-1">
                     depende
                   </span>{' '}
                   DE VOCÊ.
@@ -264,7 +270,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                 LEITURA DE MAPA • SESSÕES PERSONALIZADAS
               </span>
               <h2 className="font-heading text-3xl sm:text-5xl font-bold text-[#2B2566] tracking-tight">
-                Consultas Astrológicas Individuais
+                Consultas Individuais
               </h2>
               <div className="flex items-center gap-2 pt-0.5">
                 <span className="w-8 h-px bg-[#2B2566]/20"></span>
@@ -472,7 +478,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             </div>
           </div>
 
-          {/* BANNER 3: ENCONTROS & PALESTRAS (IDENTIDADE TERRACOTA / TOM TERROSO ACOLHEDOR) */}
+          {/* BANNER 3: ENCONTROS (IDENTIDADE TERRACOTA / TOM TERROSO ACOLHEDOR) */}
           <div className="relative rounded-3xl overflow-hidden min-h-[380px] sm:min-h-[420px] border-2 border-[#C2593F]/70 shadow-[0_20px_50px_rgba(194,89,63,0.22)] flex items-center">
             {/* Foto de Fundo */}
             <div
@@ -490,7 +496,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                   <span>✦ EVENTOS, WORKSHOPS & PALESTRAS</span>
                 </div>
                 <h3 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-tight">
-                  Encontros & Palestras
+                  Encontros
                 </h3>
                 <p className="font-heading text-lg sm:text-xl text-[#F8BAA0] font-medium">
                   Diálogos vivos sobre rotina, trabalho e decisões conscientes
@@ -511,7 +517,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                   onClick={() => onNavigate('/encontros')}
                   className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[#C2593F] hover:bg-[#af4e36] text-white px-8 py-4 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-xl transition-all transform hover:-translate-y-0.5 cursor-pointer"
                 >
-                  <span>CONHECER ENCONTROS E PALESTRAS</span>
+                  <span>CONHECER ENCONTROS</span>
                   <ArrowRight className="h-4 w-4 text-[#F8BAA0]" />
                 </button>
               </div>
@@ -548,76 +554,62 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             </button>
           </div>
 
-          {/* 3 Cartas de Tarô na Mesma Linha com o Card Projetando para Fora do Box de Texto */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 items-start">
-            {blogPosts.map((post) => (
-              <div
-                key={post.id}
-                onClick={() => onNavigate('/leituras')}
-                className="flex flex-col items-center group cursor-pointer"
-              >
-                {/* Carta com Foto em Proporção de Tarô que passa para fora do box */}
-                <div className="relative w-full max-w-[290px] aspect-[5/7] rounded-2xl overflow-hidden shadow-xl border-2 border-[#F0B55E]/50 group-hover:border-[#F0B55E] group-hover:-translate-y-2 transition-all duration-300 z-10 bg-[#2B2566]">
-                  <img
-                    src={post.imageUrl}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#2B2566]/90 via-transparent to-transparent opacity-90" />
-                  <div className="absolute top-3 left-3 bg-[#F0B55E] text-[#2B2566] text-[10px] font-bold px-2 py-0.5 rounded font-heading shadow-xs">
-                    {post.roman}
-                  </div>
-                  <div className="absolute bottom-3 left-3 right-3 text-white text-xs font-heading font-semibold uppercase tracking-wider">
-                    {post.category}
-                  </div>
-                </div>
-
-                {/* Box com texto menor e mais estreito que a carta */}
-                <div className="w-[88%] -mt-6 pt-9 pb-5 px-5 bg-[#FFFFFF] rounded-2xl border border-[#E2DCCF] shadow-xs text-center space-y-2 group-hover:shadow-md transition-shadow">
-                  <span className="text-[10px] font-bold text-[#8C987F] uppercase tracking-wider block">
-                    {post.date}
-                  </span>
-                  <h4 className="font-heading text-base font-bold text-[#2B2566] leading-snug line-clamp-2 group-hover:text-[#F0B55E] transition-colors">
-                    {post.title}
-                  </h4>
-                  <p className="text-xs text-[#423C7B] leading-relaxed font-light line-clamp-2">
-                    {post.excerpt}
-                  </p>
-                  <div className="pt-1">
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-[#2B2566] group-hover:text-[#F0B55E] transition-colors">
-                      Ler mais <ArrowRight className="h-3 w-3" />
-                    </span>
-                  </div>
-                </div>
+          {/* Grid com as Cartas Viradas 3D (FlipTarotCard) no mesmo estilo de Consultas Individuais */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+            {blogPosts.map((post, index) => (
+              <div key={post.id} className="w-full">
+                <FlipTarotCard
+                  index={index}
+                  romanNumeral={post.roman}
+                  categoryBadge={post.category}
+                  title={post.title}
+                  subtitle={post.excerpt}
+                  imageUrl={post.imageUrl}
+                  actionLabel="LER ARTIGO"
+                  onAction={() => onNavigate('/leituras')}
+                  onDetailClick={() => onNavigate('/leituras')}
+                />
               </div>
             ))}
           </div>
+
+          <p className="text-[11px] text-center text-[#68638C]">
+            Toque ou passe o cursor sobre as cartas para girar • Clique para ler o artigo completo
+          </p>
         </div>
       </section>
 
       {/* =========================================================================
-          SESSÃO 8: DESTAQUE PARA O CANAL DO YOUTUBE (FUNDO CLARO ELEGANTE SEPARADO DO RODAPÉ)
+          SESSÃO 8: DESTAQUE PARA O CANAL DO YOUTUBE (BANNER COM FUNDO ROXO INSTITUCIONAL)
           ========================================================================= */}
       <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] border-t border-[#E2DCCF] relative overflow-hidden">
-        {/* Órbitas Decorativas Hairline */}
+        {/* Órbitas Decorativas Hairline ao fundo */}
         <div className="absolute right-[-100px] top-0 w-[500px] h-[500px] rounded-full border border-[#2B2566]/5 pointer-events-none"></div>
 
         <div className="mx-auto max-w-7xl relative z-10">
-          {/* Card Editorial Separado em Estilo Caixa Nobre */}
-          <div className="bg-[#FFFFFF] rounded-3xl border border-[#E2DCCF] p-8 sm:p-12 lg:p-16 shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          {/* Card Nobre com Fundo Roxo Profundo conforme solicitado */}
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2B2566] via-[#211B55] to-[#3D206B] border-2 border-[#F0B55E]/50 p-8 sm:p-12 lg:p-16 shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-10 items-center text-white">
             
+            {/* Elementos Celestes de Fundo Sutis */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full border border-[#F0B55E]/10"></div>
+              <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full border border-[#E6E3F1]/10"></div>
+              <div className="absolute top-8 right-12 text-[#F0B55E] opacity-60 text-xs">✦</div>
+              <div className="absolute bottom-8 left-16 text-[#E6E3F1] opacity-30 text-[10px]">★</div>
+            </div>
+
             {/* Texto e Convite para o Canal */}
-            <div className="lg:col-span-6 space-y-5">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-600/10 text-red-600 border border-red-200 text-xs font-bold uppercase tracking-wider">
-                <Youtube className="h-4 w-4 text-red-600" />
+            <div className="lg:col-span-6 space-y-5 relative z-10">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-600/20 text-[#FF6B6B] border border-red-500/40 text-xs font-bold uppercase tracking-wider backdrop-blur-xs">
+                <Youtube className="h-4 w-4 text-[#FF6B6B]" />
                 <span>CANAL OFICIAL NO YOUTUBE</span>
               </div>
 
-              <h2 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-[#2B2566] leading-tight">
+              <h2 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight">
                 Acompanhe a Casa 6 em Vídeo
               </h2>
 
-              <p className="text-xs sm:text-sm text-[#423C7B] leading-relaxed font-light">
+              <p className="text-xs sm:text-sm text-[#E6E3F1]/90 leading-relaxed font-light">
                 No nosso canal oficial, Bianca Tofoli compartilha análises astrológicas semanais, leituras das lunações, reflexões sobre os trânsitos contemporâneos e conversas inspiradoras sobre autoconhecimento.
               </p>
 
@@ -626,7 +618,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                   href={SITE_CONFIG.youtubeUrl || 'https://www.youtube.com'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 px-8 text-xs sm:text-sm uppercase tracking-wider shadow-lg transition-all cursor-pointer transform hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-3 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 px-8 text-xs sm:text-sm uppercase tracking-wider shadow-xl transition-all cursor-pointer transform hover:-translate-y-0.5"
                 >
                   <Play className="h-4 w-4 fill-white" />
                   <span>ASSISTIR E SE INSCREVER NO CANAL</span>
@@ -635,7 +627,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             </div>
 
             {/* Vídeo Incorporado em Player Responsivo com Borda Dourada */}
-            <div className="lg:col-span-6">
+            <div className="lg:col-span-6 relative z-10">
               <div className="relative w-full aspect-video rounded-3xl overflow-hidden border-2 border-[#F0B55E] shadow-2xl bg-black">
                 <iframe
                   className="w-full h-full"
