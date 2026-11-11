@@ -95,6 +95,54 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
     }
   ];
 
+  // 4 Palestras e Vivências Oficiais para a Sessão 6 (Montar Juntos é Dourada)
+  const lectureCards = [
+    {
+      id: 'palestra-waap',
+      roman: 'I',
+      category: 'WORKSHOP',
+      title: 'WAAP',
+      fullTitle: 'WAAP: Workshop Astrológico de Autoconhecimento Profissional',
+      subtitle: 'Imersão no autoconhecimento aplicado à carreira, propósito e dinâmicas de equipe.',
+      iconUrl: 'https://static.wixstatic.com/media/02c8e0_427896bbb9fc41d19b341c27b8911c11~mv2.png',
+      priceFormatted: 'SOB CONSULTA',
+      isGolden: false,
+    },
+    {
+      id: 'palestra-respirar-calma',
+      roman: 'II',
+      category: 'VIVÊNCIA',
+      title: 'RESPIRAR (A)CALMA',
+      fullTitle: 'RESPIRAR (A)CALMA',
+      subtitle: 'Palestra e vivência sobre pausa consciente, gestão da ansiedade e reconciliação interior.',
+      iconUrl: 'https://static.wixstatic.com/media/02c8e0_1c8cc4414b974a1fa7953b603e066b2b~mv2.png',
+      priceFormatted: 'SOB CONSULTA',
+      isGolden: false,
+    },
+    {
+      id: 'palestra-autoconhecimento-cuidado',
+      roman: 'III',
+      category: 'CORPORATIVO',
+      title: 'Autoconhecimento',
+      fullTitle: 'AUTOCONHECIMENTO: Uma ferramenta de cuidado para si e para o outro',
+      subtitle: 'Desenvolvimento da empatia, inteligência relacional e limites saudáveis nas equipes.',
+      iconUrl: 'https://static.wixstatic.com/media/02c8e0_7e64906fe5664ee29a2dad07d76d8c7a~mv2.png',
+      priceFormatted: 'SOB CONSULTA',
+      isGolden: false,
+    },
+    {
+      id: 'palestra-vamos-montar-juntos',
+      roman: 'IV',
+      category: 'SOB MEDIDA',
+      title: 'Montar Juntos',
+      fullTitle: 'VAMOS MONTAR JUNTOS?',
+      subtitle: 'Formato personalizado desenvolvido sob medida para as demandas da sua empresa ou evento.',
+      iconUrl: 'https://static.wixstatic.com/media/02c8e0_b033d99920454a7e90dd46c0059ac290~mv2.png',
+      priceFormatted: 'PERSONALIZADO',
+      isGolden: true,
+    }
+  ];
+
   // Artigos Editoriais da Sessão 7 (Leituras Astrais)
   const blogPosts = CATALOG_BLOG_POSTS.slice(0, 3).map((p, idx) => ({
     id: p.id,
@@ -453,182 +501,158 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
       </section>
 
       {/* =========================================================================
-          SESSÕES 5, 6 & ENCONTROS: BANNERS PROMOCIONAIS OFICIAIS COM ANIMAÇÃO ASTROLÓGICA
-          Patota Astral (Verde Floresta) • Bússola Guia (Azul Noite Dourado) • Encontros (Terracota Cósmico)
+          SESSÃO 5: BANNERS PROMOCIONAIS OFICIAIS (PATOTA ASTRAL & BÚSSOLA GUIA)
+          Logos pulando para fora do box • Sem valores • Título grande, texto e botão
           ========================================================================= */}
-      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] space-y-12">
+      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] space-y-16 lg:space-y-24">
+        <div className="mx-auto max-w-7xl space-y-16 lg:space-y-24">
+
+          {/* BANNER 1: PATOTA ASTRAL (VERDE FLORESTA DO PROJETO COM LOGO PULANDO PARA FORA) */}
+          <div className="relative pt-12 sm:pt-16 lg:pt-20">
+            <div className="relative rounded-3xl bg-[#0E3D23] border border-[#25D366]/40 shadow-2xl p-6 sm:p-10 lg:p-14 overflow-visible">
+              {/* Animação Astrológica de Fundo: Órbitas Girando e Estrelas Cintilantes */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+                <div className="absolute -right-24 -top-24 w-[480px] h-[480px] rounded-full border border-[#4ADE80]/15 animate-celestial-orbit-slow" />
+                <div className="absolute right-10 -bottom-28 w-[380px] h-[380px] rounded-full border border-dashed border-[#F0B55E]/15 animate-celestial-orbit-reverse" />
+                <div className="absolute top-10 right-1/4 text-[#4ADE80] opacity-40 text-xs animate-pulse">✦</div>
+                <div className="absolute bottom-12 right-1/3 text-[#F0B55E] opacity-35 text-xs animate-pulse">★</div>
+              </div>
+
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                {/* Logo Oficial 3D Grande Pulando Para Fora do Box */}
+                <div className="lg:col-span-5 flex justify-center lg:justify-start">
+                  <div className="-mt-20 sm:-mt-28 lg:-mt-36 -mb-4 lg:-mb-8 sm:-ml-4 lg:-ml-8 shrink-0">
+                    <img
+                      src="https://static.wixstatic.com/media/02c8e0_e5132493b4a14c0498c5df95ee68c593~mv2.png"
+                      alt="Patota Astral — Bianca Tofoli"
+                      className="w-64 sm:w-80 lg:w-[400px] h-auto object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.5)] transition-transform duration-500 hover:scale-105"
+                      draggable={false}
+                    />
+                  </div>
+                </div>
+
+                {/* Conteúdo: Título Grande, Texto e Botão Logo Abaixo (Sem Valor) */}
+                <div className="lg:col-span-7 space-y-4 text-white text-center lg:text-left">
+                  <h3 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.08]">
+                    Astrologia <span className="font-highlight italic text-[#4ADE80] font-normal block sm:inline">Diária por</span> Assinatura
+                  </h3>
+                  <p className="text-sm sm:text-base text-[#DCFCE7]/90 leading-relaxed font-light max-w-2xl mx-auto lg:mx-0">
+                    Conecte-se com a energia de cada lua nova e cheia, antecipe desafios e potencialize oportunidades. Apenas R$ 1,50 por dia para ter a sabedoria cósmica guiando suas semanas com acolhimento e trocas reais.
+                  </p>
+                  <div className="pt-2">
+                    <button
+                      onClick={() => onNavigate('/patota')}
+                      className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#072B15] px-8 py-4 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                    >
+                      <span>FAZER PARTE DA PATOTA</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* BANNER 2: BÚSSOLA GUIA (TOM AMARELO DOURADO DO PROJETO COM LOGO PULANDO PARA FORA) */}
+          <div className="relative pt-12 sm:pt-16 lg:pt-20">
+            <div className="relative rounded-3xl bg-gradient-to-r from-[#D98E20] via-[#EFA63E] to-[#F5CA75] border border-white/60 shadow-2xl p-6 sm:p-10 lg:p-14 overflow-visible text-[#2B2566]">
+              {/* Animação Astrológica de Fundo: Órbitas Girando e Cintilações */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+                <div className="absolute -left-20 -bottom-20 w-[460px] h-[460px] rounded-full border border-white/20 animate-celestial-orbit-slow" />
+                <div className="absolute -right-16 -top-20 w-[400px] h-[400px] rounded-full border border-dashed border-[#2B2566]/15 animate-celestial-orbit-reverse" />
+                <div className="absolute top-12 left-1/3 text-[#2B2566] opacity-30 text-xs animate-pulse">✦</div>
+                <div className="absolute bottom-10 right-1/4 text-white opacity-40 text-xs animate-pulse">★</div>
+              </div>
+
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                {/* Logo Oficial 3D Grande Pulando Para Fora do Box */}
+                <div className="lg:col-span-5 flex justify-center lg:justify-start">
+                  <div className="-mt-20 sm:-mt-28 lg:-mt-36 -mb-4 lg:-mb-8 sm:-ml-4 lg:-ml-8 shrink-0">
+                    <img
+                      src="https://static.wixstatic.com/media/02c8e0_688edec712d4401984a6e1cf8afeb93e~mv2.png"
+                      alt="Bússola Guia — Casa 6"
+                      className="w-64 sm:w-80 lg:w-[400px] h-auto object-contain filter drop-shadow-[0_20px_35px_rgba(43,37,102,0.35)] transition-transform duration-500 hover:scale-105"
+                      draggable={false}
+                    />
+                  </div>
+                </div>
+
+                {/* Conteúdo: Título Solicitado, Texto e Botão Logo Abaixo (Sem Valor) */}
+                <div className="lg:col-span-7 space-y-4 text-[#2B2566] text-center lg:text-left">
+                  <h3 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#2B2566] leading-[1.08]">
+                    Seu mapa mensal de navegação <span className="font-highlight italic text-[#753D00] font-normal block sm:inline">na palma da sua mão.</span>
+                  </h3>
+                  <p className="text-sm sm:text-base text-[#2B2566]/90 leading-relaxed font-normal max-w-2xl mx-auto lg:mx-0">
+                    Mapeamento individual completo gerado a partir do seu nascimento. Entregue mensalmente em PDF pelo WhatsApp e na sua Área de Membros para você planejar trabalho, relações e rotina com clareza estratégica.
+                  </p>
+                  <div className="pt-2">
+                    <button
+                      onClick={() => onNavigate('/bussola')}
+                      className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[#2B2566] hover:bg-[#1b1463] text-white px-8 py-4 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                    >
+                      <span>CONTRATAR BÚSSOLA GUIA</span>
+                      <ArrowRight className="h-4 w-4 text-[#F0B55E]" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* =========================================================================
+          SESSÃO 6: PALESTRAS E VIVÊNCIAS (4 CARTAS DE TARÔ 3D COM MONTAR JUNTOS DOURADA)
+          ========================================================================= */}
+      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 border-t border-[#E2DCCF] bg-[#F4EFE6]">
         <div className="mx-auto max-w-7xl space-y-12">
-
-          {/* BANNER 1: PATOTA ASTRAL (VERDE FLORESTA COM LOGO 3D EM DESTAQUE) */}
-          <div className="relative rounded-3xl overflow-hidden border border-[#25D366]/30 shadow-2xl bg-gradient-to-r from-[#0C3B20] via-[#124D2B] to-[#0A301A]">
-            {/* Animação Astrológica de Fundo: Órbitas Girando e Estrelas Cintilantes */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              <div className="absolute -right-24 -top-24 w-[480px] h-[480px] rounded-full border border-[#4ADE80]/15 animate-celestial-orbit-slow" />
-              <div className="absolute right-10 -bottom-28 w-[380px] h-[380px] rounded-full border border-dashed border-[#F0B55E]/15 animate-celestial-orbit-reverse" />
-              <div className="absolute top-10 right-1/4 text-[#4ADE80] opacity-40 text-xs animate-pulse">✦</div>
-              <div className="absolute bottom-12 right-1/3 text-[#F0B55E] opacity-35 text-xs animate-pulse">★</div>
-              <div className="absolute top-1/2 right-1/12 text-white/20 text-[10px]">✦</div>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="space-y-2">
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#8C987F]">
+                EVENTOS & CORPORATIVO • VIVÊNCIAS COLETIVAS
+              </span>
+              <h2 className="font-heading text-3xl sm:text-5xl font-bold text-[#2B2566] tracking-tight">
+                Palestras e Vivências
+              </h2>
+              <p className="text-xs sm:text-sm text-[#423C7B] max-w-xl font-light">
+                Metodologias práticas e encontros conduzidos por Bianca Tofoli para cultivar presença, autoconhecimento e clareza coletiva em empresas e grupos.
+              </p>
             </div>
 
-            <div className="relative z-10 p-6 sm:p-10 lg:p-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              {/* Logo Oficial 3D Grande */}
-              <div className="lg:col-span-4 flex justify-center lg:justify-start">
-                <img
-                  src="https://static.wixstatic.com/media/02c8e0_e5132493b4a14c0498c5df95ee68c593~mv2.png"
-                  alt="Patota Astral — Bianca Tofoli"
-                  className="w-48 sm:w-60 lg:w-72 xl:w-80 h-auto object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-transform duration-500 hover:scale-105"
-                  draggable={false}
-                />
-              </div>
-
-              {/* Texto Central Elegante e Chamativo */}
-              <div className="lg:col-span-5 space-y-3.5 text-white text-center lg:text-left">
-                <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.12]">
-                  Astrologia <span className="font-highlight italic text-[#4ADE80] font-normal block sm:inline">Diária por</span> Assinatura
-                </h3>
-                <p className="text-xs sm:text-sm text-[#DCFCE7]/90 leading-relaxed font-light max-w-xl mx-auto lg:mx-0">
-                  Conecte-se com a energia de cada lua nova e cheia, antecipe desafios e potencialize oportunidades. Apenas R$ 1,50 por dia para ter a sabedoria cósmica guiando suas semanas com acolhimento e trocas reais.
-                </p>
-              </div>
-
-              {/* Bloco Lateral de Valor & Ação Direta */}
-              <div className="lg:col-span-3 flex flex-col items-center lg:items-end justify-center gap-4 text-white">
-                <div className="text-center lg:text-right">
-                  <span className="text-[10px] sm:text-xs text-[#86EFAC] font-bold uppercase tracking-[0.2em] block">
-                    ASSINATURA MENSAL
-                  </span>
-                  <span className="text-3xl sm:text-4xl lg:text-5xl font-bold font-heading text-white tracking-tight">
-                    R$ 53,00
-                  </span>
-                  <span className="text-[11px] text-[#DCFCE7]/75 font-normal block mt-1">
-                    Sem carência • Cancele quando quiser
-                  </span>
-                </div>
-
-                <button
-                  onClick={() => onNavigate('/patota')}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#072B15] px-7 py-3.5 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
-                >
-                  <span>FAZER PARTE DA PATOTA</span>
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+            <button
+              onClick={() => onNavigate('/palestras')}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#2B2566] hover:text-[#F0B55E] uppercase tracking-wider transition-colors shrink-0 cursor-pointer"
+            >
+              <span>VER TODAS AS PALESTRAS</span>
+              <ArrowRight className="h-4 w-4" />
+            </button>
           </div>
 
-          {/* BANNER 2: BÚSSOLA GUIA (AZUL NOITE DOURADO COM ANIMAÇÃO CÓSMICA) */}
-          <div className="relative rounded-3xl overflow-hidden border border-[#F0B55E]/40 shadow-2xl bg-gradient-to-r from-[#15103A] via-[#211A54] to-[#110D2E]">
-            {/* Animação Astrológica de Fundo: Órbitas Girando e Estrelas Douradas */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              <div className="absolute -left-20 -bottom-20 w-[460px] h-[460px] rounded-full border border-[#F0B55E]/15 animate-celestial-orbit-slow" />
-              <div className="absolute -right-16 -top-20 w-[400px] h-[400px] rounded-full border border-dashed border-[#E6E3F1]/15 animate-celestial-orbit-reverse" />
-              <div className="absolute top-12 left-1/3 text-[#F0B55E] opacity-40 text-xs animate-pulse">✦</div>
-              <div className="absolute bottom-10 right-1/4 text-[#E6E3F1] opacity-30 text-xs animate-pulse">★</div>
-              <div className="absolute top-1/2 left-2/3 text-[#F0B55E] opacity-25 text-[10px]">✦</div>
-            </div>
-
-            <div className="relative z-10 p-6 sm:p-10 lg:p-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              {/* Logo Oficial 3D Grande */}
-              <div className="lg:col-span-4 flex justify-center lg:justify-start">
-                <img
-                  src="https://static.wixstatic.com/media/02c8e0_688edec712d4401984a6e1cf8afeb93e~mv2.png"
-                  alt="Bússola Guia — Casa 6"
-                  className="w-48 sm:w-60 lg:w-72 xl:w-80 h-auto object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-transform duration-500 hover:scale-105"
-                  draggable={false}
+          {/* Grid com 4 Cartas Viradas 3D (FlipTarotCard) - Montar Juntos é Dourada */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {lectureCards.map((item, index) => (
+              <div key={item.id} className="w-full">
+                <FlipTarotCard
+                  index={index}
+                  romanNumeral={item.roman}
+                  categoryBadge={item.category}
+                  title={item.title}
+                  subtitle={item.subtitle}
+                  iconUrl={item.iconUrl}
+                  priceFormatted={item.priceFormatted}
+                  isGoldenCard={item.isGolden}
+                  actionLabel="SABER MAIS"
+                  onAction={() => onNavigate('/palestras')}
+                  onDetailClick={() => onNavigate('/palestras')}
                 />
               </div>
-
-              {/* Texto Central Elegante e Chamativo */}
-              <div className="lg:col-span-5 space-y-3.5 text-white text-center lg:text-left">
-                <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.12]">
-                  Seu Mapa Mensal <span className="font-highlight italic text-[#F0B55E] font-normal block sm:inline">de Navegação</span> e Decisão
-                </h3>
-                <p className="text-xs sm:text-sm text-[#E6E3F1]/90 leading-relaxed font-light max-w-xl mx-auto lg:mx-0">
-                  Mapeamento individual completo gerado a partir do seu nascimento. Entregue mensalmente em PDF pelo WhatsApp e na sua Área de Membros para você planejar trabalho, relações e rotina com clareza estratégica.
-                </p>
-              </div>
-
-              {/* Bloco Lateral de Valor & Ação Direta */}
-              <div className="lg:col-span-3 flex flex-col items-center lg:items-end justify-center gap-4 text-white">
-                <div className="text-center lg:text-right">
-                  <span className="text-[10px] sm:text-xs text-[#F0B55E] font-bold uppercase tracking-[0.2em] block">
-                    ASSINATURA MENSAL
-                  </span>
-                  <span className="text-3xl sm:text-4xl lg:text-5xl font-bold font-heading text-white tracking-tight">
-                    R$ 47,00
-                  </span>
-                  <span className="text-[11px] text-[#E6E3F1]/75 font-normal block mt-1">
-                    Relatório mensal • Acesso imediato
-                  </span>
-                </div>
-
-                <button
-                  onClick={() => onNavigate('/bussola')}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] px-7 py-3.5 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
-                >
-                  <span>CONTRATAR BÚSSOLA GUIA</span>
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* BANNER 3: ENCONTROS (TERRACOTA CÓSMICO COM A IMAGEM SOLICITADA) */}
-          <div className="relative rounded-3xl overflow-hidden border border-[#C2593F]/40 shadow-2xl bg-gradient-to-r from-[#4A1D13] via-[#63291B] to-[#3B160E]">
-            {/* Animação Astrológica de Fundo: Órbitas Girando e Cintilações Quentes */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              <div className="absolute -right-20 -bottom-20 w-[460px] h-[460px] rounded-full border border-[#F8BAA0]/15 animate-celestial-orbit-slow" />
-              <div className="absolute -left-16 -top-20 w-[400px] h-[400px] rounded-full border border-dashed border-[#F0B55E]/15 animate-celestial-orbit-reverse" />
-              <div className="absolute top-12 right-1/3 text-[#F8BAA0] opacity-40 text-xs animate-pulse">✦</div>
-              <div className="absolute bottom-10 left-1/4 text-[#F0B55E] opacity-30 text-xs animate-pulse">★</div>
-            </div>
-
-            <div className="relative z-10 p-6 sm:p-10 lg:p-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              {/* Imagem Oficial Solicitada */}
-              <div className="lg:col-span-4 flex justify-center lg:justify-start">
-                <img
-                  src="https://static.wixstatic.com/media/02c8e0_9d4538fdd5854b249a6eb3ca67fcc295~mv2.png"
-                  alt="Encontros — Bianca Tofoli"
-                  className="w-48 sm:w-60 lg:w-72 xl:w-80 h-auto object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-transform duration-500 hover:scale-105"
-                  draggable={false}
-                />
-              </div>
-
-              {/* Texto Central Elegante e Chamativo */}
-              <div className="lg:col-span-5 space-y-3.5 text-white text-center lg:text-left">
-                <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.12]">
-                  Palestras & Vivências <span className="font-highlight italic text-[#F8BAA0] font-normal block sm:inline">para Empresas</span> e Grupos
-                </h3>
-                <p className="text-xs sm:text-sm text-[#FFEDE6]/90 leading-relaxed font-light max-w-xl mx-auto lg:mx-0">
-                  Workshops transformadores e palestras que unem autoconhecimento, saúde e rotina para empresas e grupos. Metodologias práticas conduzidas por Bianca Tofoli para cultivar presença e clareza coletiva.
-                </p>
-              </div>
-
-              {/* Bloco Lateral de Valor & Ação Direta */}
-              <div className="lg:col-span-3 flex flex-col items-center lg:items-end justify-center gap-4 text-white">
-                <div className="text-center lg:text-right">
-                  <span className="text-[10px] sm:text-xs text-[#F8BAA0] font-bold uppercase tracking-[0.2em] block">
-                    PARA EMPRESAS & GRUPOS
-                  </span>
-                  <span className="text-2xl sm:text-3xl lg:text-4xl font-bold font-heading text-white tracking-tight">
-                    Formatos Sob Medida
-                  </span>
-                  <span className="text-[11px] text-[#FFEDE6]/75 font-normal block mt-1">
-                    Presencial e Online • Proposta Rápida
-                  </span>
-                </div>
-
-                <button
-                  onClick={() => onNavigate('/encontros')}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#3B160E] px-7 py-3.5 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
-                >
-                  <span>CONHECER ENCONTROS</span>
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-
+          <p className="text-[11px] text-center text-[#68638C]">
+            Toque ou passe o cursor sobre as cartas para girar • Clique para solicitar proposta para seu evento
+          </p>
         </div>
       </section>
 

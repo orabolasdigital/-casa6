@@ -91,7 +91,7 @@ export default function App() {
     if (currentPath === '/sobre') return APP_ROUTES.sobre;
     if (currentPath === '/atendimentos') return APP_ROUTES.atendimentos;
     if (currentPath.startsWith('/atendimentos/')) return APP_ROUTES.atendimentoDetalhe;
-    if (currentPath === '/bussula' || currentPath === '/bussula-guia') return APP_ROUTES.bussula;
+    if (currentPath === '/bussola' || currentPath === '/bussola-guia' || currentPath === '/bussula' || currentPath === '/bussula-guia') return APP_ROUTES.bussula;
     if (currentPath === '/membros' || currentPath === '/painel-membro') return APP_ROUTES.membros;
     if (currentPath === '/patota' || currentPath === '/patota-astral') return APP_ROUTES.patota;
     if (currentPath === '/vivencias') return APP_ROUTES.vivencias;
@@ -136,7 +136,7 @@ export default function App() {
           <SobreView onOpenBooking={() => handleOpenBooking()} />
         ) : currentPath === '/atendimentos' || currentPath.startsWith('/atendimentos/') ? (
           <AtendimentosView onOpenBooking={handleOpenBooking} />
-        ) : currentPath === '/bussula' || currentPath === '/bussula-guia' ? (
+        ) : currentPath === '/bussola' || currentPath === '/bussola-guia' || currentPath === '/bussula' || currentPath === '/bussula-guia' ? (
           <BussulaView onOpenBooking={handleOpenBooking} />
         ) : currentPath === '/membros' || currentPath === '/painel-membro' ? (
           <MembrosView />
