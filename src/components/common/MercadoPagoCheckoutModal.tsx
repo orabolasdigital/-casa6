@@ -3,7 +3,11 @@
  * Casa 6 — Bianca Tofoli
  * Modal Oficial de Checkout Transparente Mercado Pago (Checkout Bricks @mercadopago/sdk-react)
  * 
- * Arquitetura Conforme Blueprint Oficial Mercado Pago:
+ * Design Atualizado:
+ * - Cantos Retos e Sóbrios (rounded-sm)
+ * - Tipografia Sóbria e Legível (font-sans)
+ * - Cores Oficiais da Casa 6
+ * - Apenas Pix e Cartão de Crédito (Boleto Ocultado)
  * - Golden Rule of React Hooks: Todos os hooks no topo antes de qualquer condicional
  * - Tokenização direta no navegador via Payment Brick (PCI-DSS Compliant)
  * - Anti-Fraude com recálculo obrigatório de valor no backend
@@ -20,7 +24,6 @@ import {
   X,
   CheckCircle,
   ShieldCheck,
-  QrCode,
   Copy,
   Check,
   Lock,
@@ -194,7 +197,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
     }
   }), [amount, email]);
 
-  // 12. Métodos e Customização do Payment Brick (Apenas Cartão de Crédito e Pix - Boleto Ocultado)
+  // 12. Métodos e Customização do Payment Brick (Exclusivo: Pix e Cartão de Crédito)
   const brickCustomization = useMemo(() => ({
     paymentMethods: {
       creditCard: "all" as const,
@@ -537,18 +540,19 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#2B2566]/85 backdrop-blur-xs animate-in fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#2B2566]/85 backdrop-blur-xs animate-in fade-in font-sans"
       role="dialog"
       aria-modal="true"
     >
-      <div className="relative w-full max-w-xl rounded-3xl bg-[#FCFAF7] border-2 border-[#F0B55E]/60 shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
+      {/* Container Principal: Cantos Retos (rounded-sm) e Visual Sóbrio */}
+      <div className="relative w-full max-w-xl rounded-sm bg-[#FCFAF7] border border-[#D5CEBF] shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
         
         {/* =========================================================================
-            HEADER OFICIAL CASA 6 (DESIGN SYSTEM BLINDADO)
+            HEADER OFICIAL CASA 6 (FONTES SÓBRIAS E CANTOS RETOS)
             ========================================================================= */}
-        <div className="bg-gradient-to-r from-[#2B2566] via-[#211B55] to-[#362E7A] text-white p-5 sm:p-6 flex items-center justify-between shrink-0 border-b border-[#F0B55E]/30 relative">
-          <div className="flex items-center gap-3.5">
-            <div className="h-10 w-10 rounded-2xl bg-[#FCFAF7] p-1.5 flex items-center justify-center shadow-md border border-[#F0B55E]/40">
+        <div className="bg-gradient-to-r from-[#2B2566] via-[#211B55] to-[#362E7A] text-white p-5 flex items-center justify-between shrink-0 border-b border-[#F0B55E]/30 relative font-sans">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-sm bg-[#FCFAF7] p-1.5 flex items-center justify-center shadow-xs border border-[#F0B55E]/40">
               <img
                 src="https://static.wixstatic.com/media/02c8e0_bce65db1891746ca848f16f8403ddaed~mv2.png"
                 alt="Casa 6"
@@ -557,14 +561,14 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#F0B55E]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#F0B55E]">
                   Casa 6 • Bianca Tofoli
                 </span>
                 <span className="text-[10px] text-[#E6E3F1]/70">
                   • Checkout Seguro
                 </span>
               </div>
-              <p className="text-base sm:text-lg font-bold font-heading text-white line-clamp-1 mt-0.5">
+              <p className="text-sm sm:text-base font-bold text-white line-clamp-1 mt-0.5 tracking-tight">
                 {itemTitle}
               </p>
             </div>
@@ -573,14 +577,14 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
           <div className="flex items-center gap-3">
             <div className="hidden sm:block text-right">
               <span className="text-[10px] text-[#E6E3F1]/80 uppercase tracking-wider block">Total</span>
-              <span className="font-heading font-bold text-lg text-[#F0B55E]">
+              <span className="font-bold text-base sm:text-lg text-[#F0B55E]">
                 R$ {amount.toFixed(2).replace('.', ',')}
               </span>
             </div>
 
             <button
               onClick={onClose}
-              className="p-2 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              className="p-1.5 rounded-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               aria-label="Fechar checkout"
             >
               <X className="h-5 w-5" />
@@ -589,17 +593,17 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
         </div>
 
         {/* =========================================================================
-            BARRA DE PROGRESSO EM 3 ETAPAS OFICIAIS
+            BARRA DE PROGRESSO EM 3 ETAPAS OFICIAIS (CANTOS RETOS)
             ========================================================================= */}
         {currentStep < 4 && (
-          <div className="bg-[#F4EFE6] px-5 py-3 border-b border-[#E2DCCF] flex items-center justify-between">
+          <div className="bg-[#F4EFE6] px-5 py-2.5 border-b border-[#E2DCCF] flex items-center justify-between font-sans">
             <div className="flex items-center gap-2 sm:gap-4 w-full">
               {/* Etapa 1 */}
               <div className="flex items-center gap-2">
                 <span
-                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  className={`w-5 h-5 rounded-sm flex items-center justify-center text-[10px] font-bold transition-all ${
                     currentStep === 1
-                      ? 'bg-[#F0B55E] text-[#2B2566] ring-2 ring-[#2B2566]'
+                      ? 'bg-[#F0B55E] text-[#2B2566] ring-1 ring-[#2B2566]'
                       : currentStep > 1
                       ? 'bg-[#12BB40] text-white'
                       : 'bg-[#E2DCCF] text-[#68638C]'
@@ -607,7 +611,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 >
                   {currentStep > 1 ? '✓' : '1'}
                 </span>
-                <span className={`text-[11px] font-bold uppercase tracking-wider ${currentStep === 1 ? 'text-[#2B2566]' : 'text-[#68638C]'}`}>
+                <span className={`text-[10px] sm:text-[11px] font-bold uppercase tracking-wider ${currentStep === 1 ? 'text-[#2B2566]' : 'text-[#68638C]'}`}>
                   Identificação
                 </span>
               </div>
@@ -617,9 +621,9 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
               {/* Etapa 2 */}
               <div className="flex items-center gap-2">
                 <span
-                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  className={`w-5 h-5 rounded-sm flex items-center justify-center text-[10px] font-bold transition-all ${
                     currentStep === 2
-                      ? 'bg-[#F0B55E] text-[#2B2566] ring-2 ring-[#2B2566]'
+                      ? 'bg-[#F0B55E] text-[#2B2566] ring-1 ring-[#2B2566]'
                       : currentStep > 2
                       ? 'bg-[#12BB40] text-white'
                       : 'bg-[#E2DCCF] text-[#68638C]'
@@ -627,7 +631,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 >
                   {currentStep > 2 ? '✓' : '2'}
                 </span>
-                <span className={`text-[11px] font-bold uppercase tracking-wider ${currentStep === 2 ? 'text-[#2B2566]' : 'text-[#68638C]'}`}>
+                <span className={`text-[10px] sm:text-[11px] font-bold uppercase tracking-wider ${currentStep === 2 ? 'text-[#2B2566]' : 'text-[#68638C]'}`}>
                   {isLoja ? 'Envio' : 'Dados Astrais & CPF'}
                 </span>
               </div>
@@ -637,15 +641,15 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
               {/* Etapa 3 */}
               <div className="flex items-center gap-2">
                 <span
-                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  className={`w-5 h-5 rounded-sm flex items-center justify-center text-[10px] font-bold transition-all ${
                     currentStep === 3
-                      ? 'bg-[#F0B55E] text-[#2B2566] ring-2 ring-[#2B2566]'
+                      ? 'bg-[#F0B55E] text-[#2B2566] ring-1 ring-[#2B2566]'
                       : 'bg-[#E2DCCF] text-[#68638C]'
                   }`}
                 >
                   3
                 </span>
-                <span className={`text-[11px] font-bold uppercase tracking-wider ${currentStep === 3 ? 'text-[#2B2566]' : 'text-[#68638C]'}`}>
+                <span className={`text-[10px] sm:text-[11px] font-bold uppercase tracking-wider ${currentStep === 3 ? 'text-[#2B2566]' : 'text-[#68638C]'}`}>
                   Pagamento Seguro
                 </span>
               </div>
@@ -655,33 +659,33 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
 
         {/* Mensagem de Erro de Validação */}
         {stepError && (
-          <div className="mx-6 mt-4 p-3 rounded-xl bg-red-100 border border-red-300 text-red-800 text-xs">
+          <div className="mx-5 mt-4 p-3 rounded-sm bg-red-50 border border-red-200 text-red-800 text-xs font-sans">
             {stepError}
           </div>
         )}
 
         {/* =========================================================================
-            CORPO DO MODAL (ETAPAS 1, 2, 3 E SUCESSO)
+            CORPO DO MODAL (FONTES SÓBRIAS E LEGÍVEIS)
             ========================================================================= */}
-        <div className="p-5 sm:p-7 overflow-y-auto flex-1 space-y-5">
+        <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-4 font-sans">
           
           {/* =====================================================================
               ETAPA 1: IDENTIFICAÇÃO (SEM CPF)
               ===================================================================== */}
           {currentStep === 1 && (
             <form onSubmit={handleNextFromStep1} className="space-y-4">
-              <div className="border-b border-[#E2DCCF] pb-3">
-                <h3 className="font-heading text-lg font-bold text-[#2B2566]">
+              <div className="border-b border-[#E2DCCF] pb-2.5">
+                <h3 className="text-base font-bold text-[#2B2566] tracking-tight">
                   1. Seus Dados de Contato
                 </h3>
-                <p className="text-xs text-[#423C7B]">
+                <p className="text-xs text-[#423C7B] mt-0.5">
                   Informe seus dados para emissão do voucher oficial e notificações.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
+                  <label className="block text-[11px] font-semibold text-[#2B2566] mb-1">
                     Primeiro Nome *
                   </label>
                   <input
@@ -690,12 +694,12 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="Ex: Mariana"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#F0B55E] focus:outline-none"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#2B2566] focus:outline-none transition-colors"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
+                  <label className="block text-[11px] font-semibold text-[#2B2566] mb-1">
                     Sobrenome *
                   </label>
                   <input
@@ -704,14 +708,14 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="Ex: Duarte"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#F0B55E] focus:outline-none"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#2B2566] focus:outline-none transition-colors"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
+                  <label className="block text-[11px] font-semibold text-[#2B2566] mb-1">
                     Telefone WhatsApp *
                   </label>
                   <input
@@ -720,12 +724,12 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="(11) 99999-9999"
                     value={whatsapp}
                     onChange={(e) => setWhatsapp(formatWhatsapp(e.target.value))}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#F0B55E] focus:outline-none"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#2B2566] focus:outline-none transition-colors"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
+                  <label className="block text-[11px] font-semibold text-[#2B2566] mb-1">
                     E-mail para Receber o Pedido *
                   </label>
                   <input
@@ -734,15 +738,15 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="mariana@exemplo.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#F0B55E] focus:outline-none"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#2B2566] focus:outline-none transition-colors"
                   />
                 </div>
               </div>
 
-              <div className="pt-3">
+              <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center gap-2 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] py-3.5 px-6 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-md transition-all cursor-pointer transform hover:-translate-y-0.5"
+                  className="w-full flex items-center justify-center gap-2 rounded-sm bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] py-3 px-5 text-xs font-bold uppercase tracking-wider shadow-xs transition-colors cursor-pointer"
                 >
                   <span>{isLoja ? 'Avançar para Endereço de Envio' : 'Avançar para Dados Astrais & CPF'}</span>
                   <ArrowRight className="h-4 w-4" />
@@ -756,18 +760,18 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
               ===================================================================== */}
           {currentStep === 2 && isLoja && (
             <form onSubmit={handleNextFromStep2} className="space-y-4">
-              <div className="border-b border-[#E2DCCF] pb-3">
-                <h3 className="font-heading text-lg font-bold text-[#2B2566] flex items-center gap-2">
-                  <Truck className="h-5 w-5 text-[#B87314]" />
+              <div className="border-b border-[#E2DCCF] pb-2.5">
+                <h3 className="text-base font-bold text-[#2B2566] flex items-center gap-2 tracking-tight">
+                  <Truck className="h-4 w-4 text-[#B87314]" />
                   <span>2. Endereço de Envio</span>
                 </h3>
-                <p className="text-xs text-[#423C7B]">
+                <p className="text-xs text-[#423C7B] mt-0.5">
                   Informe o CEP para preenchimento automático do endereço.
                 </p>
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
+                <label className="block text-[11px] font-semibold text-[#2B2566] mb-1">
                   CEP (Obrigatório) *
                 </label>
                 <div className="relative">
@@ -778,11 +782,11 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     value={cep}
                     onChange={(e) => handleCepChange(e.target.value)}
                     maxLength={9}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] font-mono focus:border-[#F0B55E] focus:outline-none"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] font-mono focus:border-[#2B2566] focus:outline-none"
                   />
                   {isLoadingCep && (
                     <div className="absolute right-3 top-2.5 text-[#B87314] flex items-center gap-1.5 text-xs">
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
                       <span className="text-[10px]">Buscando CEP...</span>
                     </div>
                   )}
@@ -794,7 +798,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
 
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                 <div className="sm:col-span-8">
-                  <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
+                  <label className="block text-[11px] font-semibold text-[#2B2566] mb-1">
                     Rua / Avenida / Logradouro *
                   </label>
                   <input
@@ -803,12 +807,12 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="Preenchido pelo CEP"
                     value={street}
                     onChange={(e) => setStreet(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566]"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#2B2566] focus:outline-none"
                   />
                 </div>
 
                 <div className="sm:col-span-4">
-                  <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
+                  <label className="block text-[11px] font-semibold text-[#2B2566] mb-1">
                     Número *
                   </label>
                   <input
@@ -817,14 +821,14 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="123"
                     value={number}
                     onChange={(e) => setNumber(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566]"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#2B2566] focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
+                  <label className="block text-[11px] font-semibold text-[#2B2566] mb-1">
                     Complemento (Opcional)
                   </label>
                   <input
@@ -832,12 +836,12 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="Apto 101, Bloco B"
                     value={complement}
                     onChange={(e) => setComplement(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566]"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#2B2566] focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
+                  <label className="block text-[11px] font-semibold text-[#2B2566] mb-1">
                     Bairro *
                   </label>
                   <input
@@ -846,14 +850,14 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="Bairro"
                     value={neighborhood}
                     onChange={(e) => setNeighborhood(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566]"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#2B2566] focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                 <div className="sm:col-span-8">
-                  <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
+                  <label className="block text-[11px] font-semibold text-[#2B2566] mb-1">
                     Cidade *
                   </label>
                   <input
@@ -862,12 +866,12 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="Cidade"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566]"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#2B2566] focus:outline-none"
                   />
                 </div>
 
                 <div className="sm:col-span-4">
-                  <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
+                  <label className="block text-[11px] font-semibold text-[#2B2566] mb-1">
                     Estado (UF) *
                   </label>
                   <input
@@ -877,13 +881,13 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     maxLength={2}
                     value={state}
                     onChange={(e) => setState(e.target.value.toUpperCase())}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] uppercase text-center font-bold"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] uppercase text-center font-bold focus:border-[#2B2566] focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
+                <label className="block text-[11px] font-semibold text-[#2B2566] mb-1">
                   Observações para a Entrega (Opcional)
                 </label>
                 <textarea
@@ -891,7 +895,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   placeholder="Instruções para o entregador, ponto de referência..."
                   value={shippingNotes}
                   onChange={(e) => setShippingNotes(e.target.value)}
-                  className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2 text-[#2B2566]"
+                  className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2 text-[#2B2566] focus:border-[#2B2566] focus:outline-none"
                 />
               </div>
 
@@ -899,7 +903,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 <button
                   type="button"
                   onClick={() => setCurrentStep(1)}
-                  className="inline-flex items-center gap-1.5 px-5 py-3 rounded-full border border-[#E2DCCF] text-xs font-bold text-[#2B2566] hover:bg-[#F4EFE6] cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-sm border border-[#D5CEBF] text-xs font-semibold text-[#2B2566] hover:bg-[#F4EFE6] transition-colors cursor-pointer"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Voltar</span>
@@ -907,7 +911,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
 
                 <button
                   type="submit"
-                  className="flex-1 flex items-center justify-center gap-2 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] py-3.5 px-6 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-md transition-all cursor-pointer transform hover:-translate-y-0.5"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-sm bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] py-3 px-5 text-xs font-bold uppercase tracking-wider shadow-xs transition-colors cursor-pointer"
                 >
                   <span>Avançar para Pagamento Seguro</span>
                   <ArrowRight className="h-4 w-4" />
@@ -921,19 +925,19 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
               ===================================================================== */}
           {currentStep === 2 && !isLoja && (
             <form onSubmit={handleNextFromStep2} className="space-y-4">
-              <div className="border-b border-[#E2DCCF] pb-3">
-                <h3 className="font-heading text-lg font-bold text-[#2B2566] flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-[#F0B55E]" />
+              <div className="border-b border-[#E2DCCF] pb-2.5">
+                <h3 className="text-base font-bold text-[#2B2566] flex items-center gap-2 tracking-tight">
+                  <Sparkles className="h-4 w-4 text-[#F0B55E]" />
                   <span>2. Dados Astrais & CPF</span>
                 </h3>
-                <p className="text-xs text-[#423C7B]">
+                <p className="text-xs text-[#423C7B] mt-0.5">
                   Necessários para o mapa astral e acesso individual à Área de Membros.
                 </p>
               </div>
 
               {/* Campo CPF (com validação estrita de 11 dígitos) */}
               <div>
-                <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
+                <label className="block text-[11px] font-semibold text-[#2B2566] mb-1">
                   CPF do Titular (Validado Receita Federal) *
                 </label>
                 <input
@@ -943,14 +947,14 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   value={cpf}
                   onChange={(e) => setCpf(formatCpf(e.target.value))}
                   maxLength={14}
-                  className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] font-mono focus:border-[#F0B55E] focus:outline-none"
+                  className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] font-mono focus:border-[#2B2566] focus:outline-none"
                 />
               </div>
 
               {/* Data de Nascimento */}
               <div className="grid grid-cols-3 gap-2.5">
                 <div>
-                  <label className="block text-[10px] font-bold text-[#2B2566] mb-1">Dia *</label>
+                  <label className="block text-[10px] font-semibold text-[#2B2566] mb-1">Dia *</label>
                   <input
                     type="number"
                     min="1"
@@ -959,16 +963,16 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="DD"
                     value={birthDay}
                     onChange={(e) => setBirthDay(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3 py-2 text-center text-[#2B2566]"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3 py-2 text-center text-[#2B2566]"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-[#2B2566] mb-1">Mês *</label>
+                  <label className="block text-[10px] font-semibold text-[#2B2566] mb-1">Mês *</label>
                   <select
                     required
                     value={birthMonth}
                     onChange={(e) => setBirthMonth(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-2 py-2 text-center text-[#2B2566]"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-2 py-2 text-center text-[#2B2566]"
                   >
                     <option value="">Mês</option>
                     <option value="01">01 - Jan</option>
@@ -986,7 +990,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-[#2B2566] mb-1">Ano *</label>
+                  <label className="block text-[10px] font-semibold text-[#2B2566] mb-1">Ano *</label>
                   <input
                     type="number"
                     min="1920"
@@ -995,7 +999,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="AAAA"
                     value={birthYear}
                     onChange={(e) => setBirthYear(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3 py-2 text-center text-[#2B2566]"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3 py-2 text-center text-[#2B2566]"
                   />
                 </div>
               </div>
@@ -1003,7 +1007,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
               {/* Horário de Nascimento */}
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label className="block text-[10px] font-bold text-[#2B2566] mb-1">Hora de Nascimento (00-23) *</label>
+                  <label className="block text-[10px] font-semibold text-[#2B2566] mb-1">Hora de Nascimento (00-23) *</label>
                   <input
                     type="number"
                     min="0"
@@ -1012,11 +1016,11 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="14"
                     value={birthHour}
                     onChange={(e) => setBirthHour(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3 py-2 text-center text-[#2B2566]"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3 py-2 text-center text-[#2B2566]"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-[#2B2566] mb-1">Minuto (00-59) *</label>
+                  <label className="block text-[10px] font-semibold text-[#2B2566] mb-1">Minuto (00-59) *</label>
                   <input
                     type="number"
                     min="0"
@@ -1025,7 +1029,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="30"
                     value={birthMinute}
                     onChange={(e) => setBirthMinute(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3 py-2 text-center text-[#2B2566]"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3 py-2 text-center text-[#2B2566]"
                   />
                 </div>
               </div>
@@ -1033,7 +1037,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
               {/* Cidade e Estado de Nascimento */}
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                 <div className="sm:col-span-8">
-                  <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
+                  <label className="block text-[11px] font-semibold text-[#2B2566] mb-1">
                     Cidade de Nascimento *
                   </label>
                   <input
@@ -1042,11 +1046,11 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="Ex: São Paulo"
                     value={birthCity}
                     onChange={(e) => setBirthCity(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566]"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566]"
                   />
                 </div>
                 <div className="sm:col-span-4">
-                  <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
+                  <label className="block text-[11px] font-semibold text-[#2B2566] mb-1">
                     Estado (UF) *
                   </label>
                   <input
@@ -1056,7 +1060,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     maxLength={2}
                     value={birthState}
                     onChange={(e) => setBirthState(e.target.value.toUpperCase())}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] uppercase text-center font-bold"
+                    className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] uppercase text-center font-bold"
                   />
                 </div>
               </div>
@@ -1065,7 +1069,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 <button
                   type="button"
                   onClick={() => setCurrentStep(1)}
-                  className="inline-flex items-center gap-1.5 px-5 py-3 rounded-full border border-[#E2DCCF] text-xs font-bold text-[#2B2566] hover:bg-[#F4EFE6] cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-sm border border-[#D5CEBF] text-xs font-semibold text-[#2B2566] hover:bg-[#F4EFE6] transition-colors cursor-pointer"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Voltar</span>
@@ -1073,7 +1077,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
 
                 <button
                   type="submit"
-                  className="flex-1 flex items-center justify-center gap-2 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] py-3.5 px-6 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-md transition-all cursor-pointer transform hover:-translate-y-0.5"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-sm bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] py-3 px-5 text-xs font-bold uppercase tracking-wider shadow-xs transition-colors cursor-pointer"
                 >
                   <span>{isPatota ? 'Avançar para Assinatura' : 'Avançar para Pagamento Seguro'}</span>
                   <ArrowRight className="h-4 w-4" />
@@ -1087,18 +1091,18 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
               ===================================================================== */}
           {currentStep === 3 && (
             <div className="space-y-4">
-              <div className="border-b border-[#E2DCCF] pb-3">
-                <h3 className="font-heading text-lg font-bold text-[#2B2566] flex items-center gap-2">
-                  <ShieldCheck className="h-5 w-5 text-[#12BB40]" />
+              <div className="border-b border-[#E2DCCF] pb-2.5">
+                <h3 className="text-base font-bold text-[#2B2566] flex items-center gap-2 tracking-tight">
+                  <ShieldCheck className="h-4 w-4 text-[#12BB40]" />
                   <span>3. Pagamento Transparente Mercado Pago</span>
                 </h3>
-                <p className="text-xs text-[#423C7B]">
+                <p className="text-xs text-[#423C7B] mt-0.5">
                   Preencha diretamente no modal seguro (Cartão de Crédito ou Pix Instantâneo).
                 </p>
               </div>
 
-              {/* Resumo do Pedido */}
-              <div className="p-3.5 rounded-2xl bg-[#F4EFE6] border border-[#E2DCCF] text-xs space-y-1.5">
+              {/* Resumo do Pedido (Cantos Retos e Tipografia Sóbria) */}
+              <div className="p-3.5 rounded-sm bg-[#F4EFE6] border border-[#E2DCCF] text-xs space-y-1.5 font-sans">
                 <div className="flex justify-between items-center">
                   <span className="text-[#423C7B]">Titular:</span>
                   <strong className="text-[#2B2566]">{firstName} {lastName}</strong>
@@ -1125,14 +1129,14 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
 
               {/* Se Pix estiver Pendente: Exibe QR Code + Copia e Cola + Polling Ativo */}
               {pendingPaymentId && (
-                <div className="p-5 rounded-2xl bg-white border-2 border-[#12BB40] text-center space-y-3.5 shadow-md">
+                <div className="p-4 rounded-sm bg-white border border-[#12BB40] text-center space-y-3 shadow-xs">
                   <div className="flex items-center justify-center gap-2 text-xs font-bold text-[#12BB40] uppercase tracking-wider">
                     <Loader2 className="h-4 w-4 animate-spin text-[#12BB40]" />
                     <span>Aguardando Pagamento Pix (Sincronização em Tempo Real)</span>
                   </div>
 
                   {pixQrCodeBase64 ? (
-                    <div className="w-44 h-44 mx-auto bg-white p-2 rounded-xl border border-[#E2DCCF] shadow-sm flex items-center justify-center">
+                    <div className="w-40 h-40 mx-auto bg-white p-2 rounded-sm border border-[#E2DCCF] flex items-center justify-center">
                       <img
                         src={`data:image/png;base64,${pixQrCodeBase64}`}
                         alt="QR Code Pix Oficial"
@@ -1140,9 +1144,9 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                       />
                     </div>
                   ) : pixQrCode ? (
-                    <div className="w-44 h-44 mx-auto bg-white p-2 rounded-xl border border-[#E2DCCF] shadow-sm flex items-center justify-center">
+                    <div className="w-40 h-40 mx-auto bg-white p-2 rounded-sm border border-[#E2DCCF] flex items-center justify-center">
                       <img
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${encodeURIComponent(pixQrCode)}`}
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(pixQrCode)}`}
                         alt="QR Code Pix Oficial"
                         className="w-full h-full object-contain"
                       />
@@ -1157,14 +1161,14 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     <button
                       type="button"
                       onClick={handleCopyPix}
-                      className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#F4EFE6] hover:bg-[#E6E3F1] text-[#2B2566] text-xs font-bold border border-[#E2DCCF] transition-colors cursor-pointer"
+                      className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-sm bg-[#F4EFE6] hover:bg-[#E6E3F1] text-[#2B2566] text-xs font-bold border border-[#E2DCCF] transition-colors cursor-pointer"
                     >
                       {copiedPix ? <Check className="h-4 w-4 text-[#12BB40]" /> : <Copy className="h-4 w-4" />}
                       <span>{copiedPix ? 'Chave Pix Copiada com Sucesso!' : 'Copiar Código Pix (Copia e Cola)'}</span>
                     </button>
                   )}
 
-                  <div className="pt-2">
+                  <div className="pt-1">
                     <button
                       type="button"
                       onClick={async () => {
@@ -1177,7 +1181,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                           setStepError('O pagamento ainda consta como pendente no banco. Se já pagou, aguarde alguns segundos.');
                         }
                       }}
-                      className="w-full py-3 px-4 rounded-full bg-[#12BB40] hover:bg-[#0fa437] text-white text-xs font-bold uppercase tracking-wider shadow-md cursor-pointer transition-all"
+                      className="w-full py-2.5 px-4 rounded-sm bg-[#12BB40] hover:bg-[#0fa437] text-white text-xs font-bold uppercase tracking-wider shadow-xs cursor-pointer transition-colors"
                     >
                       {isProcessingPayment ? 'Verificando com o Banco...' : 'Já Realizei o Pagamento / Confirmar'}
                     </button>
@@ -1190,7 +1194,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 <div className="relative min-h-[300px]">
                   {!isBrickReady && (
                     <div className="py-8 text-center space-y-2">
-                      <Loader2 className="h-6 w-6 animate-spin text-[#F0B55E] mx-auto" />
+                      <Loader2 className="h-5 w-5 animate-spin text-[#F0B55E] mx-auto" />
                       <p className="text-xs text-[#68638C]">
                         Carregando ambiente seguro de pagamento Mercado Pago...
                       </p>
@@ -1216,7 +1220,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 <button
                   type="button"
                   onClick={() => setCurrentStep(2)}
-                  className="inline-flex items-center gap-1.5 px-5 py-3 rounded-full border border-[#E2DCCF] text-xs font-bold text-[#2B2566] hover:bg-[#F4EFE6] cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-sm border border-[#D5CEBF] text-xs font-semibold text-[#2B2566] hover:bg-[#F4EFE6] transition-colors cursor-pointer"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Voltar</span>
@@ -1234,27 +1238,27 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
               ETAPA 4: VALIDAÇÃO & SUCESSO COM VOUCHER, BÔNUS E BOTÃO WHATSAPP
               ===================================================================== */}
           {currentStep === 4 && (
-            <div className="text-center py-4 space-y-5">
-              <div className="w-18 h-18 rounded-full bg-[#12BB40]/15 text-[#12BB40] mx-auto flex items-center justify-center shadow-lg border-2 border-[#12BB40]/30 animate-in zoom-in">
-                <CheckCircle className="h-10 w-10 text-[#12BB40]" />
+            <div className="text-center py-3 space-y-4 font-sans">
+              <div className="w-12 h-12 rounded-sm bg-[#12BB40]/15 text-[#12BB40] mx-auto flex items-center justify-center border border-[#12BB40]/30">
+                <CheckCircle className="h-7 w-7 text-[#12BB40]" />
               </div>
 
-              <div className="space-y-1.5">
-                <span className="text-[10px] uppercase font-bold tracking-widest text-[#12BB40]">
-                  PAGAMENTO APROVADO & BLINDADO
+              <div className="space-y-1">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-[#12BB40]">
+                  PAGAMENTO APROVADO & CONFIRMADO
                 </span>
-                <h3 className="font-heading text-2xl sm:text-3xl font-bold text-[#2B2566]">
+                <h3 className="text-xl sm:text-2xl font-bold text-[#2B2566] tracking-tight">
                   {isPatota ? 'Bem-vinda(o) à Patota Astral!' : 'Compra Confirmada com Sucesso!'}
                 </h3>
-                <p className="text-xs sm:text-sm text-[#423C7B] max-w-md mx-auto leading-relaxed">
+                <p className="text-xs text-[#423C7B] max-w-md mx-auto leading-relaxed">
                   {isPatota
                     ? `Sua assinatura da Patota Astral foi confirmada (Pedido #${confirmedOrderId}). Seu acesso ao círculo mensal já está liberado!`
                     : `Seu pedido #${confirmedOrderId} foi aprovado e o voucher oficial já está gerado.`}
                 </p>
               </div>
 
-              {/* Cartão do Voucher e Bônus de 1ª Compra */}
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-[#2B2566] to-[#362E7A] text-white text-left space-y-2.5 max-w-md mx-auto shadow-lg border border-[#F0B55E]/40">
+              {/* Cartão do Voucher e Bônus de 1ª Compra (Cantos Retos) */}
+              <div className="p-4 rounded-sm bg-gradient-to-br from-[#2B2566] to-[#362E7A] text-white text-left space-y-2 max-w-md mx-auto shadow-xs border border-[#F0B55E]/40 font-sans">
                 <div className="flex items-center justify-between border-b border-white/10 pb-2">
                   <span className="text-xs text-[#E6E3F1]">Código do Voucher:</span>
                   <span className="font-mono text-sm font-bold text-[#F0B55E] tracking-wider">
@@ -1292,16 +1296,16 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 )}
               </div>
 
-              {/* Botões de Ação no WhatsApp */}
-              <div className="space-y-3 max-w-md mx-auto pt-2">
+              {/* Botões de Ação no WhatsApp (Cantos Retos) */}
+              <div className="space-y-2.5 max-w-md mx-auto pt-1 font-sans">
                 {isLoja ? (
                   <a
                     href={`https://wa.me/${SITE_CONFIG.whatsappNumberRaw}?text=${encodeURIComponent(getWhatsAppApprovedMessage())}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full inline-flex items-center justify-center gap-2.5 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-4 px-6 text-xs sm:text-sm uppercase tracking-wider shadow-xl transition-all cursor-pointer transform hover:-translate-y-0.5"
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-sm bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 px-5 text-xs uppercase tracking-wider shadow-xs transition-colors cursor-pointer"
                   >
-                    <MessageCircle className="h-5 w-5 fill-white text-[#25D366]" />
+                    <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
                     <span>ENVIAR COMPROVANTE VIA WHATSAPP</span>
                   </a>
                 ) : (
@@ -1309,9 +1313,9 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     href={patotaGroupInviteUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full inline-flex items-center justify-center gap-2.5 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-4 px-6 text-xs sm:text-sm uppercase tracking-wider shadow-xl transition-all cursor-pointer transform hover:-translate-y-0.5"
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-sm bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 px-5 text-xs uppercase tracking-wider shadow-xs transition-colors cursor-pointer"
                   >
-                    <MessageCircle className="h-5 w-5 fill-white text-[#25D366]" />
+                    <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
                     <span>ENTRAR NO GRUPO VIP DA PATOTA NO WHATSAPP</span>
                   </a>
                 )}
@@ -1331,7 +1335,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     className="inline-flex items-center gap-1.5 text-xs font-bold text-[#2B2566] hover:text-[#B87314] uppercase tracking-wider cursor-pointer transition-colors"
                   >
                     <span>Acessar Área de Membros</span>
-                    <ExternalLink className="h-3.5 w-3.5" />
+                    <ExternalLink className="h-3 w-3" />
                   </button>
 
                   <span className="text-[#E2DCCF]">•</span>
