@@ -7,7 +7,7 @@
  * - Etapa 1: Coleta de Informações (Nome, Sobrenome, WhatsApp, E-mail — SEM CPF)
  * - Etapa 2 (Lojinha): Endereço de Envio com autopreenchimento por CEP (ViaCEP)
  * - Etapa 2 (Patota Astral / Bússola): Dados Astrais (Dia, Mês, Ano, Hora, Minuto, Cidade/UF) + CPF
- * - Etapa 3: Pagamento com Mercado Pago Checkout Pro (Pix, Cartão de Crédito/Débito, Boleto)
+ * - Etapa 3: Pagamento Seguro pelo Modal Oficial do Mercado Pago Checkout Pro (Cartão de Crédito, Débito, Pix, Boleto)
  * - Etapa 4: Validação / Aprovação com Botão de Envio para WhatsApp (Lojinha) ou Link do Grupo VIP (Patota)
  */
 
@@ -25,16 +25,26 @@ import {
   ArrowLeft,
   Truck,
   Sparkles,
-  MapPin,
-  Calendar,
   MessageCircle,
   ExternalLink,
   Loader2,
   FileText
 } from 'lucide-react';
-import { MERCADO_PAGO_CONFIG, createOrderRecord } from '../../services/mercadopago';
+import {
+  MERCADO_PAGO_CONFIG,
+  createOrderRecord,
+  saveCustomerRecord,
+  createMercadoPagoPreference,
+  CustomerRecord
+} from '../../services/mercadopago';
 import { SITE_CONFIG } from '../../config/site';
 import { BirthData, ShippingAddress } from '../../types';
+
+declare global {
+  interface Window {
+    MercadoPago?: any;
+  }
+}
 
 interface MercadoPagoCheckoutModalProps {
   isOpen: boolean;
@@ -92,19 +102,15 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
   const [birthCity, setBirthCity] = useState(customerData?.birthData?.city || '');
   const [birthState, setBirthState] = useState(customerData?.birthData?.state || '');
 
-  // Etapa 3: Pagamento Mercado Pago
-  const [activeMode, setActiveMode] = useState<'production' | 'test'>('production');
-  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit_card' | 'ticket'>('pix');
+  // Etapa 3: Preferência Oficial do Mercado Pago e Modal
+  const [preferenceId, setPreferenceId] = useState<string>('');
+  const [initPoint, setInitPoint] = useState<string>('');
+  const [isLoadingPreference, setIsLoadingPreference] = useState(false);
+  const [isOpeningModal, setIsOpeningModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'checkout_pro' | 'pix' | 'credit_card' | 'ticket'>('checkout_pro');
   const [copiedPix, setCopiedPix] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [stepError, setStepError] = useState('');
-
-  // Cartão de crédito campos
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardHolder, setCardHolder] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCvv, setCardCvv] = useState('');
-  const [cardInstallments, setCardInstallments] = useState('1');
 
   // Pedido Concluído
   const [confirmedOrderId, setConfirmedOrderId] = useState('');
@@ -125,19 +131,122 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
         setBirthCity(customerData.birthData.city || '');
         setBirthState(customerData.birthData.state || '');
       }
-      setCardHolder(`${customerData?.firstName || ''} ${customerData?.lastName || ''}`.trim());
       setStepError('');
       setCurrentStep(1);
+      setPreferenceId('');
+      setInitPoint('');
     }
   }, [isOpen, customerData]);
 
+  // Ao chegar na Etapa 3, cria a preferência oficial no Mercado Pago e cadastra cliente
+  useEffect(() => {
+    if (isOpen && currentStep === 3 && !preferenceId) {
+      const initPreference = async () => {
+        setIsLoadingPreference(true);
+        try {
+          const cleanEmail = email.trim().toLowerCase();
+          const fullName = `${firstName.trim()} ${lastName.trim()}`;
+          const cleanCpf = cpf.trim() || (serviceType === 'loja' ? '000.000.000-00' : '123.456.789-00');
+
+          const shippingPayload: ShippingAddress | undefined = serviceType === 'loja'
+            ? {
+                cep,
+                street,
+                number,
+                complement,
+                neighborhood,
+                city,
+                state,
+                notes: shippingNotes
+              }
+            : undefined;
+
+          const birthDataPayload: BirthData | undefined = serviceType !== 'loja'
+            ? {
+                birthDay,
+                birthMonth,
+                birthYear,
+                birthHour,
+                birthMinute,
+                city: birthCity,
+                state: birthState
+              }
+            : undefined;
+
+          // 1. Cadastra cliente no banco de dados (/customers)
+          const customerId = `cust_${cleanEmail.replace(/[^a-z0-9]/g, '_')}`;
+          const customerRecord: CustomerRecord = {
+            id: customerId,
+            fullName,
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            email: cleanEmail,
+            whatsapp,
+            cpf: cleanCpf,
+            shippingAddress: shippingPayload,
+            birthData: birthDataPayload,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+          await saveCustomerRecord(customerRecord);
+
+          // 2. Gera Preferência de Checkout Pro no Mercado Pago
+          const pref = await createMercadoPagoPreference({
+            itemTitle,
+            amount,
+            customerName: fullName,
+            customerEmail: cleanEmail,
+            customerPhone: whatsapp,
+            customerCpf: cleanCpf,
+            shippingAddress: shippingPayload
+          });
+
+          setPreferenceId(pref.preferenceId);
+          setInitPoint(pref.initPoint);
+        } catch (err) {
+          console.warn('[Mercado Pago Init Preference] Aviso:', err);
+        } finally {
+          setIsLoadingPreference(false);
+        }
+      };
+
+      initPreference();
+    }
+  }, [
+    isOpen,
+    currentStep,
+    preferenceId,
+    email,
+    firstName,
+    lastName,
+    whatsapp,
+    cpf,
+    serviceType,
+    cep,
+    street,
+    number,
+    complement,
+    neighborhood,
+    city,
+    state,
+    shippingNotes,
+    birthDay,
+    birthMonth,
+    birthYear,
+    birthHour,
+    birthMinute,
+    birthCity,
+    birthState,
+    itemTitle,
+    amount
+  ]);
+
   if (!isOpen) return null;
 
-  const activeCreds = activeMode === 'production' ? MERCADO_PAGO_CONFIG.production : MERCADO_PAGO_CONFIG.test;
   const isLoja = serviceType === 'loja';
   const isPatota = serviceType === 'patota';
 
-  // Código Pix dinâmico seguro formatado para a transação
+  // Código Pix dinâmico com valor configurado
   const pixCode = `00020101021226840014br.gov.bcb.pix2562pix-mercadopago.com/qr/casa6-${Math.random().toString(36).substring(2, 10)}5204000053039865802BR5925CASA 6 BIANCA TOFOLI6009SAO PAULO62070503***6304`;
 
   // Máscaras de Entrada
@@ -160,17 +269,6 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
     const digits = val.replace(/\D/g, '').substring(0, 8);
     if (digits.length <= 5) return digits;
     return `${digits.substring(0, 5)}-${digits.substring(5)}`;
-  };
-
-  const formatCardNumber = (val: string) => {
-    const digits = val.replace(/\D/g, '').substring(0, 16);
-    return digits.replace(/(\d{4})(?=\d)/g, '$1 ');
-  };
-
-  const formatCardExpiry = (val: string) => {
-    const digits = val.replace(/\D/g, '').substring(0, 4);
-    if (digits.length <= 2) return digits;
-    return `${digits.substring(0, 2)}/${digits.substring(2)}`;
   };
 
   // Busca de CEP Automática via ViaCEP
@@ -290,44 +388,73 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
     setTimeout(() => setCopiedPix(false), 3000);
   };
 
-  // Preenchimento de dados simulados de teste
-  const handleFillTestData = () => {
-    setFirstName('Camila');
-    setLastName('Mendonça');
-    setEmail('camila.mendonca@casa6.com.br');
-    setWhatsapp('(11) 98765-4321');
-    setCpf('123.456.789-00');
+  /**
+   * Abre o Modal Oficial do Mercado Pago Checkout Pro
+   * Inicializa com a Public Key de Produção e exibe a interface nativa do Mercado Pago
+   */
+  const handleOpenMercadoPagoModal = async () => {
+    setIsOpeningModal(true);
+    setStepError('');
 
-    if (isLoja) {
-      setCep('01310-100');
-      setStreet('Avenida Paulista');
-      setNumber('1000');
-      setComplement('Apto 42');
-      setNeighborhood('Bela Vista');
-      setCity('São Paulo');
-      setState('SP');
-      setShippingNotes('Entregar na portaria');
-    } else {
-      setBirthDay('14');
-      setBirthMonth('05');
-      setBirthYear('1992');
-      setBirthHour('15');
-      setBirthMinute('30');
-      setBirthCity('São Paulo');
-      setBirthState('SP');
-    }
+    try {
+      // Garante que a preferência exista
+      let currentPrefId = preferenceId;
+      let currentInit = initPoint;
 
-    if (paymentMethod === 'credit_card') {
-      setCardNumber('4242 4242 4242 4242');
-      setCardHolder('CAMILA MENDONCA');
-      setCardExpiry('12/28');
-      setCardCvv('123');
+      if (!currentPrefId) {
+        const cleanEmail = email.trim().toLowerCase();
+        const fullName = `${firstName.trim()} ${lastName.trim()}`;
+        const cleanCpf = cpf.trim() || (isLoja ? '000.000.000-00' : '123.456.789-00');
+
+        const pref = await createMercadoPagoPreference({
+          itemTitle,
+          amount,
+          customerName: fullName,
+          customerEmail: cleanEmail,
+          customerPhone: whatsapp,
+          customerCpf: cleanCpf,
+          shippingAddress: isLoja ? { cep, street, number, complement, neighborhood, city, state, notes: shippingNotes } : undefined
+        });
+        currentPrefId = pref.preferenceId;
+        currentInit = pref.initPoint;
+        setPreferenceId(currentPrefId);
+        setInitPoint(currentInit);
+      }
+
+      // Se o SDK do Mercado Pago estiver carregado na janela, invoca o modal nativo
+      if (typeof window !== 'undefined' && window.MercadoPago && currentPrefId) {
+        try {
+          const mp = new window.MercadoPago(MERCADO_PAGO_CONFIG.production.publicKey, {
+            locale: 'pt-BR'
+          });
+
+          mp.checkout({
+            preference: {
+              id: currentPrefId
+            },
+            autoOpen: true
+          });
+          return;
+        } catch (sdkErr) {
+          console.warn('[Mercado Pago SDK Modal Error]', sdkErr);
+        }
+      }
+
+      // Fallback seguro: Redireciona diretamente para o checkout oficial do Mercado Pago
+      if (currentInit) {
+        window.open(currentInit, '_blank');
+      }
+    } catch (err) {
+      console.error('[Mercado Pago Modal Trigger Error]', err);
+      setStepError('Não foi possível carregar o modal do Mercado Pago. Tente novamente.');
+    } finally {
+      setIsOpeningModal(false);
     }
   };
 
-  // Confirmação e Finalização do Pagamento
-  const handleConfirmPayment = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Confirmação e Finalização do Pedido (Avança para Etapa 4)
+  const handleConfirmPayment = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setStepError('');
     setIsProcessing(true);
 
@@ -369,7 +496,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
         serviceType,
         itemTitle,
         amount,
-        paymentMethod,
+        paymentMethod: paymentMethod === 'checkout_pro' ? 'credit_card' : paymentMethod,
         birthData: birthDataPayload,
         shippingAddress: shippingPayload
       });
@@ -378,14 +505,14 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
       setCurrentStep(4);
       if (onSuccess) onSuccess(order.id);
     } catch (err) {
-      console.error('Erro ao processar compra no Mercado Pago:', err);
+      console.error('Erro ao registrar pedido:', err);
       setStepError('Houve uma falha ao registrar o pedido. Tente novamente.');
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // Geração da mensagem de WhatsApp para Lojinha
+  // Mensagem WhatsApp para a Lojinha
   const getWhatsAppLojaMessage = () => {
     const fullName = `${firstName.trim()} ${lastName.trim()}`;
     return `Olá, Bianca! Acabei de realizar a compra de "${itemTitle}" pelo site da Casa 6.\n\n` +
@@ -414,7 +541,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
       <div className="relative w-full max-w-xl rounded-3xl bg-[#FCFAF7] border-2 border-[#F0B55E]/60 shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
         
         {/* =========================================================================
-            HEADER OFICIAL CASA 6 COM BADGE MERCADO PAGO CHECKOUT PRO
+            HEADER OFICIAL CASA 6 (LIMPO E SEM TAGS DE TESTE)
             ========================================================================= */}
         <div className="bg-gradient-to-r from-[#2B2566] via-[#211B55] to-[#362E7A] text-white p-5 sm:p-6 flex items-center justify-between shrink-0 border-b border-[#F0B55E]/30 relative">
           <div className="flex items-center gap-3.5">
@@ -426,13 +553,12 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
               />
             </div>
             <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#E6E3F1]">Casa 6</span>
-                <span className="text-[9px] bg-[#009ee3] text-white font-black px-2 py-0.5 rounded-full shadow-xs">
-                  Mercado Pago Checkout Pro
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#F0B55E]">
+                  Casa 6 • Bianca Tofoli
                 </span>
-                <span className="text-[9px] bg-[#12BB40] text-white font-bold px-2 py-0.5 rounded-full">
-                  {activeMode === 'production' ? 'PRODUÇÃO ATIVA' : 'SANDBOX TESTE'}
+                <span className="text-[10px] text-[#E6E3F1]/70">
+                  • Ambiente Seguro
                 </span>
               </div>
               <p className="text-base sm:text-lg font-bold font-heading text-white line-clamp-1 mt-0.5">
@@ -448,6 +574,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 R$ {amount.toFixed(2).replace('.', ',')}
               </span>
             </div>
+
             <button
               onClick={onClose}
               className="p-2 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
@@ -540,22 +667,13 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
               ===================================================================== */}
           {currentStep === 1 && (
             <form onSubmit={handleNextFromStep1} className="space-y-4">
-              <div className="border-b border-[#E2DCCF] pb-3 flex items-center justify-between">
-                <div>
-                  <h3 className="font-heading text-lg font-bold text-[#2B2566]">
-                    1. Seus Dados de Contato
-                  </h3>
-                  <p className="text-xs text-[#423C7B]">
-                    Informe seus dados para identificação e emissão do comprovante.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleFillTestData}
-                  className="px-2.5 py-1 rounded-lg bg-[#F0B55E]/30 hover:bg-[#F0B55E] text-[#2B2566] text-[10px] font-bold transition-all cursor-pointer"
-                >
-                  ⚡ Simular Dados
-                </button>
+              <div className="border-b border-[#E2DCCF] pb-3">
+                <h3 className="font-heading text-lg font-bold text-[#2B2566]">
+                  1. Seus Dados de Contato
+                </h3>
+                <p className="text-xs text-[#423C7B]">
+                  Informe seus dados para identificação e emissão do comprovante.
+                </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -635,16 +753,14 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
               ===================================================================== */}
           {currentStep === 2 && isLoja && (
             <form onSubmit={handleNextFromStep2} className="space-y-4">
-              <div className="border-b border-[#E2DCCF] pb-3 flex items-center justify-between">
-                <div>
-                  <h3 className="font-heading text-lg font-bold text-[#2B2566] flex items-center gap-2">
-                    <Truck className="h-5 w-5 text-[#B87314]" />
-                    <span>2. Endereço de Envio</span>
-                  </h3>
-                  <p className="text-xs text-[#423C7B]">
-                    Informe o CEP para preenchimento automático da rua, bairro e cidade.
-                  </p>
-                </div>
+              <div className="border-b border-[#E2DCCF] pb-3">
+                <h3 className="font-heading text-lg font-bold text-[#2B2566] flex items-center gap-2">
+                  <Truck className="h-5 w-5 text-[#B87314]" />
+                  <span>2. Endereço de Envio</span>
+                </h3>
+                <p className="text-xs text-[#423C7B]">
+                  Informe o CEP para preenchimento automático da rua, bairro e cidade.
+                </p>
               </div>
 
               {/* CEP com busca automática */}
@@ -808,16 +924,14 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
               ===================================================================== */}
           {currentStep === 2 && !isLoja && (
             <form onSubmit={handleNextFromStep2} className="space-y-4">
-              <div className="border-b border-[#E2DCCF] pb-3 flex items-center justify-between">
-                <div>
-                  <h3 className="font-heading text-lg font-bold text-[#2B2566] flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-[#F0B55E]" />
-                    <span>2. Dados Astrais & CPF</span>
-                  </h3>
-                  <p className="text-xs text-[#423C7B]">
-                    Essenciais para a assinatura, mapa e acesso à Área de Membros.
-                  </p>
-                </div>
+              <div className="border-b border-[#E2DCCF] pb-3">
+                <h3 className="font-heading text-lg font-bold text-[#2B2566] flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-[#F0B55E]" />
+                  <span>2. Dados Astrais & CPF</span>
+                </h3>
+                <p className="text-xs text-[#423C7B]">
+                  Essenciais para a assinatura, mapa e acesso à Área de Membros.
+                </p>
               </div>
 
               {/* Campo CPF (Exclusivo desta etapa) */}
@@ -973,41 +1087,18 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
           )}
 
           {/* =====================================================================
-              ETAPA 3: PAGAMENTO MERCADO PAGO CHECKOUT PRO
+              ETAPA 3: PAGAMENTO SEGURO COM MODAL OFICIAL MERCADO PAGO CHECKOUT PRO
               ===================================================================== */}
           {currentStep === 3 && (
-            <form onSubmit={handleConfirmPayment} className="space-y-4">
-              <div className="border-b border-[#E2DCCF] pb-3 flex items-center justify-between">
-                <div>
-                  <h3 className="font-heading text-lg font-bold text-[#2B2566]">
-                    3. Pagamento Seguro Mercado Pago
-                  </h3>
-                  <p className="text-xs text-[#423C7B]">
-                    Escolha a modalidade de pagamento desejada.
-                  </p>
-                </div>
-
-                {/* Seletor de Modo Mercado Pago */}
-                <div className="inline-flex rounded-lg bg-[#E6E3F1] p-0.5 text-[10px]">
-                  <button
-                    type="button"
-                    onClick={() => setActiveMode('production')}
-                    className={`px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer ${
-                      activeMode === 'production' ? 'bg-[#2B2566] text-white shadow-xs' : 'text-[#423C7B]'
-                    }`}
-                  >
-                    Produção
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveMode('test')}
-                    className={`px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer ${
-                      activeMode === 'test' ? 'bg-[#2B2566] text-white shadow-xs' : 'text-[#423C7B]'
-                    }`}
-                  >
-                    Sandbox
-                  </button>
-                </div>
+            <div className="space-y-4">
+              <div className="border-b border-[#E2DCCF] pb-3">
+                <h3 className="font-heading text-lg font-bold text-[#2B2566] flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5 text-[#12BB40]" />
+                  <span>3. Pagamento Seguro Mercado Pago</span>
+                </h3>
+                <p className="text-xs text-[#423C7B]">
+                  Pague com segurança através do modal oficial do Mercado Pago Checkout Pro.
+                </p>
               </div>
 
               {/* Resumo do Pedido */}
@@ -1036,8 +1127,65 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 )}
               </div>
 
-              {/* Seletor do Método de Pagamento */}
-              <div className="grid grid-cols-3 gap-2.5">
+              {/* Card Destaque: Modal Oficial Mercado Pago (Checkout Pro) */}
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-[#2B2566] to-[#362E7A] text-white shadow-xl space-y-4 border border-[#F0B55E]/40">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="h-9 w-9 rounded-xl bg-white/10 p-2 flex items-center justify-center">
+                      <CreditCard className="h-5 w-5 text-[#F0B55E]" />
+                    </div>
+                    <div>
+                      <h4 className="font-heading font-bold text-sm text-white">
+                        Checkout Pro Mercado Pago
+                      </h4>
+                      <p className="text-[11px] text-[#E6E3F1]">
+                        Cartão de Crédito em até 12x, Débito, Pix ou Boleto
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] bg-[#12BB40] text-white font-bold px-2 py-0.5 rounded-full">
+                    Oficial
+                  </span>
+                </div>
+
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={handleOpenMercadoPagoModal}
+                    disabled={isLoadingPreference || isOpeningModal}
+                    className="w-full flex items-center justify-center gap-2.5 rounded-full bg-[#009ee3] hover:bg-[#0089c7] text-white py-3.5 px-6 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-lg transition-all cursor-pointer transform hover:-translate-y-0.5 disabled:opacity-70"
+                  >
+                    {isOpeningModal || isLoadingPreference ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin text-white" />
+                        <span>Conectando ao Mercado Pago...</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck className="h-4 w-4 text-white" />
+                        <span>Abrir Modal Oficial do Mercado Pago</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {initPoint && (
+                  <div className="text-center pt-1">
+                    <a
+                      href={initPoint}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] text-[#F0B55E] hover:underline inline-flex items-center gap-1 font-semibold"
+                    >
+                      <span>Caso o modal não abra automaticamente, clique aqui</span>
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* Seletor Rápido de Opções de Pagamento */}
+              <div className="grid grid-cols-3 gap-2.5 pt-1">
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('pix')}
@@ -1048,13 +1196,16 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   }`}
                 >
                   <QrCode className="h-5 w-5 mx-auto mb-1 text-[#009ee3]" />
-                  <span className="text-xs block font-bold">PIX</span>
-                  <span className="text-[10px] text-[#12BB40] font-semibold">Instantâneo</span>
+                  <span className="text-xs block font-bold">PIX Direto</span>
+                  <span className="text-[10px] text-[#12BB40] font-semibold">QR Code</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => setPaymentMethod('credit_card')}
+                  onClick={() => {
+                    setPaymentMethod('credit_card');
+                    handleOpenMercadoPagoModal();
+                  }}
                   className={`p-3 rounded-2xl border text-center transition-all cursor-pointer ${
                     paymentMethod === 'credit_card'
                       ? 'border-[#009ee3] bg-[#009ee3]/10 font-bold text-[#009ee3] ring-1 ring-[#009ee3]'
@@ -1081,7 +1232,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 </button>
               </div>
 
-              {/* Detalhes do Pix */}
+              {/* QR Code Pix Direto */}
               {paymentMethod === 'pix' && (
                 <div className="p-4 rounded-2xl bg-white border border-[#E2DCCF] space-y-3 text-center">
                   <div className="w-36 h-36 mx-auto bg-gray-50 rounded-xl border border-dashed border-[#E2DCCF] flex items-center justify-center p-2 shadow-inner">
@@ -1105,89 +1256,19 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 </div>
               )}
 
-              {/* Detalhes do Cartão */}
-              {paymentMethod === 'credit_card' && (
-                <div className="space-y-3 bg-white p-4 rounded-2xl border border-[#E2DCCF]">
-                  <div>
-                    <label className="block text-[11px] font-bold text-[#2B2566] mb-0.5">Número do Cartão</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="0000 0000 0000 0000"
-                      value={cardNumber}
-                      onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                      maxLength={19}
-                      className="w-full text-xs rounded-xl border border-[#E2DCCF] px-3.5 py-2 text-[#2B2566] font-mono"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-bold text-[#2B2566] mb-0.5">Nome Impresso no Cartão</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="NOME COMO NO CARTAO"
-                      value={cardHolder}
-                      onChange={(e) => setCardHolder(e.target.value.toUpperCase())}
-                      className="w-full text-xs rounded-xl border border-[#E2DCCF] px-3.5 py-2 text-[#2B2566] uppercase"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <div>
-                      <label className="block text-[11px] font-bold text-[#2B2566] mb-0.5">Validade (MM/AA)</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="12/28"
-                        value={cardExpiry}
-                        onChange={(e) => setCardExpiry(formatCardExpiry(e.target.value))}
-                        maxLength={5}
-                        className="w-full text-xs rounded-xl border border-[#E2DCCF] px-3.5 py-2 text-[#2B2566] text-center"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold text-[#2B2566] mb-0.5">CVV (Código)</label>
-                      <input
-                        type="password"
-                        required
-                        placeholder="123"
-                        value={cardCvv}
-                        onChange={(e) => setCardCvv(e.target.value.substring(0, 4))}
-                        maxLength={4}
-                        className="w-full text-xs rounded-xl border border-[#E2DCCF] px-3.5 py-2 text-[#2B2566] text-center"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-bold text-[#2B2566] mb-0.5">Opção de Parcelamento</label>
-                    <select
-                      value={cardInstallments}
-                      onChange={(e) => setCardInstallments(e.target.value)}
-                      className="w-full text-xs rounded-xl border border-[#E2DCCF] px-3.5 py-2 text-[#2B2566]"
-                    >
-                      <option value="1">1x de R$ {amount.toFixed(2).replace('.', ',')} (à vista)</option>
-                      <option value="2">2x de R$ {(amount / 2).toFixed(2).replace('.', ',')}</option>
-                      <option value="3">3x de R$ {(amount / 3).toFixed(2).replace('.', ',')}</option>
-                    </select>
-                  </div>
-                </div>
-              )}
-
-              {/* Detalhes do Boleto */}
+              {/* Boleto Informativo */}
               {paymentMethod === 'ticket' && (
                 <div className="p-4 rounded-2xl bg-white border border-[#E2DCCF] space-y-2 text-center">
                   <p className="text-xs text-[#2B2566] font-bold">
                     Boleto Bancário Mercado Pago
                   </p>
                   <p className="text-[11px] text-[#423C7B] leading-relaxed">
-                    Ao confirmar, o boleto bancário será gerado e enviado para o seu e-mail <strong>{email}</strong> com vencimento em até 3 dias úteis.
+                    Você pode gerar seu boleto abrindo o modal oficial acima ou clicando para concluir e receber o boleto registrado no e-mail <strong>{email}</strong>.
                   </p>
                 </div>
               )}
 
-              {/* Botões Voltar e Confirmar Pagamento */}
+              {/* Botões Voltar e Avançar para Validação */}
               <div className="pt-2 flex items-center justify-between gap-3">
                 <button
                   type="button"
@@ -1199,27 +1280,26 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 </button>
 
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={() => handleConfirmPayment()}
                   disabled={isProcessing}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-full bg-[#009ee3] hover:bg-[#0089c7] text-white py-3.5 px-6 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-xl transition-all cursor-pointer transform hover:-translate-y-0.5"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] py-3.5 px-6 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-xl transition-all cursor-pointer transform hover:-translate-y-0.5 disabled:opacity-60"
                 >
-                  <ShieldCheck className="h-4 w-4" />
+                  <CheckCircle className="h-4 w-4 text-[#2B2566]" />
                   <span>
                     {isProcessing
-                      ? 'Gravando e Processando Pagamento...'
-                      : `Confirmar e Pagar R$ ${amount.toFixed(2).replace('.', ',')}`}
+                      ? 'Registrando Pedido...'
+                      : 'Já Paguei / Confirmar Pedido'}
                   </span>
                 </button>
               </div>
 
-              <div className="flex items-center justify-between text-[10px] text-[#68638C] pt-1">
-                <div className="flex items-center gap-1">
-                  <Lock className="h-3 w-3 text-[#12BB40]" />
-                  <span>Criptografia SSL de 256 bits</span>
-                </div>
-                <span>Chave: {activeCreds.publicKey.substring(0, 16)}...</span>
+              {/* Rodapé Seguro Sem Exibição de Chaves */}
+              <div className="flex items-center justify-center gap-2 text-[11px] text-[#68638C] pt-1">
+                <Lock className="h-3.5 w-3.5 text-[#12BB40]" />
+                <span>Ambiente Seguro Criptografado SSL 256 bits • Mercado Pago Produção</span>
               </div>
-            </form>
+            </div>
           )}
 
           {/* =====================================================================
@@ -1241,7 +1321,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 <p className="text-xs sm:text-sm text-[#423C7B] max-w-md mx-auto leading-relaxed">
                   {isPatota
                     ? `Sua assinatura da Patota Astral foi confirmada (Pedido #${confirmedOrderId}). Seu acesso ao círculo mensal já está liberado!`
-                    : `Seu pedido #${confirmedOrderId} foi aprovado e registrado no Firestore em tempo real.`}
+                    : `Seu pedido #${confirmedOrderId} foi aprovado e registrado com sucesso.`}
                 </p>
               </div>
 

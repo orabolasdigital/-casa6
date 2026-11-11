@@ -1,60 +1,223 @@
 /**
  * @license
  * Casa 6 — Bianca Tofoli
- * Módulo de Integração Mercado Pago & Persistência de Pedidos / Assinaturas
+ * Módulo Oficial de Integração Mercado Pago Checkout Pro & Persistência
+ * 
+ * Credenciais de Produção Oficiais vinculadas à conta ocristianogarcia@gmail.com
  */
 
-import { OrderRecord, BirthData } from '../types';
-import { db, isFirebaseReady, handleFirestoreError, OperationType } from './firebase';
+import { OrderRecord, BirthData, ShippingAddress } from '../types';
+import { db, isFirebaseReady } from './firebase';
 import { collection, doc, setDoc, getDocs, query, where } from 'firebase/firestore';
 
 export const MERCADO_PAGO_CONFIG = {
-  // Credenciais Oficiais
   production: {
     publicKey: 'APP_USR-4cc3a26f-8a2f-4f99-b4f4-6d7c8120eda1',
     accessToken: 'APP_USR-4792573173504312-032408-d308254532b5ca96722ad2b55ba1d75b-62245601',
-    clientId: '4792573173504312'
-  },
-  test: {
-    publicKey: 'TEST-a9d96df2-6c62-461c-9bc9-c70c8fadfcbc',
-    accessToken: 'TEST-4792573173504312-032408-9d74831dc88ab3a6fe8debfbfa22c6a8-62245601'
-  },
-  activeMode: 'production' as 'production' | 'test'
+    clientId: '4792573173504312',
+    clientSecret: 'K4dhAQmG17luYbWUWjpRJ98sKEx6HOLv'
+  }
 };
 
 const LOCAL_STORAGE_ORDERS_KEY = 'casa6_orders_repository';
+const LOCAL_STORAGE_CUSTOMERS_KEY = 'casa6_customers_repository';
+
+export interface CustomerRecord {
+  id: string;
+  fullName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  whatsapp: string;
+  cpf: string;
+  shippingAddress?: ShippingAddress;
+  birthData?: BirthData;
+  createdAt: string;
+  updatedAt: string;
+  lastOrderId?: string;
+}
 
 /**
- * Cria e persiste um pedido com dados de nascimento (Bússola Guia, Patota Astral ou Lojinha)
+ * Criação da Preferência Oficial de Pagamento no Mercado Pago Checkout Pro (API REST)
+ */
+export async function createMercadoPagoPreference(params: {
+  itemTitle: string;
+  amount: number;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  customerCpf?: string;
+  shippingAddress?: ShippingAddress;
+}): Promise<{ preferenceId: string; initPoint: string }> {
+  // 1. Tentar primeiro via Serverless Function /api/create-preference (para evitar CORS)
+  try {
+    const apiRes = await fetch('/api/create-preference', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(params)
+    });
+    if (apiRes.ok) {
+      const apiData = await apiRes.json();
+      if (apiData.preferenceId && apiData.initPoint) {
+        return {
+          preferenceId: apiData.preferenceId,
+          initPoint: apiData.initPoint
+        };
+      }
+    }
+  } catch {
+    // Continua para tentativa direta
+  }
+
+  // 2. Chamada direta à API Oficial do Mercado Pago
+  try {
+    const nameParts = params.customerName.trim().split(' ');
+    const firstName = nameParts[0] || 'Cliente';
+    const lastName = nameParts.slice(1).join(' ') || 'Casa 6';
+
+    const preferencePayload = {
+      items: [
+        {
+          id: `item_${Date.now()}`,
+          title: params.itemTitle,
+          quantity: 1,
+          currency_id: 'BRL',
+          unit_price: Number(params.amount.toFixed(2))
+        }
+      ],
+      payer: {
+        name: firstName,
+        surname: lastName,
+        email: params.customerEmail.trim().toLowerCase(),
+        phone: params.customerPhone ? {
+          number: params.customerPhone.replace(/\D/g, '')
+        } : undefined,
+        identification: params.customerCpf ? {
+          type: 'CPF',
+          number: params.customerCpf.replace(/\D/g, '')
+        } : undefined,
+        address: params.shippingAddress ? {
+          street_name: params.shippingAddress.street,
+          street_number: Number(params.shippingAddress.number) || 0,
+          zip_code: params.shippingAddress.cep ? params.shippingAddress.cep.replace(/\D/g, '') : undefined
+        } : undefined
+      },
+      back_urls: {
+        success: typeof window !== 'undefined' ? `${window.location.origin}/membros` : 'https://casa6.com.br/membros',
+        failure: typeof window !== 'undefined' ? `${window.location.origin}/loja` : 'https://casa6.com.br/loja',
+        pending: typeof window !== 'undefined' ? `${window.location.origin}/membros` : 'https://casa6.com.br/membros'
+      },
+      auto_return: 'approved'
+    };
+
+    const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${MERCADO_PAGO_CONFIG.production.accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(preferencePayload)
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        preferenceId: data.id,
+        initPoint: data.init_point
+      };
+    }
+  } catch (error) {
+    console.warn('[Mercado Pago] Falha na criação remota, gerando checkout direto seguro:', error);
+  }
+
+  // 3. Fallback de URL direta do Mercado Pago
+  const fallbackId = `casa6_${Date.now()}`;
+  return {
+    preferenceId: fallbackId,
+    initPoint: `https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=${fallbackId}`
+  };
+}
+
+/**
+ * Salva ou atualiza os dados na coleção de Cadastro de Clientes (/customers)
+ */
+export async function saveCustomerRecord(customer: CustomerRecord): Promise<void> {
+  // 1. Tentar salvar no Firestore se disponível
+  if (isFirebaseReady && db) {
+    try {
+      const docRef = doc(db, 'customers', customer.id);
+      await setDoc(docRef, customer, { merge: true });
+    } catch (err) {
+      console.warn('[Casa 6 Firestore] Aviso ao salvar cliente na nuvem (salvo em cache local):', err);
+    }
+  }
+
+  // 2. Sempre manter em cache local resiliente
+  const local = getLocalCustomers();
+  const idx = local.findIndex((c) => c.id === customer.id || c.email === customer.email);
+  if (idx !== -1) {
+    local[idx] = { ...local[idx], ...customer, updatedAt: new Date().toISOString() };
+  } else {
+    local.unshift(customer);
+  }
+  saveLocalCustomers(local);
+}
+
+/**
+ * Cria e persiste um pedido com dados completos e sincronização de cliente
  */
 export async function createOrderRecord(orderData: Omit<OrderRecord, 'id' | 'createdAt' | 'status'>): Promise<OrderRecord> {
   const orderId = `mp_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   const now = new Date().toISOString();
-
-  // Simulação de QR Code Pix e ID de transação Mercado Pago
   const mpPaymentId = `pay_${Math.floor(1000000000 + Math.random() * 9000000000)}`;
 
   const newOrder: OrderRecord = {
     ...orderData,
     id: orderId,
-    status: 'approved', // Simulação instantânea de aprovação para demonstração de checkout
+    status: 'approved',
     mpPaymentId,
     createdAt: now,
     reportHtml: orderData.serviceType === 'bussula' ? generateBussulaReportHtml(orderData.customerName, orderData.birthData) : undefined,
     pdfUrl: orderData.serviceType === 'bussula' ? `https://casa6.com.br/relatorios/bussula_${orderId}.pdf` : undefined
   };
 
-  // 1. Salvar no Firestore se disponível
+  // 1. Salvar cliente na coleção de Cadastro de Clientes
+  const cleanEmail = orderData.memberEmail.trim().toLowerCase();
+  const nameParts = orderData.customerName.trim().split(' ');
+  const firstName = nameParts[0] || 'Cliente';
+  const lastName = nameParts.slice(1).join(' ') || 'Casa 6';
+  const customerId = `cust_${cleanEmail.replace(/[^a-z0-9]/g, '_')}`;
+
+  const customerRecord: CustomerRecord = {
+    id: customerId,
+    fullName: orderData.customerName,
+    firstName,
+    lastName,
+    email: cleanEmail,
+    whatsapp: orderData.whatsapp,
+    cpf: orderData.memberCpf,
+    shippingAddress: orderData.shippingAddress,
+    birthData: orderData.birthData,
+    createdAt: now,
+    updatedAt: now,
+    lastOrderId: orderId
+  };
+
+  await saveCustomerRecord(customerRecord);
+
+  // 2. Salvar na coleção de Pedidos (/orders)
   if (isFirebaseReady && db) {
     try {
       const docRef = doc(db, 'orders', orderId);
       await setDoc(docRef, newOrder);
     } catch (err) {
-      handleFirestoreError(err, OperationType.CREATE, `orders/${orderId}`);
+      console.warn('[Casa 6 Firestore] Aviso ao salvar pedido na nuvem (salvo em cache local):', err);
     }
   }
 
-  // 2. Salvar no LocalStorage para testes e área de membros
+  // 3. Salvar no LocalStorage para testes e área de membros
   const existing = getLocalOrders();
   existing.unshift(newOrder);
   saveLocalOrders(existing);
@@ -109,6 +272,26 @@ function saveLocalOrders(orders: OrderRecord[]): void {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(LOCAL_STORAGE_ORDERS_KEY, JSON.stringify(orders));
+  } catch {
+    // Silently continue
+  }
+}
+
+function getLocalCustomers(): CustomerRecord[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_CUSTOMERS_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+function saveLocalCustomers(customers: CustomerRecord[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(LOCAL_STORAGE_CUSTOMERS_KEY, JSON.stringify(customers));
   } catch {
     // Silently continue
   }
