@@ -142,7 +142,7 @@ export const AstrologicalTestimonialCard: React.FC<AstrologicalTestimonialCardPr
 
   return (
     <div
-      className={`relative rounded-2xl bg-white text-[#2B2566] border border-[#E2DCCF] p-6 sm:p-7 shadow-[0_4px_20px_rgba(43,37,102,0.05)] ${accent.borderHover} ${accent.glowShadow} transition-all duration-300 flex flex-col justify-between overflow-hidden group min-h-[300px] select-text`}
+      className={`relative rounded-2xl bg-white text-[#2B2566] border border-[#E2DCCF] p-6 sm:p-7 shadow-[0_4px_20px_rgba(43,37,102,0.05)] ${accent.borderHover} ${accent.glowShadow} transition-all duration-300 flex flex-col justify-between overflow-hidden group select-text`}
     >
       {/* Marca D'Água Astrológica de Fundo */}
       {accent.watermark}
@@ -178,7 +178,7 @@ export const AstrologicalTestimonialCard: React.FC<AstrologicalTestimonialCardPr
 
           {/* Badge do Tipo de Serviço / Consulta */}
           <span
-            className={`text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full border ${accent.badgeBg} truncate max-w-[170px]`}
+            className={`text-[9px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${accent.badgeBg} truncate max-w-[200px]`}
           >
             {testimonial.serviceTitle}
           </span>
@@ -192,8 +192,8 @@ export const AstrologicalTestimonialCard: React.FC<AstrologicalTestimonialCardPr
           </div>
         </div>
 
-        {/* Texto do Depoimento com Aspas e Tipografia Editorial Acolhedora */}
-        <p className="font-heading italic text-xs sm:text-[13px] text-[#37306B] leading-relaxed pt-1">
+        {/* Texto do Depoimento com Aspas e Tipografia Editorial na Cor Roxa Padrão */}
+        <p className="font-heading italic text-sm sm:text-[14px] text-[#2B2566] leading-relaxed pt-1">
           “{testimonial.content}”
         </p>
       </div>

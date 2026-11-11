@@ -119,14 +119,28 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
   ];
 
   const [testimonialGroupIndex, setTestimonialGroupIndex] = useState(0);
+  const [isTestimonialsHovered, setIsTestimonialsHovered] = useState(false);
+  const [isTestimonialsFading, setIsTestimonialsFading] = useState(false);
 
-  // Troca automática periódica suave (muda o combo de 4 depoimentos a cada 8.5s)
+  const changeTestimonialGroup = (nextIndex: number) => {
+    if (nextIndex === testimonialGroupIndex || isTestimonialsFading) return;
+    setIsTestimonialsFading(true);
+    setTimeout(() => {
+      setTestimonialGroupIndex(nextIndex);
+      setTimeout(() => {
+        setIsTestimonialsFading(false);
+      }, 50);
+    }, 200);
+  };
+
+  // Troca automática periódica suave (pausa ao passar o mouse para permitir leitura confortável)
   useEffect(() => {
+    if (isTestimonialsHovered) return;
     const timer = setInterval(() => {
-      setTestimonialGroupIndex((prev) => (prev + 1) % testimonialGroups.length);
+      changeTestimonialGroup((testimonialGroupIndex + 1) % testimonialGroups.length);
     }, 8500);
     return () => clearInterval(timer);
-  }, [testimonialGroups.length]);
+  }, [isTestimonialsHovered, testimonialGroupIndex, testimonialGroups.length]);
 
   return (
     <div className="bg-[#F4EFE6] text-[#2B2566] overflow-x-hidden font-body">
@@ -370,9 +384,9 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
       </section>
 
       {/* =========================================================================
-          SESSÃO 4: DEPOIMENTOS DE CLIENTES (FUNDO CLARO ELEGANTE & PAGINAÇÃO COM 3 BOLINHAS)
+          SESSÃO 4: DEPOIMENTOS DE CLIENTES (FUNDO CLARO PADRÃO & CARDS HORIZONTAIS)
           ========================================================================= */}
-      <section className="py-20 sm:py-28 border-y border-[#E2DCCF] bg-[#FAF7F2] text-[#2B2566] relative overflow-hidden">
+      <section className="py-20 sm:py-28 border-y border-[#E2DCCF] bg-[#F4EFE6] text-[#2B2566] relative overflow-hidden">
         {/* Órbitas Decorativas Sutis no Fundo Claro */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full border border-[#2B2566]/4"></div>
@@ -381,7 +395,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
           <div className="absolute bottom-12 right-1/4 text-[#8C987F] opacity-30 text-xs">★</div>
         </div>
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-4 text-center mb-12 z-10">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-4 text-center mb-10 z-10">
           <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#8C987F]">
             EXPERIÊNCIAS REAIS • ACOLHIMENTO E CLAREZA
           </span>
@@ -398,11 +412,16 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
           </p>
         </div>
 
-        {/* Combo com 4 Depoimentos Atuais com Adornos Astrológicos Exclusivos */}
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 z-10">
+        {/* Combo com 4 Depoimentos Atuais em Formato Retangular Horizontal (2x2) */}
+        <div
+          className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 z-10"
+          onMouseEnter={() => setIsTestimonialsHovered(true)}
+          onMouseLeave={() => setIsTestimonialsHovered(false)}
+        >
           <div
-            key={testimonialGroupIndex}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-500 ease-in-out"
+            className={`grid grid-cols-1 md:grid-cols-2 gap-5 transition-opacity duration-200 ease-in-out ${
+              isTestimonialsFading ? 'opacity-0' : 'opacity-100'
+            }`}
           >
             {testimonialGroups[testimonialGroupIndex].map((item, idx) => (
               <AstrologicalTestimonialCard
@@ -414,31 +433,21 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             ))}
           </div>
 
-          {/* Paginação com Três Bolinhas (3 Grupos de Depoimentos que Alternam a cada período) */}
-          <div className="flex flex-col items-center justify-center gap-3 pt-10">
-            <div className="flex items-center gap-3">
-              {testimonialGroups.map((_, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setTestimonialGroupIndex(idx)}
-                  className={`transition-all duration-300 rounded-full cursor-pointer flex items-center justify-center ${
-                    testimonialGroupIndex === idx
-                      ? 'w-9 h-3 bg-[#B87314] shadow-xs'
-                      : 'w-3 h-3 bg-[#2B2566]/20 hover:bg-[#2B2566]/40'
-                  }`}
-                  aria-label={`Visualizar grupo de depoimentos ${idx + 1} de 3`}
-                >
-                  {testimonialGroupIndex === idx && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-white select-none" />
-                  )}
-                </button>
-              ))}
-            </div>
-
-            <span className="text-[10px] uppercase tracking-widest text-[#8C987F] font-semibold">
-              Grupo {testimonialGroupIndex + 1} de {testimonialGroups.length} • Alterna periodicamente
-            </span>
+          {/* Indicadores Minimalistas e Suaves */}
+          <div className="flex items-center justify-center gap-2 pt-8">
+            {testimonialGroups.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => changeTestimonialGroup(idx)}
+                className={`transition-all duration-300 rounded-full cursor-pointer ${
+                  testimonialGroupIndex === idx
+                    ? 'w-7 h-1 bg-[#B87314]'
+                    : 'w-2 h-1 bg-[#2B2566]/20 hover:bg-[#2B2566]/45'
+                }`}
+                aria-label={`Visualizar grupo de depoimentos ${idx + 1} de 3`}
+              />
+            ))}
           </div>
         </div>
       </section>
