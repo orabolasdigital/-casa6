@@ -125,20 +125,17 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             <span>VIDA REAL</span>
           </div>
 
-          {/* Título Oficial Casa 6 com Slogan e Toque Misterioso/Elegante */}
-          <h1 className="font-heading text-3xl sm:text-5xl lg:text-[3.5rem] font-bold text-white tracking-tight leading-[1.14] max-w-4xl text-balance">
-            A nossa casa de desenvolvimento pessoal:
-            <span className="block mt-1.5 sm:mt-2 text-white/95">
-              onde os mistérios do céu{' '}
-              <span className="font-highlight italic text-[#F0B55E] text-[1.22em] font-semibold inline-block align-baseline tracking-normal">
-                encontram a clareza
-              </span>{' '}
-              da sua vida real.
-            </span>
+          {/* Título Oficial Restaurado conforme solicitado */}
+          <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.15] max-w-4xl text-balance">
+            Autoconhecimento, equilíbrio{' '}
+            <span className="font-highlight italic text-[#F0B55E] text-[1.26em] font-semibold inline-block align-baseline ml-1 sm:ml-2 tracking-normal">
+              e transformação
+            </span>{' '}
+            para sua vida.
           </h1>
 
           <p className="text-base sm:text-lg text-[#E6E3F1]/90 leading-relaxed max-w-2xl font-light">
-            Descubra a Casa 6 e se conecte com a sua essência através da astrologia com um olhar lúcido, contemporâneo e acolhedor.
+            Descubra a Casa 6 e se conecte com a sua essência através da astrologia com um olhar lúcido e acolhedor.
           </p>
 
           <div className="pt-2 flex items-center">
@@ -152,20 +149,45 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
           </div>
         </div>
 
-        {/* Degradê Sutil de Transição para Suavizar o Fundo Escuro para a Sessão Clara */}
-        <div className="absolute inset-x-0 bottom-0 h-40 sm:h-52 bg-gradient-to-b from-transparent via-[#2B2566]/60 to-[#F4EFE6] pointer-events-none z-10" />
-
-        {/* Transição Orgânica Mais Arqueada entrando por baixo da imagem da Bianca */}
+        {/* Transição Orgânica Hiper-Arqueada com Degradê Curvilíneo Acompanhando o Arco */}
         <div className="absolute -bottom-px left-0 right-0 w-full overflow-hidden leading-none pointer-events-none z-15">
           <svg
-            viewBox="0 0 1440 140"
+            viewBox="0 0 1440 200"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="w-full h-20 sm:h-28 lg:h-36 block text-[#F4EFE6]"
+            className="w-full h-24 sm:h-36 lg:h-48 block"
             preserveAspectRatio="none"
           >
+            <defs>
+              {/* Gradiente que acompanha o arco, indo da transparência e tom escuro para o tom claro Lua */}
+              <linearGradient id="arcDegradeCurvilineo" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#2B2566" stopOpacity="0" />
+                <stop offset="35%" stopColor="#F4EFE6" stopOpacity="0.45" />
+                <stop offset="70%" stopColor="#F4EFE6" stopOpacity="0.85" />
+                <stop offset="100%" stopColor="#F4EFE6" stopOpacity="1" />
+              </linearGradient>
+              <linearGradient id="arcGlowSuave" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#F4EFE6" stopOpacity="0" />
+                <stop offset="50%" stopColor="#F4EFE6" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#F4EFE6" stopOpacity="0.7" />
+              </linearGradient>
+            </defs>
+
+            {/* Faixa Superior do Arco com Degradê Suave Acompanhando a Curvatura */}
             <path
-              d="M0,0 C380,140 1060,140 1440,0 L1440,140 L0,140 Z"
+              d="M0,0 C320,150 1120,150 1440,0 L1440,200 L0,200 Z"
+              fill="url(#arcGlowSuave)"
+            />
+
+            {/* Faixa Intermediária Arqueada com o Degradê Principal */}
+            <path
+              d="M0,15 C320,170 1120,170 1440,15 L1440,200 L0,200 Z"
+              fill="url(#arcDegradeCurvilineo)"
+            />
+
+            {/* Base Sólida do Arco que Conecta com a Sessão Clara */}
+            <path
+              d="M0,45 C320,195 1120,195 1440,45 L1440,200 L0,200 Z"
               fill="#F4EFE6"
             />
           </svg>
@@ -328,18 +350,18 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-4 text-center mb-10 z-10">
           <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#F0B55E]">
-            TESTEMUNHOS REAIS • ACOLHIMENTO E CLAREZA
+            EXPERIÊNCIAS REAIS • ACOLHIMENTO E CLAREZA
           </span>
           <h2 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-white">
-            Relatos de Consulentes
+            O Que Dizem os Clientes
           </h2>
           <div className="flex items-center justify-center gap-3 py-1">
             <span className="w-12 h-px bg-white/20"></span>
             <span className="w-1.5 h-1.5 rounded-full bg-[#F0B55E]"></span>
             <span className="w-12 h-px bg-white/20"></span>
           </div>
-          <p className="text-xs sm:text-sm text-[#E6E3F1]/80 max-w-lg mx-auto font-light">
-            Palavras reais de quem vivenciou as consultas e encontrou direção lúcida para sua rotina com Bianca Tofoli.
+          <p className="text-xs sm:text-sm text-[#E6E3F1]/85 max-w-lg mx-auto font-light">
+            Depoimentos de quem encontrou clareza prática e acolhimento nas consultas e vivências com Bianca Tofoli.
           </p>
         </div>
 
@@ -580,62 +602,101 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
       </section>
 
       {/* =========================================================================
-          SESSÃO 8: DESTAQUE PARA O CANAL DO YOUTUBE (BANNER COM FUNDO ROXO INSTITUCIONAL)
+          SESSÃO 8: DESTAQUES DE MÍDIA — 2 BANNERS ROXOS: YOUTUBE & SPOTIFY
           ========================================================================= */}
       <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] border-t border-[#E2DCCF] relative overflow-hidden">
         {/* Órbitas Decorativas Hairline ao fundo */}
         <div className="absolute right-[-100px] top-0 w-[500px] h-[500px] rounded-full border border-[#2B2566]/5 pointer-events-none"></div>
 
         <div className="mx-auto max-w-7xl relative z-10">
-          {/* Card Nobre com Fundo Roxo Profundo conforme solicitado */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2B2566] via-[#211B55] to-[#3D206B] border-2 border-[#F0B55E]/50 p-8 sm:p-12 lg:p-16 shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-10 items-center text-white">
-            
-            {/* Elementos Celestes de Fundo Sutis */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full border border-[#F0B55E]/10"></div>
-              <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full border border-[#E6E3F1]/10"></div>
-              <div className="absolute top-8 right-12 text-[#F0B55E] opacity-60 text-xs">✦</div>
-              <div className="absolute bottom-8 left-16 text-[#E6E3F1] opacity-30 text-[10px]">★</div>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
 
-            {/* Texto e Convite para o Canal */}
-            <div className="lg:col-span-6 space-y-5 relative z-10">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-600/20 text-[#FF6B6B] border border-red-500/40 text-xs font-bold uppercase tracking-wider backdrop-blur-xs">
-                <Youtube className="h-4 w-4 text-[#FF6B6B]" />
-                <span>CANAL OFICIAL NO YOUTUBE</span>
+            {/* BANNER 1: YOUTUBE (FUNDO ROXO, SEM TAG, BOTÃO VERMELHO) */}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2B2566] via-[#211B55] to-[#3D206B] border-2 border-[#F0B55E]/40 p-6 sm:p-8 lg:p-10 shadow-2xl flex flex-col justify-between text-white">
+              {/* Elementos Celestes de Fundo */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                <div className="absolute -top-20 -left-20 w-60 h-60 rounded-full border border-[#F0B55E]/10"></div>
+                <div className="absolute top-6 right-8 text-[#F0B55E] opacity-50 text-xs">✦</div>
               </div>
 
-              <h2 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight">
-                Acompanhe a Casa 6 em Vídeo
-              </h2>
+              <div className="space-y-4 relative z-10">
+                <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white leading-tight">
+                  Acompanhe a Casa 6 em Vídeo
+                </h3>
+                <p className="text-xs sm:text-sm text-[#E6E3F1]/90 leading-relaxed font-light">
+                  Análises astrológicas semanais, leituras das lunações, reflexões sobre os trânsitos contemporâneos e conversas inspiradoras com Bianca Tofoli.
+                </p>
 
-              <p className="text-xs sm:text-sm text-[#E6E3F1]/90 leading-relaxed font-light">
-                No nosso canal oficial, Bianca Tofoli compartilha análises astrológicas semanais, leituras das lunações, reflexões sobre os trânsitos contemporâneos e conversas inspiradoras sobre autoconhecimento.
-              </p>
+                {/* Player de Vídeo Incorporado */}
+                <div className="relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-[#F0B55E]/50 shadow-xl bg-black">
+                  <iframe
+                    className="w-full h-full"
+                    src="https://www.youtube.com/embed/dQw4w9WgXcQ?controls=1&rel=0"
+                    title="Canal Casa 6 — Bianca Tofoli no YouTube"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
 
-              <div className="pt-2">
+              {/* Botão Vermelho Oficial do YouTube */}
+              <div className="pt-6 relative z-10">
                 <a
                   href={SITE_CONFIG.youtubeUrl || 'https://www.youtube.com'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 px-8 text-xs sm:text-sm uppercase tracking-wider shadow-xl transition-all cursor-pointer transform hover:-translate-y-0.5"
+                  className="inline-flex items-center justify-center gap-2.5 w-full sm:w-auto rounded-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 px-8 text-xs uppercase tracking-wider shadow-xl transition-all cursor-pointer transform hover:-translate-y-0.5"
                 >
                   <Play className="h-4 w-4 fill-white" />
-                  <span>ASSISTIR E SE INSCREVER NO CANAL</span>
+                  <span>ASSISTIR NO YOUTUBE</span>
                 </a>
               </div>
             </div>
 
-            {/* Vídeo Incorporado em Player Responsivo com Borda Dourada */}
-            <div className="lg:col-span-6 relative z-10">
-              <div className="relative w-full aspect-video rounded-3xl overflow-hidden border-2 border-[#F0B55E] shadow-2xl bg-black">
-                <iframe
-                  className="w-full h-full"
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ?controls=1&rel=0"
-                  title="Vídeo mais recente Casa 6 — Bianca Tofoli"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+            {/* BANNER 2: SPOTIFY (FUNDO ROXO, BOTÃO VERDE SPOTIFY) */}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2B2566] via-[#211B55] to-[#3D206B] border-2 border-[#1DB954]/40 p-6 sm:p-8 lg:p-10 shadow-2xl flex flex-col justify-between text-white">
+              {/* Elementos Celestes de Fundo */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                <div className="absolute -bottom-24 -right-24 w-60 h-60 rounded-full border border-[#1DB954]/10"></div>
+                <div className="absolute top-6 right-8 text-[#1DB954] opacity-50 text-xs">★</div>
+              </div>
+
+              <div className="space-y-4 relative z-10">
+                <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white leading-tight">
+                  Ouça no Spotify
+                </h3>
+                <p className="text-xs sm:text-sm text-[#E6E3F1]/90 leading-relaxed font-light">
+                  Episódios sobre os céus, rotina e autoconhecimento lúcido em formato de podcast para acompanhar onde estiver, no trânsito ou no trabalho.
+                </p>
+
+                {/* Player Oficial de Áudio do Spotify */}
+                <div className="relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-[#1DB954]/50 shadow-xl bg-[#121212]">
+                  <iframe
+                    src="https://open.spotify.com/embed/show/2vW3CknG8e7o8B0G12p1xQ?utm_source=generator&theme=0"
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy"
+                    title="Podcast Casa 6 no Spotify"
+                    className="w-full h-full"
+                  />
+                </div>
+              </div>
+
+              {/* Botão Verde Oficial do Spotify */}
+              <div className="pt-6 relative z-10">
+                <a
+                  href={SITE_CONFIG.spotifyUrl || 'https://open.spotify.com'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2.5 w-full sm:w-auto rounded-full bg-[#1DB954] hover:bg-[#1aa34a] text-[#000000] font-black py-3.5 px-8 text-xs uppercase tracking-wider shadow-xl transition-all cursor-pointer transform hover:-translate-y-0.5"
+                >
+                  <svg className="h-4 w-4 fill-current text-black" viewBox="0 0 24 24">
+                    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+                  </svg>
+                  <span>OUVIR NO SPOTIFY</span>
+                </a>
               </div>
             </div>
 

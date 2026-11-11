@@ -19,6 +19,8 @@ export const SITE_CONFIG: SiteConfiguration = {
   instagramUrl: 'https://www.instagram.com/casa6astrologia',
   instagramBiancaHandle: '@biancatofoli',
   instagramBiancaUrl: 'https://www.instagram.com/biancatofoli',
+  youtubeUrl: 'https://www.youtube.com',
+  spotifyUrl: 'https://open.spotify.com',
   operatingRegion: 'Atendimento Online Global & Presencial em São Paulo / Brasil',
   legalNotice: 'Site protegido contra cópia e uso indevido de conteúdo. Reprodução proibida nos termos da Lei Federal nº 9.610/1998.',
   developerCreditText: 'Desenvolvido por @orabolasdigital com estratégia humana e IA. Propriedade intelectual protegida.',
