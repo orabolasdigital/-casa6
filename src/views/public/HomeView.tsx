@@ -665,8 +665,10 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                   categoryBadge={post.category}
                   title={post.title}
                   subtitle={post.excerpt}
-                  imageUrl={post.imageUrl}
-                  actionLabel="LER ARTIGO"
+                  backgroundImageUrl={post.imageUrl}
+                  iconUrl="https://static.wixstatic.com/media/02c8e0_bce65db1891746ca848f16f8403ddaed~mv2.png"
+                  date={post.date}
+                  actionLabel="LER ARTIGO COMPLETO"
                   onAction={() => onNavigate('/leituras')}
                   onDetailClick={() => onNavigate('/leituras')}
                 />

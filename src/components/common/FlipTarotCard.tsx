@@ -2,8 +2,9 @@
  * @license
  * Casa 6 — Bianca Tofoli
  * Carta de Tarô com Efeito 3D Flip Oficial
- * Suporta cartas roxas (#2B2566) e carta dourada especial (#F0B55E) para o Combo Anual.
- * Exibe símbolos com fundo transparente no anverso e no verso.
+ * Suporta:
+ * 1. Consultas Individuais (Cartas roxas com símbolo transparente e carta dourada especial para o Combo).
+ * 2. Leituras Astrais / Blog (Fundo da foto do artigo com camada de roxo sobreposta, favicon Casa 6 como símbolo e botão de leitura ao virar).
  */
 
 import React, { useState } from 'react';
@@ -16,7 +17,9 @@ interface FlipTarotCardProps {
   title: string;
   subtitle: string;
   imageUrl?: string;
-  iconUrl?: string;
+  backgroundImageUrl?: string; // Foto de fundo com overlay roxo para Leituras Astrais
+  iconUrl?: string;            // Símbolo do atendimento OU favicon da Casa 6
+  date?: string;               // Data de publicação do artigo
   priceFormatted?: string;
   isGoldenCard?: boolean;
   actionLabel?: string;
@@ -31,7 +34,9 @@ export const FlipTarotCard: React.FC<FlipTarotCardProps> = ({
   title,
   subtitle,
   imageUrl,
+  backgroundImageUrl,
   iconUrl,
+  date,
   priceFormatted,
   isGoldenCard = false,
   actionLabel = 'AGENDAR CONSULTA',
@@ -44,7 +49,8 @@ export const FlipTarotCard: React.FC<FlipTarotCardProps> = ({
     setIsFlipped(!isFlipped);
   };
 
-  const activeSymbol = iconUrl || imageUrl;
+  // Se houver backgroundImageUrl, o ícone central é exclusivamente o iconUrl (ex: favicon)
+  const activeSymbol = backgroundImageUrl ? iconUrl : (iconUrl || imageUrl);
 
   return (
     <div
@@ -59,7 +65,8 @@ export const FlipTarotCard: React.FC<FlipTarotCardProps> = ({
         
         {/* =========================================================================
             FACE 1 (INICIAL / CARTA VIRADA)
-            Roxa padrão (#2B2566) OU Dourada radiante para o Combo Anual
+            - Para Leituras Astrais: Foto do blog ao fundo com overlay roxo + Favicon no centro
+            - Para Atendimentos: Fundo roxo #2B2566 ou dourado com símbolo transparente
             ========================================================================= */}
         <div
           className={`tarot-face-back p-6 sm:p-7 flex flex-col justify-between shadow-xl rounded-2xl relative overflow-hidden ${
@@ -68,6 +75,17 @@ export const FlipTarotCard: React.FC<FlipTarotCardProps> = ({
               : 'bg-[#2B2566] text-white border-2 border-[#F0B55E]/40'
           }`}
         >
+          {/* Fundo Fotográfico com Camada de Roxo (Leituras Astrais) */}
+          {backgroundImageUrl && (
+            <>
+              <div
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 pointer-events-none"
+                style={{ backgroundImage: `url('${backgroundImageUrl}')` }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#2B2566]/94 via-[#2B2566]/88 to-[#2B2566]/92 pointer-events-none" />
+            </>
+          )}
+
           {/* Órbitas e Linhas Circulares Sutis do Brand Guide */}
           <div className="absolute inset-0 opacity-20 pointer-events-none flex items-center justify-center">
             <svg className="w-80 h-80" viewBox="0 0 200 200" fill="none">
@@ -125,28 +143,34 @@ export const FlipTarotCard: React.FC<FlipTarotCardProps> = ({
             />
           </div>
 
-          {/* Centro: Símbolo Oficial do Atendimento com Fundo Transparente */}
+          {/* Centro: Símbolo Central (Favicon para Blog / Símbolo do Atendimento) + Título */}
           <div className="relative z-10 text-center space-y-3.5 my-auto">
             {activeSymbol && (
-              <div className="mx-auto w-24 h-22 flex items-center justify-center p-1">
+              <div
+                className={`mx-auto flex items-center justify-center p-1 ${
+                  backgroundImageUrl ? 'w-14 h-14' : 'w-24 h-22'
+                }`}
+              >
                 <img
                   src={activeSymbol}
                   alt={title}
-                  className={`max-h-20 max-w-full object-contain filter ${
-                    isGoldenCard
-                      ? 'drop-shadow-[0_4px_12px_rgba(43,37,102,0.3)]'
-                      : 'drop-shadow-[0_0_14px_rgba(240,181,94,0.4)]'
+                  className={`object-contain filter ${
+                    backgroundImageUrl
+                      ? 'max-h-12 max-w-full drop-shadow-[0_0_10px_rgba(240,181,94,0.5)]'
+                      : isGoldenCard
+                      ? 'max-h-20 max-w-full drop-shadow-[0_4px_12px_rgba(43,37,102,0.3)]'
+                      : 'max-h-20 max-w-full drop-shadow-[0_0_14px_rgba(240,181,94,0.4)]'
                   }`}
                   draggable={false}
                 />
               </div>
             )}
 
-            <div className="space-y-1.5 px-2">
+            <div className="space-y-1.5 px-1">
               <h3
-                className={`font-heading text-xl sm:text-2xl font-bold tracking-tight leading-snug ${
-                  isGoldenCard ? 'text-[#2B2566] font-black' : 'text-white'
-                }`}
+                className={`font-heading text-lg sm:text-xl font-bold tracking-tight leading-snug ${
+                  backgroundImageUrl ? 'line-clamp-3' : ''
+                } ${isGoldenCard ? 'text-[#2B2566] font-black' : 'text-white'}`}
               >
                 {title}
               </h3>
@@ -183,7 +207,7 @@ export const FlipTarotCard: React.FC<FlipTarotCardProps> = ({
 
         {/* =========================================================================
             FACE 2 (VERSO REVELADO AO VIRAR / HOVER)
-            Exibe o Símbolo Grande do Atendimento com Fundo Transparente
+            Exibe Resumo e Botão de Leitura ou Agendamento
             ========================================================================= */}
         <div
           className={`tarot-face-front p-5 sm:p-6 flex flex-col justify-between shadow-2xl rounded-2xl relative overflow-hidden ${
@@ -207,23 +231,70 @@ export const FlipTarotCard: React.FC<FlipTarotCardProps> = ({
             />
           </div>
 
-          {/* Símbolo Grande do Atendimento com Fundo Transparente (Ou Imagem Retangular para Blog) */}
-          {iconUrl ? (
-            <div
-              className={`relative my-2 w-full h-[40%] rounded-xl flex items-center justify-center p-3 border transition-transform group-hover:scale-[1.03] ${
-                isGoldenCard
-                  ? 'bg-white/80 border-[#EFA63E]/30 shadow-xs'
-                  : 'bg-gradient-to-b from-[#2B2566]/5 via-[#F0B55E]/5 to-[#F4EFE6] border-[#E2DCCF]'
-              }`}
-            >
-              <img
-                src={iconUrl}
-                alt={title}
-                className="max-h-24 sm:max-h-28 max-w-[85%] object-contain filter drop-shadow-[0_8px_16px_rgba(43,37,102,0.18)]"
-                draggable={false}
-              />
+          {/* Caso 1: Leituras Astrais / Blog (com backgroundImageUrl) */}
+          {backgroundImageUrl ? (
+            <div className="space-y-3 my-auto py-2">
+              <div className="relative w-full h-28 sm:h-32 rounded-xl overflow-hidden border border-[#E2DCCF] shadow-xs">
+                <img
+                  src={backgroundImageUrl}
+                  alt={title}
+                  className="w-full h-full object-cover protected-img"
+                  draggable={false}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#2B2566]/75 via-transparent to-transparent" />
+                <span className="absolute bottom-2 left-2.5 px-2 py-0.5 rounded-full bg-[#F0B55E] text-[#2B2566] text-[9px] font-black uppercase tracking-wider">
+                  {categoryBadge}
+                </span>
+              </div>
+
+              <div className="space-y-1 text-center px-1">
+                <h4 className="font-heading font-bold text-base sm:text-lg text-[#2B2566] leading-snug line-clamp-2">
+                  {title}
+                </h4>
+                {date && (
+                  <span className="text-[10px] text-[#8C987F] font-medium block">
+                    Por Bianca Tofoli • {date}
+                  </span>
+                )}
+                <p className="text-xs text-[#423C7B] leading-relaxed line-clamp-3 font-normal pt-0.5">
+                  {subtitle}
+                </p>
+              </div>
             </div>
+          ) : iconUrl ? (
+            /* Caso 2: Atendimentos com Símbolo Transparente Grande */
+            <>
+              <div
+                className={`relative my-2 w-full h-[40%] rounded-xl flex items-center justify-center p-3 border transition-transform group-hover:scale-[1.03] ${
+                  isGoldenCard
+                    ? 'bg-white/80 border-[#EFA63E]/30 shadow-xs'
+                    : 'bg-gradient-to-b from-[#2B2566]/5 via-[#F0B55E]/5 to-[#F4EFE6] border-[#E2DCCF]'
+                }`}
+              >
+                <img
+                  src={iconUrl}
+                  alt={title}
+                  className="max-h-24 sm:max-h-28 max-w-[85%] object-contain filter drop-shadow-[0_8px_16px_rgba(43,37,102,0.18)]"
+                  draggable={false}
+                />
+              </div>
+
+              <div className="space-y-1 text-center my-auto px-1">
+                <h4 className="font-heading font-bold text-lg sm:text-xl text-[#2B2566] tracking-tight">
+                  {title}
+                </h4>
+                {priceFormatted && (
+                  <div className="text-xs sm:text-sm font-bold text-[#B87314]">
+                    {priceFormatted}
+                  </div>
+                )}
+                <p className="text-xs text-[#423C7B] leading-relaxed line-clamp-2 font-normal pt-1">
+                  {subtitle}
+                </p>
+              </div>
+            </>
           ) : (
+            /* Caso 3: Imagem padrão */
             <div className="relative my-3 w-full h-[45%] rounded-xl overflow-hidden border border-[#E2DCCF] shadow-inner group-hover:scale-[1.02] transition-transform">
               <img
                 src={imageUrl}
@@ -234,21 +305,6 @@ export const FlipTarotCard: React.FC<FlipTarotCardProps> = ({
               <div className="absolute inset-0 bg-gradient-to-t from-[#2B2566]/80 via-transparent to-transparent" />
             </div>
           )}
-
-          {/* Título Oficial Limpo + Preço + Descrição */}
-          <div className="space-y-1 text-center my-auto px-1">
-            <h4 className="font-heading font-bold text-lg sm:text-xl text-[#2B2566] tracking-tight">
-              {title}
-            </h4>
-            {priceFormatted && (
-              <div className="text-xs sm:text-sm font-bold text-[#B87314]">
-                {priceFormatted}
-              </div>
-            )}
-            <p className="text-xs text-[#423C7B] leading-relaxed line-clamp-2 font-normal pt-1">
-              {subtitle}
-            </p>
-          </div>
 
           {/* Ações: Botão Direcionando e Detalhes */}
           <div className="space-y-2 pt-2 border-t border-[#E2DCCF]">
@@ -268,7 +324,7 @@ export const FlipTarotCard: React.FC<FlipTarotCardProps> = ({
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
 
-            {onDetailClick && (
+            {onDetailClick && !backgroundImageUrl && (
               <button
                 type="button"
                 onClick={(e) => {
