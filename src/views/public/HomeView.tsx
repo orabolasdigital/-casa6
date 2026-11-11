@@ -178,86 +178,45 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
           </div>
         </div>
 
-        {/* Transição Orgânica Hiper-Arqueada com Ângulo Elevado e Degradê Curvilíneo Acompanhando o Arco */}
-        <div className="absolute -bottom-px left-0 right-0 w-full overflow-hidden leading-none pointer-events-none z-15">
-          <svg
-            viewBox="0 0 1440 280"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-full h-32 sm:h-48 lg:h-64 xl:h-76 block"
-            preserveAspectRatio="none"
-          >
-            <defs>
-              {/* Gradiente que acompanha o arco, indo da transparência e tom escuro para o tom claro Lua */}
-              <linearGradient id="arcDegradeCurvilineo" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#2B2566" stopOpacity="0" />
-                <stop offset="30%" stopColor="#F4EFE6" stopOpacity="0.45" />
-                <stop offset="65%" stopColor="#F4EFE6" stopOpacity="0.85" />
-                <stop offset="100%" stopColor="#F4EFE6" stopOpacity="1" />
-              </linearGradient>
-              <linearGradient id="arcGlowSuave" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#F4EFE6" stopOpacity="0" />
-                <stop offset="45%" stopColor="#F4EFE6" stopOpacity="0.3" />
-                <stop offset="100%" stopColor="#F4EFE6" stopOpacity="0.75" />
-              </linearGradient>
-            </defs>
-
-            {/* Faixa Superior do Arco com Degradê Suave Acompanhando a Curvatura Profunda */}
-            <path
-              d="M0,0 C360,230 1080,230 1440,0 L1440,280 L0,280 Z"
-              fill="url(#arcGlowSuave)"
-            />
-
-            {/* Faixa Intermediária Arqueada com o Degradê Principal */}
-            <path
-              d="M0,25 C360,255 1080,255 1440,25 L1440,280 L0,280 Z"
-              fill="url(#arcDegradeCurvilineo)"
-            />
-
-            {/* Base Sólida do Arco que Conecta com a Sessão Clara */}
-            <path
-              d="M0,60 C360,280 1080,280 1440,60 L1440,280 L0,280 Z"
-              fill="#F4EFE6"
-            />
-          </svg>
-        </div>
+        {/* Transição Reta com Degradê Suave: Roxo escuro se fundindo no tom claro (#F4EFE6) da seção abaixo */}
+        <div className="absolute -bottom-px left-0 right-0 h-44 sm:h-64 lg:h-80 bg-gradient-to-b from-transparent via-[#2B2566]/30 via-35% via-[#F4EFE6]/75 via-75% to-[#F4EFE6] pointer-events-none z-15" />
       </section>
 
       {/* =========================================================================
           SESSÃO 2: DESTAQUE PARA BIANCA TOFOLI (FOTO EM CÍRCULO SOBREPOSTA E ELEMENTOS ANIMADOS)
           ========================================================================= */}
-      <section className="relative pt-0 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] z-20">
+      <section className="relative pt-0 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] z-20">
         <div className="mx-auto max-w-7xl relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             
             {/* Foto Circular da Bianca Sobreposta Invasiva (z-30, Invadindo a 1ª Seção) */}
-            <div className="lg:col-span-5 flex justify-center -mt-24 sm:-mt-40 lg:-mt-56 relative z-30">
-              <div className="relative w-80 sm:w-92 lg:w-[420px] aspect-square flex items-center justify-center">
+            <div className="lg:col-span-5 flex justify-center -mt-28 sm:-mt-48 lg:-mt-64 xl:-mt-76 relative z-30">
+              <div className="relative w-84 sm:w-[420px] md:w-[460px] lg:w-[490px] xl:w-[530px] aspect-square flex items-center justify-center">
                 {/* 1. Disco Sol decorativo ao fundo com pulso cósmico delicado */}
-                <div className="absolute -left-6 sm:-left-8 top-1/2 w-48 sm:w-56 h-48 sm:h-56 rounded-full bg-gradient-to-br from-[#F0B55E] to-[#E5A548] opacity-90 pointer-events-none animate-celestial-sun shadow-xl shadow-[#F0B55E]/25"></div>
+                <div className="absolute -left-6 sm:-left-10 lg:-left-12 top-1/2 -translate-y-1/2 w-52 sm:w-64 lg:w-76 h-52 sm:h-64 lg:h-76 rounded-full bg-gradient-to-br from-[#F0B55E] to-[#E5A548] opacity-90 pointer-events-none animate-celestial-sun shadow-xl shadow-[#F0B55E]/25"></div>
 
                 {/* 2. Anel de Cintilação / Brilho Suave */}
-                <div className="absolute inset-[-14px] sm:inset-[-18px] rounded-full border border-[#F0B55E]/40 pointer-events-none animate-celestial-shimmer"></div>
+                <div className="absolute inset-[-16px] sm:inset-[-22px] lg:inset-[-28px] rounded-full border border-[#F0B55E]/40 pointer-events-none animate-celestial-shimmer"></div>
 
                 {/* 3. Órbita Externa Pontilhada com Rotação Lenta Suave e Marcadores Astrais */}
-                <div className="absolute inset-[-28px] sm:inset-[-36px] rounded-full border border-dashed border-[#2B2566]/30 dark:border-[#F0B55E]/30 pointer-events-none animate-celestial-orbit-slow">
+                <div className="absolute inset-[-32px] sm:inset-[-42px] lg:inset-[-54px] rounded-full border border-dashed border-[#2B2566]/30 dark:border-[#F0B55E]/30 pointer-events-none animate-celestial-orbit-slow">
                   {/* Pérola Cósmica no topo da órbita */}
-                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#F0B55E] shadow-sm shadow-[#F0B55E]/80 flex items-center justify-center">
-                    <span className="w-1 h-1 rounded-full bg-white"></span>
+                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-[#F0B55E] shadow-sm shadow-[#F0B55E]/80 flex items-center justify-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
                   </div>
                   {/* Estrela de 4 pontas decorativa na órbita */}
-                  <div className="absolute top-1/3 -right-1 text-[10px] text-[#F0B55E] font-heading select-none">✦</div>
+                  <div className="absolute top-1/3 -right-1 text-[11px] text-[#F0B55E] font-heading select-none">✦</div>
                   {/* Marcador Oliva */}
-                  <div className="absolute -bottom-1 left-1/3 w-2 h-2 rounded-full bg-[#8C987F] opacity-75"></div>
+                  <div className="absolute -bottom-1 left-1/3 w-2.5 h-2.5 rounded-full bg-[#8C987F] opacity-75"></div>
                 </div>
 
                 {/* 4. Órbita Interna com Rotação Reversa Suave */}
-                <div className="absolute inset-[-10px] sm:inset-[-14px] rounded-full border border-[#8C987F]/40 rotate-45 pointer-events-none animate-celestial-orbit-reverse">
-                  <div className="absolute top-1 right-12 w-2 h-2 rounded-full bg-[#2B2566]/60"></div>
+                <div className="absolute inset-[-12px] sm:inset-[-16px] lg:inset-[-20px] rounded-full border border-[#8C987F]/40 rotate-45 pointer-events-none animate-celestial-orbit-reverse">
+                  <div className="absolute top-1 right-12 w-2.5 h-2.5 rounded-full bg-[#2B2566]/60"></div>
                 </div>
 
                 {/* 5. Moldura Circular Principal da Foto com Borda Branca e Anel Dourado Suave */}
-                <div className="relative w-full h-full rounded-full overflow-hidden shadow-2xl border-4 sm:border-5 border-white bg-white ring-1 ring-[#F0B55E]/30">
+                <div className="relative w-full h-full rounded-full overflow-hidden shadow-2xl border-4 sm:border-6 lg:border-8 border-white bg-white ring-1 ring-[#F0B55E]/40">
                   <img
                     src="https://static.wixstatic.com/media/02c8e0_54a33eeb476d45c49b7f4953c34177fc~mv2.jpeg"
                     alt="Bianca Tofoli — Fundadora da Casa 6"
