@@ -55,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate }) => {
         {/* Logotipo Oficial Casa 6 (Horizontal Branco para Fundo Escuro) — Ao clicar vai para a página início */}
         <button
           onClick={() => handleLinkClick('/inicio')}
-          className="flex items-center text-left focus:outline-none focus:ring-2 focus:ring-[#F0B55E] rounded-lg p-1 group cursor-pointer"
+          className="flex items-center text-left focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 outline-none border-0 p-1 group cursor-pointer select-none"
           aria-label="Página Inicial Casa 6 (Início)"
           title="Casa 6 — Ir para Início"
         >
