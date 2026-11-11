@@ -143,16 +143,8 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
     }
   ];
 
-  // Artigos Editoriais da Sessão 7 (Leituras Astrais)
-  const blogPosts = CATALOG_BLOG_POSTS.slice(0, 3).map((p, idx) => ({
-    id: p.id,
-    title: p.title,
-    excerpt: p.excerpt,
-    category: p.category,
-    roman: idx === 0 ? 'I' : idx === 1 ? 'II' : 'III',
-    imageUrl: p.imageUrl,
-    date: p.publishedAt
-  }));
+  // Artigos Editoriais da Sessão 7 (Leituras Astrais - 4 Artigos em Boxes Horizontais)
+  const blogPosts = CATALOG_BLOG_POSTS.slice(0, 4);
 
   // 3 Grupos de 4 Depoimentos Oficiais para a Sessão 4 (Alternados a cada período)
   const testimonialGroups = [
@@ -657,10 +649,18 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
       </section>
 
       {/* =========================================================================
-          SESSÃO 7: LEITURAS ASTRAIS (3 CARTAS NA MESMA LINHA COM CARTA SOBREPOSTA)
+          SESSÃO 7: LEITURAS ASTRAIS (BOXES RETANGULARES NA HORIZONTAL COM TEXTO & BOTÃO)
+          Sem efeito de carta de tarô • Fundo claro e cantoneiras astrais refinadas
           ========================================================================= */}
-      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 border-t border-[#E2DCCF] bg-[#F4EFE6]">
-        <div className="mx-auto max-w-7xl space-y-12">
+      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 border-t border-[#E2DCCF] bg-[#F4EFE6] relative overflow-hidden">
+        {/* Órbitas Decorativas Sutis no Fundo Claro */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] h-[850px] rounded-full border border-[#2B2566]/4"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] rounded-full border border-[#F0B55E]/15"></div>
+          <div className="absolute top-12 right-1/4 text-[#F0B55E] opacity-35 text-xs">✦</div>
+        </div>
+
+        <div className="mx-auto max-w-7xl space-y-12 relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="space-y-2">
               <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#8C987F]">
@@ -670,7 +670,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                 Leituras Astrais
               </h2>
               <p className="text-xs sm:text-sm text-[#423C7B] max-w-xl font-light">
-                Ensaios e reflexões autorais de Bianca Tofoli apresentados em cartas astrológicas editoriais.
+                Ensaios e reflexões autorais de Bianca Tofoli apresentados em artigos editoriais sobre os movimentos do céu e da vida.
               </p>
             </div>
 
@@ -683,30 +683,79 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             </button>
           </div>
 
-          {/* Grid com as Cartas Viradas 3D (FlipTarotCard) no mesmo estilo de Consultas Individuais */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            {blogPosts.map((post, index) => (
-              <div key={post.id} className="w-full">
-                <FlipTarotCard
-                  index={index}
-                  romanNumeral={post.roman}
-                  categoryBadge={post.category}
-                  title={post.title}
-                  subtitle={post.excerpt}
-                  backgroundImageUrl={post.imageUrl}
-                  iconUrl="https://static.wixstatic.com/media/02c8e0_bce65db1891746ca848f16f8403ddaed~mv2.png"
-                  date={post.date}
-                  actionLabel="LER ARTIGO COMPLETO"
-                  onAction={() => onNavigate('/leituras')}
-                  onDetailClick={() => onNavigate('/leituras')}
-                />
+          {/* Grid com Boxes Retangulares na Horizontal (2x2) Parecidos com Depoimentos */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+            {blogPosts.map((post) => (
+              <div
+                key={post.id}
+                className="relative rounded-2xl bg-white text-[#2B2566] border border-[#E2DCCF] p-5 sm:p-6 shadow-[0_4px_20px_rgba(43,37,102,0.05)] hover:border-[#F0B55E] hover:shadow-[0_12px_32px_rgba(240,181,94,0.18)] transition-all duration-300 flex flex-col sm:flex-row gap-5 sm:gap-6 items-center overflow-hidden group select-text"
+              >
+                {/* Cantoneiras Astrais Douradas nos Cantos */}
+                <div className="absolute top-2.5 left-2.5 pointer-events-none opacity-40 group-hover:opacity-100 transition-opacity">
+                  <svg className="w-3.5 h-3.5 text-[#F0B55E]" viewBox="0 0 16 16" fill="none">
+                    <path d="M1 9V1H9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                    <circle cx="1" cy="1" r="1" fill="currentColor" />
+                  </svg>
+                </div>
+                <div className="absolute top-2.5 right-2.5 pointer-events-none opacity-40 group-hover:opacity-100 transition-opacity">
+                  <svg className="w-3.5 h-3.5 text-[#F0B55E]" viewBox="0 0 16 16" fill="none">
+                    <path d="M15 9V1H7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                    <circle cx="15" cy="1" r="1" fill="currentColor" />
+                  </svg>
+                </div>
+
+                {/* Imagem do Texto / Artigo (Thumbnail Retangular) */}
+                <div className="w-full sm:w-44 md:w-48 lg:w-52 h-44 sm:h-52 rounded-xl overflow-hidden shrink-0 border border-[#E2DCCF] shadow-xs relative">
+                  <img
+                    src={post.imageUrl}
+                    alt={post.title}
+                    className="w-full h-full object-cover protected-img transition-transform duration-500 group-hover:scale-105"
+                    draggable={false}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#2B2566]/65 via-transparent to-transparent pointer-events-none" />
+                  <span className="absolute bottom-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-[#F0B55E] text-[#2B2566] text-[9px] font-black uppercase tracking-wider shadow-xs">
+                    {post.category}
+                  </span>
+                </div>
+
+                {/* Conteúdo Textual Chamativo & Botão */}
+                <div className="flex-1 flex flex-col justify-between space-y-3 w-full">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-[11px] text-[#8C987F] font-semibold">
+                      <span>Por Bianca Tofoli • {post.publishedAt}</span>
+                      <span className="text-[10px] text-[#B87314] uppercase tracking-wider font-bold">{post.readTime}</span>
+                    </div>
+
+                    <h3 className="font-heading font-bold text-lg sm:text-xl text-[#2B2566] leading-snug group-hover:text-[#B87314] transition-colors line-clamp-2">
+                      {post.title}
+                    </h3>
+
+                    {/* Linha Divisória Fina Dourada com Estrela */}
+                    <div className="relative py-0.5">
+                      <div className="h-px w-full bg-gradient-to-r from-transparent via-[#F0B55E]/60 to-transparent" />
+                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-[9px] text-[#F0B55E] select-none">
+                        ✦
+                      </div>
+                    </div>
+
+                    <p className="font-body text-xs sm:text-[13px] text-[#423C7B] leading-relaxed line-clamp-2">
+                      {post.excerpt}
+                    </p>
+                  </div>
+
+                  <div className="pt-1">
+                    <button
+                      onClick={() => onNavigate('/leituras')}
+                      className="inline-flex items-center gap-2 rounded-full bg-[#FAF7F2] hover:bg-[#F0B55E] text-[#2B2566] px-5 py-2.5 text-xs font-bold uppercase tracking-wider border border-[#E2DCCF] transition-all cursor-pointer group-hover:bg-[#F0B55E] shadow-xs hover:shadow-md"
+                    >
+                      <span>LER MATÉRIA COMPLETA</span>
+                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
-
-          <p className="text-[11px] text-center text-[#68638C]">
-            Toque ou passe o cursor sobre as cartas para girar • Clique para ler o artigo completo
-          </p>
         </div>
       </section>
 
