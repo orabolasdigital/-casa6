@@ -215,41 +215,98 @@ export const OFFICIAL_EXPERIENCES: ExperienceItem[] = [
 
 /**
  * Depoimentos Testemunhais Oficiais (Carrossel Lento)
+ * Feedbacks reais recebidos de consulentes e membros da Patota Astral (com anonimato preservado)
  */
 export const OFFICIAL_TESTIMONIALS: TestimonialItem[] = [
   {
     id: 'depoimento-1',
-    authorName: 'Camila Mendonça',
-    serviceTitle: 'Mapa Natal & Revolução Solar',
-    content: 'A consulta com a Bianca foi um divisor de águas. Não tem nada de misticismo raso: ela traduz o mapa com uma clareza psicológica e prática impressionante. Me senti acolhida e com direção para o ano todo.',
+    authorName: 'Membro da Patota Astral',
+    serviceTitle: 'Patota Astral • Guia Diário',
+    content: 'A Patota Astral faz toda a diferença na minha vida! As previsões me ajudam a entender melhor os desafios e oportunidades que surgem. É como ter um guia sempre à mão para navegar pelas mudanças e decisões.',
     isFeatured: true
   },
   {
     id: 'depoimento-2',
-    authorName: 'Rodrigo Siqueira',
-    serviceTitle: 'Combo Mapa Natal + Roda Astrológica',
-    content: 'O Combo com a leitura da roda foi muito além do que eu esperava. A Bianca tem uma escuta genuína e me ajudou a entender desafios de carreira que eu vinha arrastando há anos.',
+    authorName: 'Consulente de Mapa & Trânsitos',
+    serviceTitle: 'Mapa Astral & Trânsitos',
+    content: 'Tudo o que você falou e descreveu faz todo sentido perfeitamente, é como se soubesse tudo o que estou vivendo e sentindo. Você é muito incrível no que faz! Anos atrás você fez meu mapa e foi tão incrível quanto agora.',
     isFeatured: true
   },
   {
     id: 'depoimento-3',
-    authorName: 'Fernanda Valente',
-    serviceTitle: 'Comunidade Patota Astral',
-    content: 'Estar na Patota Astral mudou minha rotina. As análises de lua nova e cheia são o meu ritual mensal. É um refúgio de troca entre pessoas reais que buscam autoconhecimento de verdade.',
+    authorName: 'Membro da Patota Astral',
+    serviceTitle: 'Patota Astral • Rotina & Acolhimento',
+    content: 'Na maior parte dos dias é o primeiro "bom dia" que escuto e só de ouvir já me acolho e me sinto acolhida. Hoje faz parte da minha rotina até para conseguir me organizar e me preparar para o dia.',
     isFeatured: true
   },
   {
     id: 'depoimento-4',
-    authorName: 'Mariana Duarte',
-    serviceTitle: 'Vivência Curando os Ciclos',
-    content: 'A Vivência Curando os Ciclos me permitiu ressignificar dores antigas com muita delicadeza e força. A condução da Bianca é ao mesmo tempo acolhedora e cirúrgica.',
+    authorName: 'Consulente de Revolução Solar',
+    serviceTitle: 'Revolução Solar & Patota',
+    content: 'Os áudios da Patota fazem muita diferença no dia a dia! Ainda mais que fiz a Revolução Solar com você: sempre que comenta algo nos áudios, corro no meu PDF para ler mais. É incrível a conexão!',
     isFeatured: true
   },
   {
     id: 'depoimento-5',
-    authorName: 'Juliana Prado',
-    serviceTitle: 'Pronto Socorro Astrológico',
-    content: 'Precisei de um direcionamento urgente em uma transição societária. O Pronto Socorro Astrológico me deu o discernimento temporal exato que eu precisava para negociar com segurança.',
+    authorName: 'Membro da Patota Astral',
+    serviceTitle: 'Patota Astral • Clareza & Direção',
+    content: 'É um privilégio fazer parte da Patota Astral! Nos sentimos acolhidos e ancorados pelos astros através de previsões repletas de verdade e amor. Seus áudios me ajudam a dar o tom para minha semana e tirar o melhor proveito dos desafios.',
+    isFeatured: true
+  },
+  {
+    id: 'depoimento-6',
+    authorName: 'Consulente Casa 6',
+    serviceTitle: 'Acolhimento & Respiração',
+    content: 'Começou a bater ansiedade e corri na Patota Astral, entendi tudo e respirei! É impressionante como suas orientações trazem calma imediata e colocam a gente no centro.',
+    isFeatured: true
+  },
+  {
+    id: 'depoimento-7',
+    authorName: 'Membro da Comunidade',
+    serviceTitle: 'Orientação Diária Real',
+    content: 'Ainda bem que temos você para nos auxiliar a dar uma equilibrada, senão teríamos pirado e causado estrago em algumas situações. Obrigada Bibi, a Patota salva os nossos dias!',
+    isFeatured: true
+  },
+  {
+    id: 'depoimento-8',
+    authorName: 'Membro da Patota Astral',
+    serviceTitle: 'Patota Astral • Conhecimento & Cura',
+    content: 'A reflexão de hoje foi sensacional! Essa Patota Astral é cura, é conhecimento, é vida! Gratidão por sua vida e por todo o conhecimento que você compartilha com tanto amor.',
+    isFeatured: true
+  },
+  {
+    id: 'depoimento-9',
+    authorName: 'Consulente Casa 6',
+    serviceTitle: 'Acolhimento & Autocompaixão',
+    content: 'Durante as etapas do processo eu me apegava muito às suas dicas e áudios na Patota. Sempre me lembrava das suas recomendações para seguir vibrando alto e ter mais compaixão com meus sentimentos em períodos difíceis.',
+    isFeatured: true
+  },
+  {
+    id: 'depoimento-10',
+    authorName: 'Membro da Comunidade',
+    serviceTitle: 'Inspiração Diária',
+    content: 'Você é tão necessária! Você não faz ideia do quanto seus conteúdos me ajudam diariamente. Parece que meu dia só se inicia de verdade depois dos seus áudios e previsões! Obrigada por tanto.',
+    isFeatured: true
+  },
+  {
+    id: 'depoimento-11',
+    authorName: 'Membro da Patota Astral',
+    serviceTitle: 'Patota Astral • Energia do Dia',
+    content: 'A Patota Astral já faz parte das minhas manhãs. Fico sabendo sobre a energia do dia e isso dá uma boa consciência do que pode acontecer pra gente já ficar atento e até aproveitar melhor os momentos. Suas explicações são muito claras!',
+    isFeatured: true
+  },
+  {
+    id: 'depoimento-12',
+    authorName: 'Membro da Comunidade',
+    serviceTitle: 'Comunidade Patota Astral',
+    content: 'Sua Patota é um cristal, Bibi! Amo fazer parte dela, me sinto conectada e amparada todos os dias.',
+    isFeatured: true
+  },
+  {
+    id: 'depoimento-13',
+    authorName: 'Membro da Patota Astral',
+    serviceTitle: 'Direcionamento & Luz',
+    content: 'Parabéns à minha predileta e dedicada astróloga, que ilumina e direciona meus dias na Patota! Você é luz na nossa rotina.',
     isFeatured: true
   }
 ];

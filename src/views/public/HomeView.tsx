@@ -402,7 +402,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             EXPERIÊNCIAS REAIS • ACOLHIMENTO E CLAREZA
           </span>
           <h2 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-white">
-            O Que Dizem os Clientes
+            Depoimentos de clientes
           </h2>
           <div className="flex items-center justify-center gap-3 py-1">
             <span className="w-12 h-px bg-white/20"></span>
@@ -410,7 +410,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             <span className="w-12 h-px bg-white/20"></span>
           </div>
           <p className="text-xs sm:text-sm text-[#E6E3F1]/85 max-w-lg mx-auto font-light">
-            Depoimentos de quem encontrou clareza prática e acolhimento nas consultas e vivências com Bianca Tofoli.
+            Depoimentos de quem encontrou clareza prática, acolhimento e direção nas consultas e na Patota Astral com Bianca Tofoli.
           </p>
         </div>
 
