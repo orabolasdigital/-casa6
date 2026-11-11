@@ -241,6 +241,8 @@ export interface OrderRecord {
   status: 'approved' | 'pending' | 'in_process';
   paymentMethod: 'pix' | 'credit_card' | 'ticket';
   mpPaymentId?: string;
+  voucherCode?: string;
+  bonusConsumacao?: string;
   birthData?: BirthData;
   shippingAddress?: ShippingAddress;
   reportHtml?: string;

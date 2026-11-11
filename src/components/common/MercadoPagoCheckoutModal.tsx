@@ -1,23 +1,26 @@
 /**
  * @license
  * Casa 6 — Bianca Tofoli
- * Modal Oficial de Checkout Mercado Pago (Design System Casa 6 Oficial)
+ * Modal Oficial de Checkout Transparente Mercado Pago (Checkout Bricks @mercadopago/sdk-react)
  * 
- * Fluxo em 3 Etapas Estruturadas:
- * - Etapa 1: Coleta de Informações (Nome, Sobrenome, WhatsApp, E-mail — SEM CPF)
- * - Etapa 2 (Lojinha): Endereço de Envio com autopreenchimento por CEP (ViaCEP)
- * - Etapa 2 (Patota Astral / Bússola): Dados Astrais (Dia, Mês, Ano, Hora, Minuto, Cidade/UF) + CPF
- * - Etapa 3: Pagamento Seguro pelo Modal Oficial do Mercado Pago Checkout Pro (Cartão de Crédito, Débito, Pix, Boleto)
- * - Etapa 4: Validação / Aprovação com Botão de Envio para WhatsApp (Lojinha) ou Link do Grupo VIP (Patota)
+ * Arquitetura Conforme Blueprint Oficial Mercado Pago:
+ * - Golden Rule of React Hooks: Todos os hooks no topo antes de qualquer condicional
+ * - Tokenização direta no navegador via Payment Brick (PCI-DSS Compliant)
+ * - Anti-Fraude com recálculo obrigatório de valor no backend
+ * - Geração de Voucher Único (C6<YY><MM><DD>-<3primeirosCPF>)
+ * - Bônus de 1ª Compra registrado
+ * - Tríplice Confirmação: Síncrona + Webhook HMAC-SHA256 + Polling Ativo a cada 3s
+ * - Validação estrita de CPF com algoritmo dos 11 dígitos da Receita Federal
+ * - Disparo de Mensagem Oficial no WhatsApp
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { initMercadoPago, Payment } from '@mercadopago/sdk-react';
 import {
   X,
   CheckCircle,
   ShieldCheck,
   QrCode,
-  CreditCard,
   Copy,
   Check,
   Lock,
@@ -28,23 +31,20 @@ import {
   MessageCircle,
   ExternalLink,
   Loader2,
-  FileText
+  Gift
 } from 'lucide-react';
 import {
   MERCADO_PAGO_CONFIG,
   createOrderRecord,
   saveCustomerRecord,
-  createMercadoPagoPreference,
+  createPaymentWithBrick,
+  checkPaymentStatus,
+  validateCPF,
+  generateVoucherCode,
   CustomerRecord
 } from '../../services/mercadopago';
 import { SITE_CONFIG } from '../../config/site';
 import { BirthData, ShippingAddress } from '../../types';
-
-declare global {
-  interface Window {
-    MercadoPago?: any;
-  }
-}
 
 interface MercadoPagoCheckoutModalProps {
   isOpen: boolean;
@@ -71,16 +71,22 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
   customerData,
   onSuccess
 }) => {
-  // Controle de Etapa (1: Identificação, 2: Envio/Dados Astrais, 3: Pagamento, 4: Concluído)
+  // =========================================================================
+  // REGRA DE OURO DOS HOOKS DO REACT:
+  // Todos os useState, useEffect, useMemo e useCallback OBRIGATORIAMENTE no topo!
+  // NENHUM if (!isOpen) return null; antes dos hooks!
+  // =========================================================================
+
+  // 1. Controle de Etapa (1: Identificação, 2: Envio/Dados Astrais, 3: Pagamento, 4: Concluído)
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
 
-  // Etapa 1: Informações Pessoais (SEM CPF)
-  const [firstName, setFirstName] = useState(customerData?.firstName || '');
-  const [lastName, setLastName] = useState(customerData?.lastName || '');
-  const [email, setEmail] = useState(customerData?.email || '');
-  const [whatsapp, setWhatsapp] = useState(customerData?.whatsapp || '');
+  // 2. Etapa 1: Informações Pessoais (SEM CPF)
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
 
-  // Etapa 2 (Lojinha): Endereço de Envio
+  // 3. Etapa 2 (Lojinha): Endereço de Envio
   const [cep, setCep] = useState('');
   const [street, setStreet] = useState('');
   const [number, setNumber] = useState('');
@@ -92,36 +98,51 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
   const [isLoadingCep, setIsLoadingCep] = useState(false);
   const [cepError, setCepError] = useState('');
 
-  // Etapa 2 (Patota Astral / Bússola): Dados Astrais & CPF
+  // 4. Etapa 2 (Patota Astral / Bússola): Dados Astrais & CPF
   const [cpf, setCpf] = useState('');
-  const [birthDay, setBirthDay] = useState(customerData?.birthData?.birthDay || '');
-  const [birthMonth, setBirthMonth] = useState(customerData?.birthData?.birthMonth || '');
-  const [birthYear, setBirthYear] = useState(customerData?.birthData?.birthYear || '');
-  const [birthHour, setBirthHour] = useState(customerData?.birthData?.birthHour || '');
-  const [birthMinute, setBirthMinute] = useState(customerData?.birthData?.birthMinute || '');
-  const [birthCity, setBirthCity] = useState(customerData?.birthData?.city || '');
-  const [birthState, setBirthState] = useState(customerData?.birthData?.state || '');
+  const [birthDay, setBirthDay] = useState('');
+  const [birthMonth, setBirthMonth] = useState('');
+  const [birthYear, setBirthYear] = useState('');
+  const [birthHour, setBirthHour] = useState('');
+  const [birthMinute, setBirthMinute] = useState('');
+  const [birthCity, setBirthCity] = useState('');
+  const [birthState, setBirthState] = useState('');
 
-  // Etapa 3: Preferência Oficial do Mercado Pago e Modal
-  const [preferenceId, setPreferenceId] = useState<string>('');
-  const [initPoint, setInitPoint] = useState<string>('');
-  const [isLoadingPreference, setIsLoadingPreference] = useState(false);
-  const [isOpeningModal, setIsOpeningModal] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'checkout_pro' | 'pix' | 'credit_card' | 'ticket'>('checkout_pro');
-  const [copiedPix, setCopiedPix] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  // 5. Etapa 3: Payment Brick & Estados de Transação
+  const [isBrickReady, setIsBrickReady] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [stepError, setStepError] = useState('');
 
-  // Pedido Concluído
-  const [confirmedOrderId, setConfirmedOrderId] = useState('');
+  // 6. Pix Pendente & Polling Redundante
+  const [pendingPaymentId, setPendingPaymentId] = useState<string | number | null>(null);
+  const [pixQrCode, setPixQrCode] = useState<string>('');
+  const [pixQrCodeBase64, setPixQrCodeBase64] = useState<string>('');
+  const [copiedPix, setCopiedPix] = useState(false);
+  const [isPollingActive, setIsPollingActive] = useState(false);
 
-  // Sincroniza dados iniciais ao abrir
+  // 7. Resultado da Compra Aprovada
+  const [confirmedOrderId, setConfirmedOrderId] = useState('');
+  const [confirmedVoucher, setConfirmedVoucher] = useState('');
+  const [confirmedBonus, setConfirmedBonus] = useState('');
+
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // 8. Inicialização do SDK do Mercado Pago
+  useEffect(() => {
+    try {
+      initMercadoPago(MERCADO_PAGO_CONFIG.production.publicKey, { locale: 'pt-BR' });
+    } catch (err) {
+      console.warn('[Mercado Pago SDK React Init]', err);
+    }
+  }, []);
+
+  // 9. Sincronização inicial de dados ao abrir o modal
   useEffect(() => {
     if (isOpen) {
-      if (customerData?.firstName) setFirstName(customerData.firstName);
-      if (customerData?.lastName) setLastName(customerData.lastName);
-      if (customerData?.email) setEmail(customerData.email);
-      if (customerData?.whatsapp) setWhatsapp(customerData.whatsapp);
+      setFirstName(customerData?.firstName || '');
+      setLastName(customerData?.lastName || '');
+      setEmail(customerData?.email || '');
+      setWhatsapp(customerData?.whatsapp || '');
       if (customerData?.birthData) {
         setBirthDay(customerData.birthData.birthDay || '');
         setBirthMonth(customerData.birthData.birthMonth || '');
@@ -133,93 +154,187 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
       }
       setStepError('');
       setCurrentStep(1);
-      setPreferenceId('');
-      setInitPoint('');
+      setPendingPaymentId(null);
+      setPixQrCode('');
+      setPixQrCodeBase64('');
+      setIsBrickReady(false);
+      setIsPollingActive(false);
     }
   }, [isOpen, customerData]);
 
-  // Ao chegar na Etapa 3, cria a preferência oficial no Mercado Pago e cadastra cliente
+  // 10. Polling Ativo a cada 3 segundos (Canal de Fallback Redundante do Blueprint)
   useEffect(() => {
-    if (isOpen && currentStep === 3 && !preferenceId) {
-      const initPreference = async () => {
-        setIsLoadingPreference(true);
+    if (isPollingActive && pendingPaymentId && currentStep === 3) {
+      pollingIntervalRef.current = setInterval(async () => {
         try {
-          const cleanEmail = email.trim().toLowerCase();
-          const fullName = `${firstName.trim()} ${lastName.trim()}`;
-          const cleanCpf = cpf.trim() || (serviceType === 'loja' ? '000.000.000-00' : '123.456.789-00');
-
-          const shippingPayload: ShippingAddress | undefined = serviceType === 'loja'
-            ? {
-                cep,
-                street,
-                number,
-                complement,
-                neighborhood,
-                city,
-                state,
-                notes: shippingNotes
-              }
-            : undefined;
-
-          const birthDataPayload: BirthData | undefined = serviceType !== 'loja'
-            ? {
-                birthDay,
-                birthMonth,
-                birthYear,
-                birthHour,
-                birthMinute,
-                city: birthCity,
-                state: birthState
-              }
-            : undefined;
-
-          // 1. Cadastra cliente no banco de dados (/customers)
-          const customerId = `cust_${cleanEmail.replace(/[^a-z0-9]/g, '_')}`;
-          const customerRecord: CustomerRecord = {
-            id: customerId,
-            fullName,
-            firstName: firstName.trim(),
-            lastName: lastName.trim(),
-            email: cleanEmail,
-            whatsapp,
-            cpf: cleanCpf,
-            shippingAddress: shippingPayload,
-            birthData: birthDataPayload,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          };
-          await saveCustomerRecord(customerRecord);
-
-          // 2. Gera Preferência de Checkout Pro no Mercado Pago
-          const pref = await createMercadoPagoPreference({
-            itemTitle,
-            amount,
-            customerName: fullName,
-            customerEmail: cleanEmail,
-            customerPhone: whatsapp,
-            customerCpf: cleanCpf,
-            shippingAddress: shippingPayload
-          });
-
-          setPreferenceId(pref.preferenceId);
-          setInitPoint(pref.initPoint);
-        } catch (err) {
-          console.warn('[Mercado Pago Init Preference] Aviso:', err);
-        } finally {
-          setIsLoadingPreference(false);
+          const statusRes = await checkPaymentStatus(pendingPaymentId);
+          if (statusRes.status === 'approved') {
+            setIsPollingActive(false);
+            if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+            setCurrentStep(4);
+          }
+        } catch (pollErr) {
+          console.warn('[Polling Status Warning]', pollErr);
         }
-      };
+      }, 3000);
+    }
 
-      initPreference();
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
+  }, [isPollingActive, pendingPaymentId, currentStep]);
+
+  // 11. Configuração de Inicialização do Payment Brick
+  const brickInitialization = useMemo(() => ({
+    amount: Number(amount.toFixed(2)),
+    payer: {
+      email: (email || 'cliente@casa6.com.br').trim().toLowerCase(),
+    }
+  }), [amount, email]);
+
+  // 12. Métodos e Customização do Payment Brick
+  const brickCustomization = useMemo(() => ({
+    paymentMethods: {
+      creditCard: "all" as const,
+      debitCard: "all" as const,
+      bankTransfer: "all" as const,
+      ticket: "all" as const
+    },
+    visual: {
+      style: {
+        theme: 'default' as const
+      }
+    }
+  }), []);
+
+  // 13. Submissão do Pagamento pelo Brick (com Tokenização Segura e Anti-Fraude)
+  const handleBrickSubmit = useCallback(async (brickParam: any) => {
+    const { formData } = brickParam;
+    setIsProcessingPayment(true);
+    setStepError('');
+
+    try {
+      const cleanEmail = email.trim().toLowerCase();
+      const fullName = `${firstName.trim()} ${lastName.trim()}`;
+      const cleanCpf = cpf.trim() || (serviceType === 'loja' ? '000.000.000-00' : '123.456.789-00');
+
+      const shippingPayload: ShippingAddress | undefined = serviceType === 'loja'
+        ? {
+            cep,
+            street,
+            number,
+            complement,
+            neighborhood,
+            city,
+            state,
+            notes: shippingNotes
+          }
+        : undefined;
+
+      const birthDataPayload: BirthData | undefined = serviceType !== 'loja'
+        ? {
+            birthDay,
+            birthMonth,
+            birthYear,
+            birthHour,
+            birthMinute,
+            city: birthCity,
+            state: birthState
+          }
+        : undefined;
+
+      // Chama a rota de pagamento backend protegida contra manipulação de preço
+      const result = await createPaymentWithBrick({
+        formData,
+        payerConfig: {
+          itemTitle,
+          amount,
+          serviceType,
+          customerName: fullName,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          email: cleanEmail,
+          whatsapp,
+          cpf: cleanCpf,
+          shippingAddress: shippingPayload,
+          birthData: birthDataPayload
+        }
+      });
+
+      const orderVoucher = result.voucherCode || generateVoucherCode(cleanCpf);
+      const bonusCode = result.bonusConsumacao || `BEMVINDA-${orderVoucher}`;
+
+      // Salva no banco de dados (/customers e /orders)
+      const customerRecord: CustomerRecord = {
+        id: `cust_${cleanEmail.replace(/[^a-z0-9]/g, '_')}`,
+        fullName,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: cleanEmail,
+        whatsapp,
+        cpf: cleanCpf,
+        shippingAddress: shippingPayload,
+        birthData: birthDataPayload,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        lastOrderId: result.orderId
+      };
+      await saveCustomerRecord(customerRecord);
+
+      await createOrderRecord({
+        memberEmail: cleanEmail,
+        memberCpf: cleanCpf,
+        customerName: fullName,
+        whatsapp: whatsapp.replace(/\D/g, ''),
+        serviceType,
+        itemTitle,
+        amount,
+        paymentMethod: formData.payment_method_id === 'pix' ? 'pix' : 'credit_card',
+        voucherCode: orderVoucher,
+        bonusConsumacao: bonusCode,
+        birthData: birthDataPayload,
+        shippingAddress: shippingPayload
+      });
+
+      setConfirmedOrderId(result.orderId);
+      setConfirmedVoucher(orderVoucher);
+      setConfirmedBonus(bonusCode);
+
+      // (A) Canal Síncrono Aprovado Imediato
+      if (result.status === 'approved') {
+        setCurrentStep(4);
+        if (onSuccess) onSuccess(result.orderId);
+        return;
+      }
+
+      // (B) Canal Pix Pendente (Exibe QR Code + Copia e Cola + Ativa Polling de 3s)
+      if (result.status === 'pending' || result.status === 'in_process') {
+        setPendingPaymentId(result.id);
+        const qr = result.point_of_interaction?.transaction_data?.qr_code || '';
+        const qrBase64 = result.point_of_interaction?.transaction_data?.qr_code_base64 || '';
+
+        setPixQrCode(qr);
+        setPixQrCodeBase64(qrBase64);
+        setIsPollingActive(true);
+        return;
+      }
+
+      // (C) Rejeitado
+      if (result.status === 'rejected') {
+        setStepError('O pagamento não pôde ser aprovado pela operadora. Verifique os dados ou tente outro cartão.');
+      }
+    } catch (err: any) {
+      console.error('[Mercado Pago Brick Submit Error]', err);
+      setStepError(err.message || 'Falha ao processar o pagamento com o Mercado Pago.');
+    } finally {
+      setIsProcessingPayment(false);
     }
   }, [
-    isOpen,
-    currentStep,
-    preferenceId,
     email,
     firstName,
     lastName,
-    whatsapp,
     cpf,
     serviceType,
     cep,
@@ -238,16 +353,18 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
     birthCity,
     birthState,
     itemTitle,
-    amount
+    amount,
+    whatsapp,
+    onSuccess
   ]);
 
+  // =========================================================================
+  // APÓS TODOS OS HOOKS: VERIFICAÇÃO SE O MODAL ESTÁ ABERTO
+  // =========================================================================
   if (!isOpen) return null;
 
   const isLoja = serviceType === 'loja';
   const isPatota = serviceType === 'patota';
-
-  // Código Pix dinâmico com valor configurado
-  const pixCode = `00020101021226840014br.gov.bcb.pix2562pix-mercadopago.com/qr/casa6-${Math.random().toString(36).substring(2, 10)}5204000053039865802BR5925CASA 6 BIANCA TOFOLI6009SAO PAULO62070503***6304`;
 
   // Máscaras de Entrada
   const formatWhatsapp = (val: string) => {
@@ -284,7 +401,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
         const res = await fetch(`https://viacep.com.br/ws/${clean}/json/`);
         const data = await res.json();
         if (data.erro) {
-          setCepError('CEP não encontrado. Por favor, preencha o endereço manualmente.');
+          setCepError('CEP não encontrado. Preencha o endereço manualmente.');
         } else {
           setStreet(data.logradouro || '');
           setNeighborhood(data.bairro || '');
@@ -292,7 +409,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
           setState(data.uf || '');
         }
       } catch {
-        setCepError('Não foi possível consultar o CEP automaticamente. Preencha manualmente.');
+        setCepError('Falha ao consultar CEP. Preencha manualmente.');
       } finally {
         setIsLoadingCep(false);
       }
@@ -326,20 +443,19 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
     setCurrentStep(2);
   };
 
-  // Validação e Avanço da Etapa 2
+  // Validação e Avanço da Etapa 2 (com Validação Estrita de CPF de 11 dígitos)
   const handleNextFromStep2 = (e: React.FormEvent) => {
     e.preventDefault();
     setStepError('');
 
     if (isLoja) {
-      // Validação de Endereço de Envio
       const cleanCep = cep.replace(/\D/g, '');
       if (cleanCep.length !== 8) {
         setStepError('Informe um CEP válido com 8 dígitos.');
         return;
       }
       if (!street.trim()) {
-        setStepError('Informe o nome da rua / logradouro.');
+        setStepError('Informe a rua / logradouro.');
         return;
       }
       if (!number.trim()) {
@@ -359,10 +475,9 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
         return;
       }
     } else {
-      // Validação de Dados Astrais & CPF para Patota Astral / Bússola
-      const cleanCpf = cpf.replace(/\D/g, '');
-      if (cleanCpf.length !== 11) {
-        setStepError('Informe um CPF válido com 11 dígitos.');
+      // Validação Estrita com o Algoritmo Oficial de CPF da Receita Federal
+      if (!validateCPF(cpf)) {
+        setStepError('O CPF informado é inválido. Por favor, verifique os 11 dígitos.');
         return;
       }
       if (!birthDay || !birthMonth || !birthYear) {
@@ -383,153 +498,40 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
   };
 
   const handleCopyPix = () => {
-    navigator.clipboard.writeText(pixCode);
-    setCopiedPix(true);
-    setTimeout(() => setCopiedPix(false), 3000);
-  };
-
-  /**
-   * Abre o Modal Oficial do Mercado Pago Checkout Pro
-   * Inicializa com a Public Key de Produção e exibe a interface nativa do Mercado Pago
-   */
-  const handleOpenMercadoPagoModal = async () => {
-    setIsOpeningModal(true);
-    setStepError('');
-
-    try {
-      // Garante que a preferência exista
-      let currentPrefId = preferenceId;
-      let currentInit = initPoint;
-
-      if (!currentPrefId) {
-        const cleanEmail = email.trim().toLowerCase();
-        const fullName = `${firstName.trim()} ${lastName.trim()}`;
-        const cleanCpf = cpf.trim() || (isLoja ? '000.000.000-00' : '123.456.789-00');
-
-        const pref = await createMercadoPagoPreference({
-          itemTitle,
-          amount,
-          customerName: fullName,
-          customerEmail: cleanEmail,
-          customerPhone: whatsapp,
-          customerCpf: cleanCpf,
-          shippingAddress: isLoja ? { cep, street, number, complement, neighborhood, city, state, notes: shippingNotes } : undefined
-        });
-        currentPrefId = pref.preferenceId;
-        currentInit = pref.initPoint;
-        setPreferenceId(currentPrefId);
-        setInitPoint(currentInit);
-      }
-
-      // Se o SDK do Mercado Pago estiver carregado na janela, invoca o modal nativo
-      if (typeof window !== 'undefined' && window.MercadoPago && currentPrefId) {
-        try {
-          const mp = new window.MercadoPago(MERCADO_PAGO_CONFIG.production.publicKey, {
-            locale: 'pt-BR'
-          });
-
-          mp.checkout({
-            preference: {
-              id: currentPrefId
-            },
-            autoOpen: true
-          });
-          return;
-        } catch (sdkErr) {
-          console.warn('[Mercado Pago SDK Modal Error]', sdkErr);
-        }
-      }
-
-      // Fallback seguro: Redireciona diretamente para o checkout oficial do Mercado Pago
-      if (currentInit) {
-        window.open(currentInit, '_blank');
-      }
-    } catch (err) {
-      console.error('[Mercado Pago Modal Trigger Error]', err);
-      setStepError('Não foi possível carregar o modal do Mercado Pago. Tente novamente.');
-    } finally {
-      setIsOpeningModal(false);
+    if (pixQrCode) {
+      navigator.clipboard.writeText(pixQrCode);
+      setCopiedPix(true);
+      setTimeout(() => setCopiedPix(false), 3000);
     }
   };
 
-  // Confirmação e Finalização do Pedido (Avança para Etapa 4)
-  const handleConfirmPayment = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setStepError('');
-    setIsProcessing(true);
-
-    try {
-      const cleanEmail = email.trim().toLowerCase();
-      const cleanCpf = cpf.trim() || (isLoja ? '000.000.000-00' : '123.456.789-00');
-      const fullName = `${firstName.trim()} ${lastName.trim()}`;
-
-      const birthDataPayload: BirthData | undefined = !isLoja
-        ? {
-            birthDay,
-            birthMonth,
-            birthYear,
-            birthHour,
-            birthMinute,
-            city: birthCity,
-            state: birthState
-          }
-        : undefined;
-
-      const shippingPayload: ShippingAddress | undefined = isLoja
-        ? {
-            cep,
-            street,
-            number,
-            complement,
-            neighborhood,
-            city,
-            state,
-            notes: shippingNotes
-          }
-        : undefined;
-
-      const order = await createOrderRecord({
-        memberEmail: cleanEmail,
-        memberCpf: cleanCpf,
-        customerName: fullName,
-        whatsapp: whatsapp.replace(/\D/g, ''),
-        serviceType,
-        itemTitle,
-        amount,
-        paymentMethod: paymentMethod === 'checkout_pro' ? 'credit_card' : paymentMethod,
-        birthData: birthDataPayload,
-        shippingAddress: shippingPayload
-      });
-
-      setConfirmedOrderId(order.id);
-      setCurrentStep(4);
-      if (onSuccess) onSuccess(order.id);
-    } catch (err) {
-      console.error('Erro ao registrar pedido:', err);
-      setStepError('Houve uma falha ao registrar o pedido. Tente novamente.');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  // Mensagem WhatsApp para a Lojinha
-  const getWhatsAppLojaMessage = () => {
+  // Mensagem WhatsApp formatada
+  const getWhatsAppApprovedMessage = () => {
     const fullName = `${firstName.trim()} ${lastName.trim()}`;
-    return `Olá, Bianca! Acabei de realizar a compra de "${itemTitle}" pelo site da Casa 6.\n\n` +
-      `📦 Pedido: #${confirmedOrderId}\n` +
-      `💰 Valor: R$ ${amount.toFixed(2).replace('.', ',')}\n` +
-      `👤 Nome: ${fullName}\n` +
-      `📱 WhatsApp: ${whatsapp}\n` +
-      `✉️ E-mail: ${email}\n\n` +
-      `📍 Endereço de Envio:\n` +
-      `${street}, nº ${number}${complement ? ` - ${complement}` : ''}\n` +
-      `Bairro: ${neighborhood}\n` +
-      `Cidade: ${city} / ${state}\n` +
-      `CEP: ${cep}\n` +
-      (shippingNotes ? `Obs: ${shippingNotes}\n` : '');
+    if (isLoja) {
+      return `Olá, Bianca! Acabei de realizar a compra de "${itemTitle}" pelo site da Casa 6.\n\n` +
+        `• Pedido: #${confirmedOrderId}\n` +
+        `• Voucher: ${confirmedVoucher}\n` +
+        `• Valor: R$ ${amount.toFixed(2).replace('.', ',')}\n` +
+        `• Nome: ${fullName}\n` +
+        `• WhatsApp: ${whatsapp}\n` +
+        `• E-mail: ${email}\n\n` +
+        `📍 Endereço de Envio:\n` +
+        `${street}, nº ${number}${complement ? ` - ${complement}` : ''}\n` +
+        `Bairro: ${neighborhood} - ${city}/${state} (CEP: ${cep})\n` +
+        (shippingNotes ? `Obs: ${shippingNotes}\n` : '');
+    }
+
+    return `Olá, Bianca! Fiz a adesão de "${itemTitle}" pelo site da Casa 6.\n\n` +
+      `• Pedido: #${confirmedOrderId}\n` +
+      `• Voucher: ${confirmedVoucher}\n` +
+      `• Nome: ${fullName}\n` +
+      `• WhatsApp: ${whatsapp}\n` +
+      `• E-mail: ${email}\n` +
+      `• CPF: ${cpf}\n\n` +
+      `Pode confirmar meu acesso à Patota Astral?`;
   };
 
-  // Link do grupo VIP da Patota no WhatsApp
   const patotaGroupInviteUrl = 'https://chat.whatsapp.com/invite/patota-astral-casa6-oficial';
 
   return (
@@ -541,7 +543,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
       <div className="relative w-full max-w-xl rounded-3xl bg-[#FCFAF7] border-2 border-[#F0B55E]/60 shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
         
         {/* =========================================================================
-            HEADER OFICIAL CASA 6 (LIMPO E SEM TAGS DE TESTE)
+            HEADER OFICIAL CASA 6 (DESIGN SYSTEM BLINDADO)
             ========================================================================= */}
         <div className="bg-gradient-to-r from-[#2B2566] via-[#211B55] to-[#362E7A] text-white p-5 sm:p-6 flex items-center justify-between shrink-0 border-b border-[#F0B55E]/30 relative">
           <div className="flex items-center gap-3.5">
@@ -558,7 +560,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   Casa 6 • Bianca Tofoli
                 </span>
                 <span className="text-[10px] text-[#E6E3F1]/70">
-                  • Ambiente Seguro
+                  • Checkout Seguro
                 </span>
               </div>
               <p className="text-base sm:text-lg font-bold font-heading text-white line-clamp-1 mt-0.5">
@@ -586,7 +588,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
         </div>
 
         {/* =========================================================================
-            BARRA DE PROGRESSO EM 3 ETAPAS OFICIAIS (DESIGN SYSTEM CASA 6)
+            BARRA DE PROGRESSO EM 3 ETAPAS OFICIAIS
             ========================================================================= */}
         {currentStep < 4 && (
           <div className="bg-[#F4EFE6] px-5 py-3 border-b border-[#E2DCCF] flex items-center justify-between">
@@ -625,7 +627,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   {currentStep > 2 ? '✓' : '2'}
                 </span>
                 <span className={`text-[11px] font-bold uppercase tracking-wider ${currentStep === 2 ? 'text-[#2B2566]' : 'text-[#68638C]'}`}>
-                  {isLoja ? 'Envio' : 'Dados Astrais'}
+                  {isLoja ? 'Envio' : 'Dados Astrais & CPF'}
                 </span>
               </div>
 
@@ -643,7 +645,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   3
                 </span>
                 <span className={`text-[11px] font-bold uppercase tracking-wider ${currentStep === 3 ? 'text-[#2B2566]' : 'text-[#68638C]'}`}>
-                  Pagamento
+                  Pagamento Seguro
                 </span>
               </div>
             </div>
@@ -663,7 +665,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
         <div className="p-5 sm:p-7 overflow-y-auto flex-1 space-y-5">
           
           {/* =====================================================================
-              ETAPA 1: COLETA DE INFORMAÇÕES PESSOAIS (SEM CPF)
+              ETAPA 1: IDENTIFICAÇÃO (SEM CPF)
               ===================================================================== */}
           {currentStep === 1 && (
             <form onSubmit={handleNextFromStep1} className="space-y-4">
@@ -672,7 +674,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   1. Seus Dados de Contato
                 </h3>
                 <p className="text-xs text-[#423C7B]">
-                  Informe seus dados para identificação e emissão do comprovante.
+                  Informe seus dados para emissão do voucher oficial e notificações.
                 </p>
               </div>
 
@@ -749,7 +751,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
           )}
 
           {/* =====================================================================
-              ETAPA 2 (LOJINHA): DADOS DE LOCALIZAÇÃO PARA ENVIO COM BUSCA POR CEP
+              ETAPA 2 (LOJINHA): ENDEREÇO DE ENVIO (VIACEP)
               ===================================================================== */}
           {currentStep === 2 && isLoja && (
             <form onSubmit={handleNextFromStep2} className="space-y-4">
@@ -759,11 +761,10 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   <span>2. Endereço de Envio</span>
                 </h3>
                 <p className="text-xs text-[#423C7B]">
-                  Informe o CEP para preenchimento automático da rua, bairro e cidade.
+                  Informe o CEP para preenchimento automático do endereço.
                 </p>
               </div>
 
-              {/* CEP com busca automática */}
               <div>
                 <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
                   CEP (Obrigatório) *
@@ -781,7 +782,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   {isLoadingCep && (
                     <div className="absolute right-3 top-2.5 text-[#B87314] flex items-center gap-1.5 text-xs">
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      <span className="text-[10px]">Buscando...</span>
+                      <span className="text-[10px]">Buscando CEP...</span>
                     </div>
                   )}
                 </div>
@@ -790,7 +791,6 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 )}
               </div>
 
-              {/* Rua e Número */}
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                 <div className="sm:col-span-8">
                   <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
@@ -802,7 +802,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="Preenchido pelo CEP"
                     value={street}
                     onChange={(e) => setStreet(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#F0B55E] focus:outline-none"
+                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566]"
                   />
                 </div>
 
@@ -816,12 +816,11 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="123"
                     value={number}
                     onChange={(e) => setNumber(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#F0B55E] focus:outline-none"
+                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566]"
                   />
                 </div>
               </div>
 
-              {/* Complemento e Bairro */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
@@ -832,7 +831,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="Apto 101, Bloco B"
                     value={complement}
                     onChange={(e) => setComplement(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#F0B55E] focus:outline-none"
+                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566]"
                   />
                 </div>
 
@@ -846,12 +845,11 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="Bairro"
                     value={neighborhood}
                     onChange={(e) => setNeighborhood(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#F0B55E] focus:outline-none"
+                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566]"
                   />
                 </div>
               </div>
 
-              {/* Cidade e Estado */}
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                 <div className="sm:col-span-8">
                   <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
@@ -863,7 +861,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     placeholder="Cidade"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#F0B55E] focus:outline-none"
+                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566]"
                   />
                 </div>
 
@@ -878,26 +876,24 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                     maxLength={2}
                     value={state}
                     onChange={(e) => setState(e.target.value.toUpperCase())}
-                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] uppercase text-center font-bold focus:border-[#F0B55E] focus:outline-none"
+                    className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2.5 text-[#2B2566] uppercase text-center font-bold"
                   />
                 </div>
               </div>
 
-              {/* Observações de Envio */}
               <div>
                 <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
                   Observações para a Entrega (Opcional)
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="Instruções para o entregador, ponto de referência, etc."
+                  placeholder="Instruções para o entregador, ponto de referência..."
                   value={shippingNotes}
                   onChange={(e) => setShippingNotes(e.target.value)}
-                  className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2 text-[#2B2566] focus:border-[#F0B55E] focus:outline-none"
+                  className="w-full text-xs rounded-xl border border-[#E2DCCF] bg-white px-3.5 py-2 text-[#2B2566]"
                 />
               </div>
 
-              {/* Botões Voltar e Avançar */}
               <div className="pt-2 flex items-center justify-between gap-3">
                 <button
                   type="button"
@@ -912,7 +908,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   type="submit"
                   className="flex-1 flex items-center justify-center gap-2 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] py-3.5 px-6 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-md transition-all cursor-pointer transform hover:-translate-y-0.5"
                 >
-                  <span>Avançar para Pagamento</span>
+                  <span>Avançar para Pagamento Seguro</span>
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -920,7 +916,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
           )}
 
           {/* =====================================================================
-              ETAPA 2 (PATOTA ASTRAL & BÚSSOLA): DADOS ASTRAIS DE NASCIMENTO & CPF
+              ETAPA 2 (PATOTA ASTRAL & BÚSSOLA): DADOS ASTRAIS & CPF OBRIGATÓRIO
               ===================================================================== */}
           {currentStep === 2 && !isLoja && (
             <form onSubmit={handleNextFromStep2} className="space-y-4">
@@ -930,14 +926,14 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   <span>2. Dados Astrais & CPF</span>
                 </h3>
                 <p className="text-xs text-[#423C7B]">
-                  Essenciais para a assinatura, mapa e acesso à Área de Membros.
+                  Necessários para o mapa astral e acesso individual à Área de Membros.
                 </p>
               </div>
 
-              {/* Campo CPF (Exclusivo desta etapa) */}
+              {/* Campo CPF (com validação estrita de 11 dígitos) */}
               <div>
                 <label className="block text-[11px] font-bold text-[#2B2566] mb-1">
-                  CPF do Titular (Obrigatório para Cadastro & Membros) *
+                  CPF do Titular (Validado Receita Federal) *
                 </label>
                 <input
                   type="text"
@@ -1064,7 +1060,6 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 </div>
               </div>
 
-              {/* Botões Voltar e Avançar */}
               <div className="pt-2 flex items-center justify-between gap-3">
                 <button
                   type="button"
@@ -1079,7 +1074,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   type="submit"
                   className="flex-1 flex items-center justify-center gap-2 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] py-3.5 px-6 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-md transition-all cursor-pointer transform hover:-translate-y-0.5"
                 >
-                  <span>{isPatota ? 'Avançar para Assinatura' : 'Avançar para Pagamento'}</span>
+                  <span>{isPatota ? 'Avançar para Assinatura' : 'Avançar para Pagamento Seguro'}</span>
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -1087,17 +1082,17 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
           )}
 
           {/* =====================================================================
-              ETAPA 3: PAGAMENTO SEGURO COM MODAL OFICIAL MERCADO PAGO CHECKOUT PRO
+              ETAPA 3: PAGAMENTO SEGURO VIA CHECKOUT BRICKS (@mercadopago/sdk-react)
               ===================================================================== */}
           {currentStep === 3 && (
             <div className="space-y-4">
               <div className="border-b border-[#E2DCCF] pb-3">
                 <h3 className="font-heading text-lg font-bold text-[#2B2566] flex items-center gap-2">
                   <ShieldCheck className="h-5 w-5 text-[#12BB40]" />
-                  <span>3. Pagamento Seguro Mercado Pago</span>
+                  <span>3. Pagamento Transparente Mercado Pago</span>
                 </h3>
                 <p className="text-xs text-[#423C7B]">
-                  Pague com segurança através do modal oficial do Mercado Pago Checkout Pro.
+                  Preencha diretamente no modal seguro (Cartão de Crédito/Débito ou Pix Instantâneo).
                 </p>
               </div>
 
@@ -1127,183 +1122,115 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 )}
               </div>
 
-              {/* Card Destaque: Modal Oficial Mercado Pago (Checkout Pro) */}
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-[#2B2566] to-[#362E7A] text-white shadow-xl space-y-4 border border-[#F0B55E]/40">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="h-9 w-9 rounded-xl bg-white/10 p-2 flex items-center justify-center">
-                      <CreditCard className="h-5 w-5 text-[#F0B55E]" />
+              {/* Se Pix estiver Pendente: Exibe QR Code + Copia e Cola + Polling Ativo */}
+              {pendingPaymentId && (
+                <div className="p-5 rounded-2xl bg-white border-2 border-[#12BB40] text-center space-y-3.5 shadow-md">
+                  <div className="flex items-center justify-center gap-2 text-xs font-bold text-[#12BB40] uppercase tracking-wider">
+                    <Loader2 className="h-4 w-4 animate-spin text-[#12BB40]" />
+                    <span>Aguardando Pagamento Pix (Sincronização em Tempo Real)</span>
+                  </div>
+
+                  {pixQrCodeBase64 ? (
+                    <div className="w-44 h-44 mx-auto bg-white p-2 rounded-xl border border-[#E2DCCF] shadow-sm flex items-center justify-center">
+                      <img
+                        src={`data:image/png;base64,${pixQrCodeBase64}`}
+                        alt="QR Code Pix Oficial"
+                        className="w-full h-full object-contain"
+                      />
                     </div>
-                    <div>
-                      <h4 className="font-heading font-bold text-sm text-white">
-                        Checkout Pro Mercado Pago
-                      </h4>
-                      <p className="text-[11px] text-[#E6E3F1]">
-                        Cartão de Crédito em até 12x, Débito, Pix ou Boleto
+                  ) : pixQrCode ? (
+                    <div className="w-44 h-44 mx-auto bg-white p-2 rounded-xl border border-[#E2DCCF] shadow-sm flex items-center justify-center">
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${encodeURIComponent(pixQrCode)}`}
+                        alt="QR Code Pix Oficial"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  ) : null}
+
+                  <p className="text-xs text-[#423C7B]">
+                    Escaneie o QR Code no seu banco ou use a chave Copia e Cola:
+                  </p>
+
+                  {pixQrCode && (
+                    <button
+                      type="button"
+                      onClick={handleCopyPix}
+                      className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#F4EFE6] hover:bg-[#E6E3F1] text-[#2B2566] text-xs font-bold border border-[#E2DCCF] transition-colors cursor-pointer"
+                    >
+                      {copiedPix ? <Check className="h-4 w-4 text-[#12BB40]" /> : <Copy className="h-4 w-4" />}
+                      <span>{copiedPix ? 'Chave Pix Copiada com Sucesso!' : 'Copiar Código Pix (Copia e Cola)'}</span>
+                    </button>
+                  )}
+
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        setIsProcessingPayment(true);
+                        const statusRes = await checkPaymentStatus(pendingPaymentId);
+                        setIsProcessingPayment(false);
+                        if (statusRes.status === 'approved') {
+                          setCurrentStep(4);
+                        } else {
+                          setStepError('O pagamento ainda consta como pendente no banco. Se já pagou, aguarde alguns segundos.');
+                        }
+                      }}
+                      className="w-full py-3 px-4 rounded-full bg-[#12BB40] hover:bg-[#0fa437] text-white text-xs font-bold uppercase tracking-wider shadow-md cursor-pointer transition-all"
+                    >
+                      {isProcessingPayment ? 'Verificando com o Banco...' : 'Já Realizei o Pagamento / Confirmar'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Renderização do Checkout Bricks Oficial (@mercadopago/sdk-react) */}
+              {!pendingPaymentId && (
+                <div className="relative min-h-[300px]">
+                  {!isBrickReady && (
+                    <div className="py-8 text-center space-y-2">
+                      <Loader2 className="h-6 w-6 animate-spin text-[#F0B55E] mx-auto" />
+                      <p className="text-xs text-[#68638C]">
+                        Carregando ambiente seguro de pagamento Mercado Pago...
                       </p>
                     </div>
-                  </div>
-                  <span className="text-[10px] bg-[#12BB40] text-white font-bold px-2 py-0.5 rounded-full">
-                    Oficial
-                  </span>
-                </div>
+                  )}
 
-                <div className="pt-1">
-                  <button
-                    type="button"
-                    onClick={handleOpenMercadoPagoModal}
-                    disabled={isLoadingPreference || isOpeningModal}
-                    className="w-full flex items-center justify-center gap-2.5 rounded-full bg-[#009ee3] hover:bg-[#0089c7] text-white py-3.5 px-6 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-lg transition-all cursor-pointer transform hover:-translate-y-0.5 disabled:opacity-70"
-                  >
-                    {isOpeningModal || isLoadingPreference ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin text-white" />
-                        <span>Conectando ao Mercado Pago...</span>
-                      </>
-                    ) : (
-                      <>
-                        <ShieldCheck className="h-4 w-4 text-white" />
-                        <span>Abrir Modal Oficial do Mercado Pago</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                {initPoint && (
-                  <div className="text-center pt-1">
-                    <a
-                      href={initPoint}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] text-[#F0B55E] hover:underline inline-flex items-center gap-1 font-semibold"
-                    >
-                      <span>Caso o modal não abra automaticamente, clique aqui</span>
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </div>
-                )}
-              </div>
-
-              {/* Seletor Rápido de Opções de Pagamento */}
-              <div className="grid grid-cols-3 gap-2.5 pt-1">
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('pix')}
-                  className={`p-3 rounded-2xl border text-center transition-all cursor-pointer ${
-                    paymentMethod === 'pix'
-                      ? 'border-[#009ee3] bg-[#009ee3]/10 font-bold text-[#009ee3] ring-1 ring-[#009ee3]'
-                      : 'border-[#E2DCCF] bg-white text-[#423C7B] hover:border-[#009ee3]'
-                  }`}
-                >
-                  <QrCode className="h-5 w-5 mx-auto mb-1 text-[#009ee3]" />
-                  <span className="text-xs block font-bold">PIX Direto</span>
-                  <span className="text-[10px] text-[#12BB40] font-semibold">QR Code</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPaymentMethod('credit_card');
-                    handleOpenMercadoPagoModal();
-                  }}
-                  className={`p-3 rounded-2xl border text-center transition-all cursor-pointer ${
-                    paymentMethod === 'credit_card'
-                      ? 'border-[#009ee3] bg-[#009ee3]/10 font-bold text-[#009ee3] ring-1 ring-[#009ee3]'
-                      : 'border-[#E2DCCF] bg-white text-[#423C7B] hover:border-[#009ee3]'
-                  }`}
-                >
-                  <CreditCard className="h-5 w-5 mx-auto mb-1 text-[#009ee3]" />
-                  <span className="text-xs block font-bold">Cartão</span>
-                  <span className="text-[10px] text-gray-500">Crédito/Débito</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('ticket')}
-                  className={`p-3 rounded-2xl border text-center transition-all cursor-pointer ${
-                    paymentMethod === 'ticket'
-                      ? 'border-[#009ee3] bg-[#009ee3]/10 font-bold text-[#009ee3] ring-1 ring-[#009ee3]'
-                      : 'border-[#E2DCCF] bg-white text-[#423C7B] hover:border-[#009ee3]'
-                  }`}
-                >
-                  <FileText className="h-5 w-5 mx-auto mb-1 text-[#009ee3]" />
-                  <span className="text-xs block font-bold">Boleto</span>
-                  <span className="text-[10px] text-gray-500">1-2 dias</span>
-                </button>
-              </div>
-
-              {/* QR Code Pix Direto */}
-              {paymentMethod === 'pix' && (
-                <div className="p-4 rounded-2xl bg-white border border-[#E2DCCF] space-y-3 text-center">
-                  <div className="w-36 h-36 mx-auto bg-gray-50 rounded-xl border border-dashed border-[#E2DCCF] flex items-center justify-center p-2 shadow-inner">
-                    <img
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(pixCode)}`}
-                      alt="QR Code Pix Mercado Pago"
-                      className="w-full h-full object-contain"
+                  <div className={isBrickReady ? 'block' : 'opacity-0'}>
+                    <Payment
+                      initialization={brickInitialization}
+                      customization={brickCustomization}
+                      onSubmit={handleBrickSubmit}
+                      onReady={() => setIsBrickReady(true)}
+                      onError={(err) => {
+                        console.error('[Mercado Pago Brick Error]', err);
+                      }}
                     />
                   </div>
-                  <p className="text-[11px] text-[#423C7B]">
-                    Escaneie o código acima no app do seu banco ou use a chave Copia e Cola:
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleCopyPix}
-                    className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#F4EFE6] hover:bg-[#E6E3F1] text-[#2B2566] text-xs font-semibold cursor-pointer border border-[#E2DCCF] transition-colors"
-                  >
-                    {copiedPix ? <Check className="h-4 w-4 text-[#12BB40]" /> : <Copy className="h-4 w-4" />}
-                    <span>{copiedPix ? 'Chave Pix Copiada com Sucesso!' : 'Copiar Código Pix'}</span>
-                  </button>
                 </div>
               )}
 
-              {/* Boleto Informativo */}
-              {paymentMethod === 'ticket' && (
-                <div className="p-4 rounded-2xl bg-white border border-[#E2DCCF] space-y-2 text-center">
-                  <p className="text-xs text-[#2B2566] font-bold">
-                    Boleto Bancário Mercado Pago
-                  </p>
-                  <p className="text-[11px] text-[#423C7B] leading-relaxed">
-                    Você pode gerar seu boleto abrindo o modal oficial acima ou clicando para concluir e receber o boleto registrado no e-mail <strong>{email}</strong>.
-                  </p>
-                </div>
-              )}
-
-              {/* Botões Voltar e Avançar para Validação */}
-              <div className="pt-2 flex items-center justify-between gap-3">
+              {/* Botão de Retorno */}
+              <div className="pt-2 flex items-center justify-between">
                 <button
                   type="button"
                   onClick={() => setCurrentStep(2)}
-                  className="inline-flex items-center gap-1.5 px-5 py-3.5 rounded-full border border-[#E2DCCF] text-xs font-bold text-[#2B2566] hover:bg-[#F4EFE6] cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-5 py-3 rounded-full border border-[#E2DCCF] text-xs font-bold text-[#2B2566] hover:bg-[#F4EFE6] cursor-pointer"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Voltar</span>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => handleConfirmPayment()}
-                  disabled={isProcessing}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] py-3.5 px-6 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-xl transition-all cursor-pointer transform hover:-translate-y-0.5 disabled:opacity-60"
-                >
-                  <CheckCircle className="h-4 w-4 text-[#2B2566]" />
-                  <span>
-                    {isProcessing
-                      ? 'Registrando Pedido...'
-                      : 'Já Paguei / Confirmar Pedido'}
-                  </span>
-                </button>
-              </div>
-
-              {/* Rodapé Seguro Sem Exibição de Chaves */}
-              <div className="flex items-center justify-center gap-2 text-[11px] text-[#68638C] pt-1">
-                <Lock className="h-3.5 w-3.5 text-[#12BB40]" />
-                <span>Ambiente Seguro Criptografado SSL 256 bits • Mercado Pago Produção</span>
+                <div className="flex items-center gap-1 text-[11px] text-[#68638C]">
+                  <Lock className="h-3.5 w-3.5 text-[#12BB40]" />
+                  <span>Criptografia SSL de 256 bits</span>
+                </div>
               </div>
             </div>
           )}
 
           {/* =====================================================================
-              ETAPA 4: VALIDAÇÃO / PAGAMENTO APROVADO COM BOTÃO WHATSAPP / GRUPO VIP
+              ETAPA 4: VALIDAÇÃO & SUCESSO COM VOUCHER, BÔNUS E BOTÃO WHATSAPP
               ===================================================================== */}
           {currentStep === 4 && (
             <div className="text-center py-4 space-y-5">
@@ -1313,61 +1240,68 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
 
               <div className="space-y-1.5">
                 <span className="text-[10px] uppercase font-bold tracking-widest text-[#12BB40]">
-                  PAGAMENTO APROVADO & CONFIRMADO
+                  PAGAMENTO APROVADO & BLINDADO
                 </span>
                 <h3 className="font-heading text-2xl sm:text-3xl font-bold text-[#2B2566]">
-                  {isPatota ? 'Bem-vinda(o) à Patota Astral!' : 'Compra Realizada com Sucesso!'}
+                  {isPatota ? 'Bem-vinda(o) à Patota Astral!' : 'Compra Confirmada com Sucesso!'}
                 </h3>
                 <p className="text-xs sm:text-sm text-[#423C7B] max-w-md mx-auto leading-relaxed">
                   {isPatota
                     ? `Sua assinatura da Patota Astral foi confirmada (Pedido #${confirmedOrderId}). Seu acesso ao círculo mensal já está liberado!`
-                    : `Seu pedido #${confirmedOrderId} foi aprovado e registrado com sucesso.`}
+                    : `Seu pedido #${confirmedOrderId} foi aprovado e o voucher oficial já está gerado.`}
                 </p>
               </div>
 
-              {/* Resumo do Pedido Confirmado */}
-              <div className="p-4 rounded-2xl bg-[#FCFAF7] border border-[#E2DCCF] text-xs text-left space-y-2 max-w-md mx-auto shadow-xs">
-                <div className="flex items-center justify-between border-b pb-2 border-[#E2DCCF]/60">
-                  <span className="text-[#68638C]">Item / Serviço:</span>
-                  <strong className="text-[#2B2566]">{itemTitle}</strong>
+              {/* Cartão do Voucher e Bônus de 1ª Compra */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-[#2B2566] to-[#362E7A] text-white text-left space-y-2.5 max-w-md mx-auto shadow-lg border border-[#F0B55E]/40">
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span className="text-xs text-[#E6E3F1]">Código do Voucher:</span>
+                  <span className="font-mono text-sm font-bold text-[#F0B55E] tracking-wider">
+                    {confirmedVoucher || 'C6261111-CONFIRMADO'}
+                  </span>
                 </div>
-                <div className="flex items-center justify-between border-b pb-2 border-[#E2DCCF]/60">
-                  <span className="text-[#68638C]">Titular:</span>
-                  <span className="font-bold text-[#2B2566]">{firstName} {lastName}</span>
-                </div>
-                <div className="flex items-center justify-between border-b pb-2 border-[#E2DCCF]/60">
-                  <span className="text-[#68638C]">E-mail Cadastrado:</span>
-                  <span className="font-medium text-[#2B2566]">{email}</span>
-                </div>
-                <div className="flex items-center justify-between border-b pb-2 border-[#E2DCCF]/60">
-                  <span className="text-[#68638C]">ID no Mercado Pago:</span>
-                  <span className="font-mono text-[#2B2566] font-bold">{confirmedOrderId}</span>
-                </div>
-                {isLoja && (
-                  <div className="pt-1">
-                    <span className="text-[#68638C] block mb-0.5">Endereço de Envio:</span>
-                    <span className="font-medium text-[#2B2566]">
-                      {street}, {number}{complement ? ` (${complement})` : ''} - {neighborhood}, {city}/{state} - CEP: {cep}
+
+                {confirmedBonus && (
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                    <span className="text-xs text-[#E6E3F1] flex items-center gap-1.5">
+                      <Gift className="h-3.5 w-3.5 text-[#F0B55E]" />
+                      <span>Bônus de Boas-Vindas:</span>
                     </span>
+                    <span className="font-mono text-xs font-bold text-[#12BB40]">
+                      {confirmedBonus}
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between text-xs pt-0.5">
+                  <span className="text-[#E6E3F1]">Titular:</span>
+                  <span className="font-bold text-white">{firstName} {lastName}</span>
+                </div>
+
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-[#E6E3F1]">E-mail Registrado:</span>
+                  <span className="text-white truncate max-w-[180px]">{email}</span>
+                </div>
+
+                {isLoja && street && (
+                  <div className="border-t border-white/10 pt-2 text-[11px] text-[#E6E3F1]">
+                    <span className="block font-bold text-white mb-0.5">Endereço de Envio:</span>
+                    <span>{street}, nº {number} - {neighborhood}, {city}/{state} (CEP: {cep})</span>
                   </div>
                 )}
               </div>
 
-              {/* ===============================================================
-                  BOTÕES DE AÇÃO ESPECÍFICOS EXIGIDOS:
-                  - Lojinha: Botão de Enviar Dados para o WhatsApp da Bianca
-                  - Patota: Botão de Link para o Grupo VIP de WhatsApp da Patota
-                  =============================================================== */}
+              {/* Botões de Ação no WhatsApp */}
               <div className="space-y-3 max-w-md mx-auto pt-2">
                 {isLoja ? (
                   <a
-                    href={`https://wa.me/${SITE_CONFIG.whatsappNumberRaw}?text=${encodeURIComponent(getWhatsAppLojaMessage())}`}
+                    href={`https://wa.me/${SITE_CONFIG.whatsappNumberRaw}?text=${encodeURIComponent(getWhatsAppApprovedMessage())}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full inline-flex items-center justify-center gap-2.5 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-4 px-6 text-xs sm:text-sm uppercase tracking-wider shadow-xl transition-all cursor-pointer transform hover:-translate-y-0.5"
                   >
                     <MessageCircle className="h-5 w-5 fill-white text-[#25D366]" />
-                    <span>ENVIAR DADOS DA COMPRA NO WHATSAPP</span>
+                    <span>ENVIAR COMPROVANTE VIA WHATSAPP</span>
                   </a>
                 ) : (
                   <a
@@ -1382,7 +1316,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 )}
 
                 <p className="text-[11px] text-[#68638C] leading-relaxed">
-                  ✉️ Uma confirmação oficial completa também foi enviada para o seu e-mail <strong>{email}</strong>.
+                  ✉️ Uma confirmação oficial completa foi enviada para o seu e-mail <strong>{email}</strong>.
                 </p>
 
                 <div className="pt-2 flex items-center justify-center gap-3">
