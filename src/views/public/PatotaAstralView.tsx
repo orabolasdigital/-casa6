@@ -121,6 +121,17 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
         <p className="text-xs font-bold text-[#166437]">
           Apenas R$ 53,00 por mês no Mercado Pago (cancele quando quiser)
         </p>
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={() => setCheckoutOpen(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-[#072B15] px-6 py-3 text-xs font-bold uppercase tracking-wider shadow-md transition-all cursor-pointer transform hover:-translate-y-0.5"
+          >
+            <ShieldCheck className="h-4 w-4" />
+            <span>ASSINAR AGORA NO MERCADO PAGO</span>
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {/* Depoimentos estilo WhatsApp conforme o print da Patota */}

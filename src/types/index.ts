@@ -218,6 +218,17 @@ export interface MemberAccount {
   createdAt: string;
 }
 
+export interface ShippingAddress {
+  cep: string;
+  street: string;
+  number: string;
+  complement?: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+  notes?: string;
+}
+
 export interface OrderRecord {
   id: string;
   memberEmail: string;
@@ -231,6 +242,7 @@ export interface OrderRecord {
   paymentMethod: 'pix' | 'credit_card' | 'ticket';
   mpPaymentId?: string;
   birthData?: BirthData;
+  shippingAddress?: ShippingAddress;
   reportHtml?: string;
   pdfUrl?: string;
   createdAt: string;
