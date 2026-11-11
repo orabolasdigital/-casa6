@@ -52,7 +52,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
       title: 'Pronto Socorro',
       fullTitle: 'Pronto Socorro Astrológico',
       subtitle: 'Atendimento rápido e objetivo para situações específicas do momento e tomadas de decisão.',
-      iconUrl: 'https://static.wixstatic.com/media/02c8e0_13450bc7d703418f86cbae1e89023ff7~mv2.png',
+      iconUrl: 'https://static.wixstatic.com/media/02c8e0_4d4ebb187e354ca78c685b29702bf786~mv2.png',
       priceFormatted: 'R$ 97,00',
       isGolden: false,
       serviceRef: OFFICIAL_SERVICES.find((s) => s.id === 'pronto-socorro-astrologico') || OFFICIAL_SERVICES[0]

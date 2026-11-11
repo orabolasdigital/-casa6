@@ -89,7 +89,7 @@ export const CATALOG_ATENDIMENTOS: AtendimentoProduct[] = [
   {
     id: 'pronto-socorro-astrologico',
     title: 'Pronto Socorro Astrológico',
-    image: 'https://static.wixstatic.com/media/02c8e0_13450bc7d703418f86cbae1e89023ff7~mv2.png',
+    image: 'https://static.wixstatic.com/media/02c8e0_4d4ebb187e354ca78c685b29702bf786~mv2.png',
     description: 'O Pronto-Socorro Astrológico é um atendimento rápido e objetivo, voltado para situações específicas do momento.',
     options: [
       'Dois aspectos do momento, como Mercúrio Retrógrado e Vênus, ou Sol e Marte, e receber orientações sobre como essas energias afetam sua vida.',
@@ -160,7 +160,7 @@ export const CATALOG_PALESTRAS: PalestraProduct[] = [
   {
     id: 'palestra-waap',
     title: 'WAAP: Workshop Astrológico de Autoconhecimento Profissional',
-    image: 'https://static.wixstatic.com/media/02c8e0_8cfbc9ef230746e5a507be83ce1a9c2c~mv2.png',
+    image: 'https://static.wixstatic.com/media/02c8e0_427896bbb9fc41d19b341c27b8911c11~mv2.png',
     description: 'Este workshop é uma imersão completa no autoconhecimento aplicado ao ambiente profissional. Utilizando a astrologia como ferramenta de análise, exploramos o perfil de cada colaborador e como suas características podem ser potencializadas dentro da equipe.',
     topics: [
       'Como a astrologia pode auxiliar na compreensão dos talentos e desafios individuais;',
