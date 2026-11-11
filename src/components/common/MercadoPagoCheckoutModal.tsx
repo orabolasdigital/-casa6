@@ -194,13 +194,14 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
     }
   }), [amount, email]);
 
-  // 12. Métodos e Customização do Payment Brick
+  // 12. Métodos e Customização do Payment Brick (Apenas Cartão de Crédito e Pix - Boleto Ocultado)
   const brickCustomization = useMemo(() => ({
     paymentMethods: {
       creditCard: "all" as const,
-      debitCard: "all" as const,
       bankTransfer: "all" as const,
-      ticket: "all" as const
+      types: {
+        excluded: ["ticket", "atm", "debitCard"] as ("ticket" | "atm" | "debitCard")[]
+      }
     },
     visual: {
       style: {
@@ -1092,7 +1093,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   <span>3. Pagamento Transparente Mercado Pago</span>
                 </h3>
                 <p className="text-xs text-[#423C7B]">
-                  Preencha diretamente no modal seguro (Cartão de Crédito/Débito ou Pix Instantâneo).
+                  Preencha diretamente no modal seguro (Cartão de Crédito ou Pix Instantâneo).
                 </p>
               </div>
 
