@@ -148,18 +148,18 @@ export const FlipTarotCard: React.FC<FlipTarotCardProps> = ({
             {activeSymbol && (
               <div
                 className={`mx-auto flex items-center justify-center p-1 ${
-                  backgroundImageUrl ? 'w-14 h-14' : 'w-24 h-22'
+                  backgroundImageUrl ? 'w-14 h-14' : 'w-32 sm:w-36 h-28 sm:h-32'
                 }`}
               >
                 <img
                   src={activeSymbol}
                   alt={title}
-                  className={`object-contain filter ${
+                  className={`object-contain filter transition-transform duration-500 group-hover:scale-108 ${
                     backgroundImageUrl
                       ? 'max-h-12 max-w-full drop-shadow-[0_0_10px_rgba(240,181,94,0.5)]'
                       : isGoldenCard
-                      ? 'max-h-20 max-w-full drop-shadow-[0_4px_12px_rgba(43,37,102,0.3)]'
-                      : 'max-h-20 max-w-full drop-shadow-[0_0_14px_rgba(240,181,94,0.4)]'
+                      ? 'max-h-26 sm:max-h-30 max-w-[95%] drop-shadow-[0_6px_16px_rgba(43,37,102,0.35)]'
+                      : 'max-h-26 sm:max-h-30 max-w-[95%] drop-shadow-[0_0_18px_rgba(240,181,94,0.5)]'
                   }`}
                   draggable={false}
                 />
@@ -262,19 +262,13 @@ export const FlipTarotCard: React.FC<FlipTarotCardProps> = ({
               </div>
             </div>
           ) : iconUrl ? (
-            /* Caso 2: Atendimentos com Símbolo Transparente Grande */
+            /* Caso 2: Atendimentos com Símbolo Transparente Grande (Sem borda e fundo 100% transparente) */
             <>
-              <div
-                className={`relative my-2 w-full h-[40%] rounded-xl flex items-center justify-center p-3 border transition-transform group-hover:scale-[1.03] ${
-                  isGoldenCard
-                    ? 'bg-white/80 border-[#EFA63E]/30 shadow-xs'
-                    : 'bg-gradient-to-b from-[#2B2566]/5 via-[#F0B55E]/5 to-[#F4EFE6] border-[#E2DCCF]'
-                }`}
-              >
+              <div className="relative my-2 w-full h-[40%] flex items-center justify-center p-1 bg-transparent transition-transform duration-300 group-hover:scale-105">
                 <img
                   src={iconUrl}
                   alt={title}
-                  className="max-h-24 sm:max-h-28 max-w-[85%] object-contain filter drop-shadow-[0_8px_16px_rgba(43,37,102,0.18)]"
+                  className="max-h-26 sm:max-h-30 max-w-[90%] object-contain filter drop-shadow-[0_8px_16px_rgba(43,37,102,0.18)]"
                   draggable={false}
                 />
               </div>
