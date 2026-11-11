@@ -17,6 +17,10 @@ export const CookieConsentBanner: React.FC = () => {
     if (!existing) {
       setIsVisible(true);
     }
+
+    const handleOpen = () => setIsVisible(true);
+    window.addEventListener('open-casa6-cookies', handleOpen);
+    return () => window.removeEventListener('open-casa6-cookies', handleOpen);
   }, []);
 
   if (!isVisible) return null;

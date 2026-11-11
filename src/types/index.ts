@@ -142,6 +142,7 @@ export interface SiteConfiguration {
   instagramUrl: string;
   instagramBiancaHandle: string;
   instagramBiancaUrl: string;
+  facebookUrl?: string;
   youtubeUrl?: string;
   spotifyUrl?: string;
   operatingRegion: string;
