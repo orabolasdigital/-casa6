@@ -449,98 +449,118 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
       </section>
 
       {/* =========================================================================
-          SESSÕES 5, 6 & ENCONTROS: 3 GRANDES BANNERS DE DESTAQUE FOTOGRÁFICOS
-          Patota Astral (Verde WhatsApp / Tech) • Bússola Guia (Amarelo Sol) • Encontros & Palestras (Terracota)
+          SESSÕES 5, 6 & ENCONTROS: BANNERS PROMOCIONAIS OFICIAIS COM ANIMAÇÃO ASTROLÓGICA
+          Patota Astral (Verde Floresta) • Bússola Guia (Azul Noite Dourado) • Encontros (Terracota Cósmico)
           ========================================================================= */}
       <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] space-y-12">
         <div className="mx-auto max-w-7xl space-y-12">
 
-          {/* BANNER 1: PATOTA ASTRAL (VERDE ALEGRE / WHATSAPP TECH) */}
-          <div className="relative rounded-3xl overflow-hidden min-h-[380px] sm:min-h-[420px] border-2 border-[#25D366]/50 shadow-[0_20px_50px_rgba(37,211,102,0.18)] flex items-center">
-            {/* Foto de Fundo */}
-            <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=1800&q=80')`
-              }}
-            />
-            {/* Scrim Verde Mais Claro, Alegre e Tecnológico (Estilo WhatsApp) */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0F4A29]/94 via-[#166437]/88 to-[#0D4123]/90" />
-            
-            <div className="relative z-10 p-8 sm:p-14 lg:p-16 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              <div className="lg:col-span-8 space-y-4 text-white">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#25D366] text-[#072B15] text-[10px] font-black uppercase tracking-wider shadow-md">
-                  <MessageCircle className="h-3.5 w-3.5 text-[#072B15]" />
-                  <span>COMUNIDADE EXCLUSIVA NO WHATSAPP</span>
-                </div>
-                <h3 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-tight">
-                  Patota Astral
+          {/* BANNER 1: PATOTA ASTRAL (VERDE FLORESTA COM LOGO 3D EM DESTAQUE) */}
+          <div className="relative rounded-3xl overflow-hidden border border-[#25D366]/30 shadow-2xl bg-gradient-to-r from-[#0C3B20] via-[#124D2B] to-[#0A301A]">
+            {/* Animação Astrológica de Fundo: Órbitas Girando e Estrelas Cintilantes */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              <div className="absolute -right-24 -top-24 w-[480px] h-[480px] rounded-full border border-[#4ADE80]/15 animate-celestial-orbit-slow" />
+              <div className="absolute right-10 -bottom-28 w-[380px] h-[380px] rounded-full border border-dashed border-[#F0B55E]/15 animate-celestial-orbit-reverse" />
+              <div className="absolute top-10 right-1/4 text-[#4ADE80] opacity-40 text-xs animate-pulse">✦</div>
+              <div className="absolute bottom-12 right-1/3 text-[#F0B55E] opacity-35 text-xs animate-pulse">★</div>
+              <div className="absolute top-1/2 right-1/12 text-white/20 text-[10px]">✦</div>
+            </div>
+
+            <div className="relative z-10 p-6 sm:p-10 lg:p-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              {/* Logo Oficial 3D Grande */}
+              <div className="lg:col-span-4 flex justify-center lg:justify-start">
+                <img
+                  src="https://static.wixstatic.com/media/02c8e0_e5132493b4a14c0498c5df95ee68c593~mv2.png"
+                  alt="Patota Astral — Bianca Tofoli"
+                  className="w-48 sm:w-60 lg:w-72 xl:w-80 h-auto object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-transform duration-500 hover:scale-105"
+                  draggable={false}
+                />
+              </div>
+
+              {/* Texto Central Elegante e Chamativo */}
+              <div className="lg:col-span-5 space-y-3.5 text-white text-center lg:text-left">
+                <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.12]">
+                  Astrologia <span className="font-highlight italic text-[#4ADE80] font-normal block sm:inline">Diária por</span> Assinatura
                 </h3>
-                <p className="font-heading text-lg sm:text-xl text-[#4ADE80] font-medium">
-                  Acompanhamento astrológico contínuo e trocas com Bianca Tofoli
-                </p>
-                <p className="text-xs sm:text-sm text-[#F0FDF4]/90 leading-relaxed max-w-2xl font-light">
+                <p className="text-xs sm:text-sm text-[#DCFCE7]/90 leading-relaxed font-light max-w-xl mx-auto lg:mx-0">
                   Conecte-se com a energia de cada lua nova e cheia, antecipe desafios e potencialize oportunidades. Apenas R$ 1,50 por dia para ter a sabedoria cósmica guiando suas semanas com acolhimento e trocas reais.
                 </p>
               </div>
 
-              <div className="lg:col-span-4 flex flex-col items-start lg:items-end gap-4 text-white">
-                <div className="text-left lg:text-right">
-                  <span className="text-xs text-[#86EFAC] font-bold uppercase tracking-wider block">Assinatura Mensal</span>
-                  <span className="text-3xl sm:text-4xl font-bold font-heading text-[#25D366]">R$ 53,00</span>
-                  <span className="text-[11px] text-[#DCFCE7]/85 font-medium block mt-1">Sem carência • Cancele quando quiser</span>
+              {/* Bloco Lateral de Valor & Ação Direta */}
+              <div className="lg:col-span-3 flex flex-col items-center lg:items-end justify-center gap-4 text-white">
+                <div className="text-center lg:text-right">
+                  <span className="text-[10px] sm:text-xs text-[#86EFAC] font-bold uppercase tracking-[0.2em] block">
+                    ASSINATURA MENSAL
+                  </span>
+                  <span className="text-3xl sm:text-4xl lg:text-5xl font-bold font-heading text-white tracking-tight">
+                    R$ 53,00
+                  </span>
+                  <span className="text-[11px] text-[#DCFCE7]/75 font-normal block mt-1">
+                    Sem carência • Cancele quando quiser
+                  </span>
                 </div>
 
                 <button
                   onClick={() => onNavigate('/patota')}
-                  className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-[#072B15] px-8 py-4 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-xl transition-all transform hover:-translate-y-0.5 cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#072B15] px-7 py-3.5 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
                 >
                   <span>FAZER PARTE DA PATOTA</span>
-                  <ArrowRight className="h-4 w-4 text-[#072B15]" />
+                  <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             </div>
           </div>
 
-          {/* BANNER 2: BÚSSOLA GUIA (AMARELO SOL DOURADO / FUNDO LUMINOSO) */}
-          <div className="relative rounded-3xl overflow-hidden min-h-[380px] sm:min-h-[420px] border-2 border-[#F0B55E]/80 shadow-[0_20px_50px_rgba(240,181,94,0.22)] flex items-center">
-            {/* Foto de Fundo */}
-            <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1800&q=80')`
-              }}
-            />
-            {/* Scrim Dourado Solar Mais Claro e Luminoso */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#704007]/90 via-[#8F530B]/84 to-[#6B3C05]/88" />
-            
-            <div className="relative z-10 p-8 sm:p-14 lg:p-16 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              <div className="lg:col-span-8 space-y-4 text-white">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F0B55E] text-[#2B2566] text-[10px] font-bold uppercase tracking-wider shadow-sm">
-                  <Compass className="h-3.5 w-3.5 text-[#2B2566]" />
-                  <span>NOVO SERVIÇO CASA 6</span>
-                </div>
-                <h3 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-tight">
-                  Bússola Guia
+          {/* BANNER 2: BÚSSOLA GUIA (AZUL NOITE DOURADO COM ANIMAÇÃO CÓSMICA) */}
+          <div className="relative rounded-3xl overflow-hidden border border-[#F0B55E]/40 shadow-2xl bg-gradient-to-r from-[#15103A] via-[#211A54] to-[#110D2E]">
+            {/* Animação Astrológica de Fundo: Órbitas Girando e Estrelas Douradas */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              <div className="absolute -left-20 -bottom-20 w-[460px] h-[460px] rounded-full border border-[#F0B55E]/15 animate-celestial-orbit-slow" />
+              <div className="absolute -right-16 -top-20 w-[400px] h-[400px] rounded-full border border-dashed border-[#E6E3F1]/15 animate-celestial-orbit-reverse" />
+              <div className="absolute top-12 left-1/3 text-[#F0B55E] opacity-40 text-xs animate-pulse">✦</div>
+              <div className="absolute bottom-10 right-1/4 text-[#E6E3F1] opacity-30 text-xs animate-pulse">★</div>
+              <div className="absolute top-1/2 left-2/3 text-[#F0B55E] opacity-25 text-[10px]">✦</div>
+            </div>
+
+            <div className="relative z-10 p-6 sm:p-10 lg:p-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              {/* Logo Oficial 3D Grande */}
+              <div className="lg:col-span-4 flex justify-center lg:justify-start">
+                <img
+                  src="https://static.wixstatic.com/media/02c8e0_688edec712d4401984a6e1cf8afeb93e~mv2.png"
+                  alt="Bússola Guia — Casa 6"
+                  className="w-48 sm:w-60 lg:w-72 xl:w-80 h-auto object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-transform duration-500 hover:scale-105"
+                  draggable={false}
+                />
+              </div>
+
+              {/* Texto Central Elegante e Chamativo */}
+              <div className="lg:col-span-5 space-y-3.5 text-white text-center lg:text-left">
+                <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.12]">
+                  Seu Mapa Mensal <span className="font-highlight italic text-[#F0B55E] font-normal block sm:inline">de Navegação</span> e Decisão
                 </h3>
-                <p className="font-heading text-lg sm:text-xl text-[#FDE047] font-medium">
-                  Seu relatório astrológico mensal personalizado em PDF
-                </p>
-                <p className="text-xs sm:text-sm text-[#FEF3C7]/90 leading-relaxed max-w-2xl font-light">
-                  Mapeamento individual completo gerado a partir da sua certidão de nascimento. Entregue mensalmente em PDF pelo WhatsApp e disponível com acesso permanente na sua Área de Membros.
+                <p className="text-xs sm:text-sm text-[#E6E3F1]/90 leading-relaxed font-light max-w-xl mx-auto lg:mx-0">
+                  Mapeamento individual completo gerado a partir do seu nascimento. Entregue mensalmente em PDF pelo WhatsApp e na sua Área de Membros para você planejar trabalho, relações e rotina com clareza estratégica.
                 </p>
               </div>
 
-              <div className="lg:col-span-4 flex flex-col items-start lg:items-end gap-4 text-white">
-                <div className="text-left lg:text-right">
-                  <span className="text-xs text-[#FDE047] font-bold uppercase tracking-wider block">Investimento Mensal</span>
-                  <span className="text-3xl sm:text-4xl font-bold font-heading text-white">R$ 68,00</span>
-                  <span className="text-[11px] text-[#FEF3C7]/80 font-medium block mt-1">Relatório individual customizado</span>
+              {/* Bloco Lateral de Valor & Ação Direta */}
+              <div className="lg:col-span-3 flex flex-col items-center lg:items-end justify-center gap-4 text-white">
+                <div className="text-center lg:text-right">
+                  <span className="text-[10px] sm:text-xs text-[#F0B55E] font-bold uppercase tracking-[0.2em] block">
+                    ASSINATURA MENSAL
+                  </span>
+                  <span className="text-3xl sm:text-4xl lg:text-5xl font-bold font-heading text-white tracking-tight">
+                    R$ 47,00
+                  </span>
+                  <span className="text-[11px] text-[#E6E3F1]/75 font-normal block mt-1">
+                    Relatório mensal • Acesso imediato
+                  </span>
                 </div>
 
                 <button
                   onClick={() => onNavigate('/bussola')}
-                  className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] px-8 py-4 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-xl transition-all transform hover:-translate-y-0.5 cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] px-7 py-3.5 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
                 >
                   <span>CONTRATAR BÚSSOLA GUIA</span>
                   <ArrowRight className="h-4 w-4" />
@@ -549,47 +569,57 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             </div>
           </div>
 
-          {/* BANNER 3: ENCONTROS (IDENTIDADE TERRACOTA / TOM TERROSO ACOLHEDOR) */}
-          <div className="relative rounded-3xl overflow-hidden min-h-[380px] sm:min-h-[420px] border-2 border-[#C2593F]/70 shadow-[0_20px_50px_rgba(194,89,63,0.22)] flex items-center">
-            {/* Foto de Fundo */}
-            <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1800&q=80')`
-              }}
-            />
-            {/* Scrim Terracota Terroso Acolhedor */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#632717]/94 via-[#823520]/88 to-[#5C2314]/90" />
-            
-            <div className="relative z-10 p-8 sm:p-14 lg:p-16 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              <div className="lg:col-span-8 space-y-4 text-white">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#C2593F] text-white text-[10px] font-bold uppercase tracking-wider shadow-md">
-                  <span>✦ EVENTOS, WORKSHOPS & PALESTRAS</span>
-                </div>
-                <h3 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-tight">
-                  Encontros
+          {/* BANNER 3: ENCONTROS (TERRACOTA CÓSMICO COM A IMAGEM SOLICITADA) */}
+          <div className="relative rounded-3xl overflow-hidden border border-[#C2593F]/40 shadow-2xl bg-gradient-to-r from-[#4A1D13] via-[#63291B] to-[#3B160E]">
+            {/* Animação Astrológica de Fundo: Órbitas Girando e Cintilações Quentes */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              <div className="absolute -right-20 -bottom-20 w-[460px] h-[460px] rounded-full border border-[#F8BAA0]/15 animate-celestial-orbit-slow" />
+              <div className="absolute -left-16 -top-20 w-[400px] h-[400px] rounded-full border border-dashed border-[#F0B55E]/15 animate-celestial-orbit-reverse" />
+              <div className="absolute top-12 right-1/3 text-[#F8BAA0] opacity-40 text-xs animate-pulse">✦</div>
+              <div className="absolute bottom-10 left-1/4 text-[#F0B55E] opacity-30 text-xs animate-pulse">★</div>
+            </div>
+
+            <div className="relative z-10 p-6 sm:p-10 lg:p-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              {/* Imagem Oficial Solicitada */}
+              <div className="lg:col-span-4 flex justify-center lg:justify-start">
+                <img
+                  src="https://static.wixstatic.com/media/02c8e0_9d4538fdd5854b249a6eb3ca67fcc295~mv2.png"
+                  alt="Encontros — Bianca Tofoli"
+                  className="w-48 sm:w-60 lg:w-72 xl:w-80 h-auto object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.4)] transition-transform duration-500 hover:scale-105"
+                  draggable={false}
+                />
+              </div>
+
+              {/* Texto Central Elegante e Chamativo */}
+              <div className="lg:col-span-5 space-y-3.5 text-white text-center lg:text-left">
+                <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.12]">
+                  Palestras & Vivências <span className="font-highlight italic text-[#F8BAA0] font-normal block sm:inline">para Empresas</span> e Grupos
                 </h3>
-                <p className="font-heading text-lg sm:text-xl text-[#F8BAA0] font-medium">
-                  Diálogos vivos sobre rotina, trabalho e decisões conscientes
-                </p>
-                <p className="text-xs sm:text-sm text-[#FFEDE6]/90 leading-relaxed max-w-2xl font-light">
-                  Palestras presenciais para empresas, encontros temáticos e workshops corporativos conduzidos por Bianca Tofoli para integrar autoconhecimento, organização diária e sustentabilidade humana.
+                <p className="text-xs sm:text-sm text-[#FFEDE6]/90 leading-relaxed font-light max-w-xl mx-auto lg:mx-0">
+                  Workshops transformadores e palestras que unem autoconhecimento, saúde e rotina para empresas e grupos. Metodologias práticas conduzidas por Bianca Tofoli para cultivar presença e clareza coletiva.
                 </p>
               </div>
 
-              <div className="lg:col-span-4 flex flex-col items-start lg:items-end gap-4 text-white">
-                <div className="text-left lg:text-right">
-                  <span className="text-xs text-[#F8BAA0] font-bold uppercase tracking-wider block">Para Empresas & Grupos</span>
-                  <span className="text-2xl sm:text-3xl font-bold font-heading text-white">Formatos Sob Medida</span>
-                  <span className="text-[11px] text-[#F8BAA0] font-medium block mt-1">Presencial e Online</span>
+              {/* Bloco Lateral de Valor & Ação Direta */}
+              <div className="lg:col-span-3 flex flex-col items-center lg:items-end justify-center gap-4 text-white">
+                <div className="text-center lg:text-right">
+                  <span className="text-[10px] sm:text-xs text-[#F8BAA0] font-bold uppercase tracking-[0.2em] block">
+                    PARA EMPRESAS & GRUPOS
+                  </span>
+                  <span className="text-2xl sm:text-3xl lg:text-4xl font-bold font-heading text-white tracking-tight">
+                    Formatos Sob Medida
+                  </span>
+                  <span className="text-[11px] text-[#FFEDE6]/75 font-normal block mt-1">
+                    Presencial e Online • Proposta Rápida
+                  </span>
                 </div>
 
                 <button
                   onClick={() => onNavigate('/encontros')}
-                  className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[#C2593F] hover:bg-[#af4e36] text-white px-8 py-4 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-xl transition-all transform hover:-translate-y-0.5 cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#3B160E] px-7 py-3.5 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
                 >
                   <span>CONHECER ENCONTROS</span>
-                  <ArrowRight className="h-4 w-4 text-[#F8BAA0]" />
+                  <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             </div>
