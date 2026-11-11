@@ -37,8 +37,10 @@ export interface FirestoreErrorInfo {
 
 const app: FirebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 
-// CRITICAL: Conforme exigência do skill, vincular ao firestoreDatabaseId provisionado
-export const db: Firestore = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+// CRITICAL: Conforme exigência do skill, vincular ao firestoreDatabaseId se provisionado, senão default
+export const db: Firestore = (firebaseConfig as any).firestoreDatabaseId
+  ? getFirestore(app, (firebaseConfig as any).firestoreDatabaseId)
+  : getFirestore(app);
 export const auth: Auth = getAuth(app);
 export const isFirebaseReady = Boolean(firebaseConfig.projectId && firebaseConfig.apiKey);
 

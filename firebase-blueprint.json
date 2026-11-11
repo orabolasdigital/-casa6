@@ -1,57 +1,114 @@
 {
+  "projectId": "casa6-cloud",
+  "appId": "1:237351344613:web:e2c9636b91f9e41660770c",
   "entities": {
-    "Lead": {
-      "title": "Lead",
-      "description": "Registro de contato e intenção de agendamento na Casa 6",
+    "CRMContact": {
+      "title": "CRMContact",
+      "description": "Registro de clientes e leads no CRM com validação estrita",
       "type": "object",
       "properties": {
-        "id": { "type": "string", "description": "Identificador único do lead" },
-        "firstName": { "type": "string", "description": "Primeiro nome do visitante" },
-        "lastName": { "type": "string", "description": "Sobrenome do visitante" },
-        "fullName": { "type": "string", "description": "Nome completo" },
-        "email": { "type": "string", "description": "E-mail de contato" },
-        "whatsapp": { "type": "string", "description": "Número de WhatsApp com DDD" },
-        "serviceId": { "type": "string", "description": "Identificador do serviço de interesse" },
-        "serviceName": { "type": "string", "description": "Nome do serviço solicitado" },
-        "sourcePage": { "type": "string", "description": "Página de origem" },
-        "sourceUrl": { "type": "string", "description": "URL completa no momento do envio" },
-        "status": { "type": "string", "enum": ["new", "contacted", "scheduled", "completed", "lost"] },
-        "createdAt": { "type": "string", "description": "Data ISO de criação" },
-        "updatedAt": { "type": "string", "description": "Data ISO de atualização" }
+        "id": { "type": "string" },
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "whatsapp": { "type": "string" },
+        "cpf": { "type": "string" },
+        "lastSource": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "createdAt": { "type": "string" }
       },
-      "required": ["id", "firstName", "lastName", "email", "whatsapp", "serviceId", "status", "createdAt"]
+      "required": ["id", "firstName", "lastName", "fullName", "email", "whatsapp", "createdAt"]
     },
     "Order": {
       "title": "Order",
-      "description": "Pedido de contratação e assinaturas com dados astrais e Mercado Pago",
+      "description": "Pedidos e assinaturas vinculadas ao Mercado Pago Checkout Pro",
       "type": "object",
       "properties": {
-        "id": { "type": "string", "description": "ID único do pedido" },
-        "memberEmail": { "type": "string", "description": "E-mail cadastrado do cliente" },
-        "memberCpf": { "type": "string", "description": "CPF para acesso à área de membros" },
-        "customerName": { "type": "string", "description": "Nome completo do cliente" },
-        "whatsapp": { "type": "string", "description": "WhatsApp para entrega do relatório PDF" },
-        "serviceType": { "type": "string", "enum": ["bussula", "patota", "loja", "atendimento"] },
-        "itemTitle": { "type": "string", "description": "Título do produto ou serviço" },
-        "amount": { "type": "number", "description": "Valor total pago em R$" },
-        "status": { "type": "string", "enum": ["approved", "pending", "in_process"] },
-        "paymentMethod": { "type": "string", "enum": ["pix", "credit_card", "ticket"] },
-        "mpPaymentId": { "type": "string", "description": "Identificador de pagamento no Mercado Pago" },
-        "reportHtml": { "type": "string", "description": "Conteúdo HTML do relatório da Bússola Guia" },
-        "pdfUrl": { "type": "string", "description": "URL do PDF gerado" },
-        "createdAt": { "type": "string", "description": "Timestamp ISO de criação" }
+        "id": { "type": "string" },
+        "memberEmail": { "type": "string" },
+        "customerName": { "type": "string" },
+        "whatsapp": { "type": "string" },
+        "serviceType": { "type": "string" },
+        "itemTitle": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string" },
+        "paymentMethod": { "type": "string" },
+        "createdAt": { "type": "string" }
       },
-      "required": ["id", "memberEmail", "memberCpf", "customerName", "serviceType", "amount", "status", "paymentMethod", "createdAt"]
+      "required": ["id", "memberEmail", "customerName", "serviceType", "amount", "status", "createdAt"]
+    },
+    "ProdutoAtendimento": {
+      "title": "ProdutoAtendimento",
+      "description": "Atendimentos e leituras astrais individuais",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "price": { "type": "number" },
+        "priceFormatted": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string" }
+      }
+    },
+    "ProdutoPalestra": {
+      "title": "ProdutoPalestra",
+      "description": "Palestras e workshops corporativos",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string" }
+      }
+    },
+    "ProdutoAssinatura": {
+      "title": "ProdutoAssinatura",
+      "description": "Planos recorrentes Bússola Guia e Patota Astral",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "serviceId": { "type": "string" },
+        "title": { "type": "string" },
+        "price": { "type": "number" },
+        "billingPeriod": { "type": "string" },
+        "isRecurring": { "type": "boolean" }
+      }
+    },
+    "ProdutoLojinha": {
+      "title": "ProdutoLojinha",
+      "description": "Itens físicos da lojinha como Box SEMEADURA",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "price": { "type": "number" },
+        "boxItems": { "type": "array" }
+      }
+    },
+    "BlogPost": {
+      "title": "BlogPost",
+      "description": "Artigos editoriais com SEO e GEO metadata",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "slug": { "type": "string" },
+        "title": { "type": "string" },
+        "fullContent": { "type": "string" },
+        "publishedAt": { "type": "string" },
+        "seoKeywords": { "type": "array" },
+        "geoCoverage": { "type": "string" }
+      }
     }
   },
   "firestore": {
-    "/leads/{leadId}": {
-      "schema": "Lead",
-      "description": "Coleção de contatos capturados no formulário master e modais"
-    },
-    "/orders/{orderId}": {
-      "schema": "Order",
-      "description": "Coleção de pedidos e assinaturas vinculados ao Mercado Pago"
-    }
+    "/crm_contatos/{contactId}": { "schema": "CRMContact" },
+    "/orders/{orderId}": { "schema": "Order" },
+    "/leads/{leadId}": { "schema": "CRMContact" },
+    "/produtos_atendimentos/{id}": { "schema": "ProdutoAtendimento" },
+    "/produtos_palestras/{id}": { "schema": "ProdutoPalestra" },
+    "/produtos_assinatura/{id}": { "schema": "ProdutoAssinatura" },
+    "/produtos_lojinha/{id}": { "schema": "ProdutoLojinha" },
+    "/blog_posts/{id}": { "schema": "BlogPost" }
   }
 }

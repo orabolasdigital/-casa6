@@ -15,6 +15,7 @@ import { AntiCopyBanner } from './components/common/AntiCopyBanner';
 import { initAntiCopyProtection } from './services/anticopy';
 import { initAuthListener } from './services/auth';
 import { trackAnalyticsEvent } from './services/analytics';
+import { syncCatalogWithFirestore } from './services/catalogService';
 
 // Visões Públicas
 import { HomeView } from './views/public/HomeView';
@@ -50,6 +51,7 @@ export default function App() {
   useEffect(() => {
     const unsubAntiCopy = initAntiCopyProtection();
     const unsubAuth = initAuthListener();
+    syncCatalogWithFirestore().catch((err) => console.info('[Casa6] Firestore catalog sync standby:', err));
 
     const handlePopState = () => {
       setCurrentPath(getInitialPath());

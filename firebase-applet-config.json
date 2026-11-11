@@ -1,12 +1,9 @@
 {
-  "projectId": "gen-lang-client-0268261140",
-  "appId": "1:825877482530:web:66c2d9b8c14c653c238e7b",
-  "apiKey": "AIzaSyDbgmIJ_z9goYuK6sQWOvFtAKCkcC1vEM8",
-  "authDomain": "gen-lang-client-0268261140.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-casa6-0f0cda45-d008-4241-9701-fdd9af9d7bfd",
-  "storageBucket": "gen-lang-client-0268261140.firebasestorage.app",
-  "messagingSenderId": "825877482530",
-  "measurementId": "",
-  "oAuthClientId": "825877482530-m61o6mu8ht1m4i1ghlitpdi342qf6fo7.apps.googleusercontent.com",
-  "recaptchaSiteKey": ""
+  "projectId": "casa6-cloud",
+  "appId": "1:237351344613:web:e2c9636b91f9e41660770c",
+  "apiKey": "AIzaSyBY389O7vgEWjLAGAVtcmxFfs0eHG62SVM",
+  "authDomain": "casa6-cloud.firebaseapp.com",
+  "storageBucket": "casa6-cloud.firebasestorage.app",
+  "messagingSenderId": "237351344613",
+  "measurementId": "G-BQ7YLE1QVG"
 }
