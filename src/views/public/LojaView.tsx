@@ -169,10 +169,10 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
           itemTitle={selectedProduct.title}
           amount={selectedProduct.price}
           customerData={{
-            firstName: 'Cliente',
-            lastName: 'Casa 6',
-            email: 'cliente@exemplo.com',
-            whatsapp: '11999999999'
+            firstName: '',
+            lastName: '',
+            email: '',
+            whatsapp: ''
           }}
           onSuccess={() => {
             // Sucesso gravado

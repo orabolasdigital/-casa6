@@ -11,6 +11,11 @@ import { MessageCircle, Moon, ArrowRight, ShieldCheck, ChevronDown, ChevronUp, S
 import { BirthData } from '../../types';
 import { MercadoPagoCheckoutModal } from '../../components/common/MercadoPagoCheckoutModal';
 import { trackAnalyticsEvent } from '../../services/analytics';
+import {
+  sanitizeName,
+  formatWhatsAppNumber,
+  lookupCRMContactByEmail
+} from '../../services/formValidation';
 
 interface PatotaAstralViewProps {
   onOpenBooking: (serviceId?: string) => void;
@@ -71,6 +76,20 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
 
     trackAnalyticsEvent('checkout_start', { service: 'patota-astral' });
     setCheckoutOpen(true);
+  };
+
+  const handleEmailBlur = async () => {
+    if (!email || !email.includes('@')) return;
+    try {
+      const existing = await lookupCRMContactByEmail(email);
+      if (existing) {
+        if (!firstName && existing.firstName) setFirstName(existing.firstName);
+        if (!lastName && existing.lastName) setLastName(existing.lastName);
+        if (!whatsapp && existing.whatsapp) setWhatsapp(existing.whatsapp);
+      }
+    } catch (e) {
+      console.warn('[CRM Lookup]', e);
+    }
   };
 
   const birthData: BirthData = {
@@ -205,10 +224,12 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
                 <input
                   type="text"
                   required
+                  maxLength={15}
+                  autoComplete="given-name"
                   placeholder="Seu primeiro nome"
                   value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full text-xs rounded-xl border border-[#c7c5b6] bg-white px-3.5 py-2.5 text-[#1b1463] focus:border-[#fab03b] focus:outline-none"
+                  onChange={(e) => setFirstName(sanitizeName(e.target.value).slice(0, 15))}
+                  className="w-full text-xs rounded-sm border border-[#c7c5b6] bg-white px-3.5 py-2.5 text-[#1b1463] focus:border-[#fab03b] focus:outline-none"
                 />
               </div>
 
@@ -217,10 +238,12 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
                 <input
                   type="text"
                   required
+                  maxLength={15}
+                  autoComplete="family-name"
                   placeholder="Seu sobrenome"
                   value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="w-full text-xs rounded-xl border border-[#c7c5b6] bg-white px-3.5 py-2.5 text-[#1b1463] focus:border-[#fab03b] focus:outline-none"
+                  onChange={(e) => setLastName(sanitizeName(e.target.value).slice(0, 15))}
+                  className="w-full text-xs rounded-sm border border-[#c7c5b6] bg-white px-3.5 py-2.5 text-[#1b1463] focus:border-[#fab03b] focus:outline-none"
                 />
               </div>
 
@@ -229,22 +252,25 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
                 <input
                   type="email"
                   required
+                  autoComplete="email"
                   placeholder="seuemail@exemplo.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full text-xs rounded-xl border border-[#c7c5b6] bg-white px-3.5 py-2.5 text-[#1b1463] focus:border-[#fab03b] focus:outline-none"
+                  onBlur={handleEmailBlur}
+                  className="w-full text-xs rounded-sm border border-[#c7c5b6] bg-white px-3.5 py-2.5 text-[#1b1463] focus:border-[#fab03b] focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#1b1463] mb-1">WhatsApp com DDD (para entrar no grupo) *</label>
+                <label className="block text-xs font-bold text-[#1b1463] mb-1">WhatsApp *</label>
                 <input
                   type="tel"
                   required
+                  autoComplete="tel"
                   placeholder="Ex: 11 99999-9999"
                   value={whatsapp}
-                  onChange={(e) => setWhatsapp(e.target.value)}
-                  className="w-full text-xs rounded-xl border border-[#c7c5b6] bg-white px-3.5 py-2.5 text-[#1b1463] focus:border-[#fab03b] focus:outline-none"
+                  onChange={(e) => setWhatsapp(formatWhatsAppNumber(e.target.value))}
+                  className="w-full text-xs rounded-sm border border-[#c7c5b6] bg-white px-3.5 py-2.5 text-[#1b1463] focus:border-[#fab03b] focus:outline-none"
                 />
               </div>
             </div>

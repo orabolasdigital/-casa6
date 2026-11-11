@@ -14,10 +14,16 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { X, CheckCircle, AlertCircle, ArrowRight, MessageCircle, ShieldCheck } from 'lucide-react';
+import { X, CheckCircle, AlertCircle, ArrowRight, MessageCircle, ShieldCheck, RefreshCw } from 'lucide-react';
 import { OFFICIAL_SERVICES, SITE_CONFIG } from '../../config/site';
 import { LeadFormInput } from '../../types';
 import { submitLeadBooking } from '../../services/leads';
+import {
+  sanitizeName,
+  formatWhatsAppNumber,
+  lookupCRMContactByEmail,
+  saveCRMContactRecord
+} from '../../services/formValidation';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -44,6 +50,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [whatsappRedirectUrl, setWhatsappRedirectUrl] = useState('');
+  const [crmMismatchAlert, setCrmMismatchAlert] = useState<{
+    show: boolean;
+    existingWhatsapp: string;
+    newWhatsapp: string;
+  }>({ show: false, existingWhatsapp: '', newWhatsapp: '' });
 
   // Atualiza serviço selecionado dinamicamente quando a modal abre
   useEffect(() => {
@@ -56,13 +67,46 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    let formattedValue = value;
+
+    if (name === 'firstName' || name === 'lastName') {
+      formattedValue = sanitizeName(value).slice(0, 15);
+    } else if (name === 'whatsapp') {
+      formattedValue = formatWhatsAppNumber(value);
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: formattedValue }));
     if (errors[name]) {
       setErrors((prev) => {
         const next = { ...prev };
         delete next[name];
         return next;
       });
+    }
+  };
+
+  const handleEmailBlur = async () => {
+    if (!formData.email || !formData.email.includes('@')) return;
+    try {
+      const existing = await lookupCRMContactByEmail(formData.email);
+      if (existing) {
+        setFormData((prev) => ({
+          ...prev,
+          firstName: prev.firstName || existing.firstName || '',
+          lastName: prev.lastName || existing.lastName || '',
+          whatsapp: prev.whatsapp || existing.whatsapp || ''
+        }));
+
+        if (formData.whatsapp && existing.whatsapp && formData.whatsapp !== existing.whatsapp) {
+          setCrmMismatchAlert({
+            show: true,
+            existingWhatsapp: existing.whatsapp,
+            newWhatsapp: formData.whatsapp
+          });
+        }
+      }
+    } catch (e) {
+      console.warn('[CRM Lookup]', e);
     }
   };
 
@@ -102,7 +146,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       aria-modal="true"
       aria-labelledby="modal-booking-title"
     >
-      <div className="relative w-full max-w-lg rounded-2xl bg-[#FCFAF7] shadow-2xl border border-[#DAD2C4] overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="relative w-full max-w-lg rounded-sm bg-[#FCFAF7] shadow-2xl border border-[#DAD2C4] overflow-hidden flex flex-col max-h-[92vh] font-sans">
         
         {/* HEADER INSPIRADO NO WHATSAPP (#075E54 / #128C7E) */}
         <div className="bg-[#075E54] text-white px-5 py-4 flex items-center justify-between border-b border-[#128C7E] shrink-0">
@@ -119,12 +163,12 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
             <div className="leading-tight">
               <div className="flex items-center gap-1.5">
-                <span className="font-heading font-bold text-base text-white tracking-wide">
+                <span className="font-sans font-bold text-base text-white tracking-wide">
                   Casa 6 — Bianca Tofoli
                 </span>
                 <MessageCircle className="h-4 w-4 text-[#25D366] fill-[#25D366]" />
               </div>
-              <span className="text-[11px] text-[#25D366] font-medium flex items-center gap-1">
+              <span className="text-[11px] text-[#25D366] font-medium flex items-center gap-1 font-sans">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#25D366] inline-block animate-pulse" />
                 Online agora • Atendimento Oficial
               </span>
@@ -133,7 +177,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
           <button
             onClick={handleResetAndClose}
-            className="rounded-full p-2 text-white/80 hover:text-white hover:bg-white/10 transition-colors focus:outline-none"
+            className="rounded-sm p-2 text-white/80 hover:text-white hover:bg-white/10 transition-colors focus:outline-none"
             aria-label="Fechar formulário"
           >
             <X className="h-5 w-5" />
@@ -141,14 +185,14 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         </div>
 
         {/* CORPO DO FORMULÁRIO COM SENSAÇÃO DE CHAT */}
-        <div className="p-5 sm:p-6 overflow-y-auto flex-1 bg-[#F3EEE5]/40 space-y-4">
+        <div className="p-5 sm:p-6 overflow-y-auto flex-1 bg-[#F3EEE5]/40 space-y-4 font-sans">
           
           {submitSuccess ? (
             <div className="text-center py-6 space-y-4">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366]/20 text-[#25D366]">
                 <CheckCircle className="h-8 w-8 text-[#25D366]" />
               </div>
-              <h3 className="font-heading text-xl font-bold text-[#22205A]">
+              <h3 className="font-sans text-xl font-bold text-[#22205A]">
                 Solicitação Registrada com Sucesso!
               </h3>
               <p className="text-xs sm:text-sm text-[#534D6B] leading-relaxed max-w-sm mx-auto">
@@ -159,7 +203,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   href={whatsappRedirectUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-[#25D366] hover:bg-[#20ba5a] px-6 py-3 text-xs sm:text-sm font-bold text-white shadow-md transition-colors"
+                  className="inline-flex items-center gap-2 rounded-sm bg-[#25D366] hover:bg-[#20ba5a] px-6 py-3 text-xs sm:text-sm font-bold text-white shadow-md transition-colors"
                 >
                   <MessageCircle className="h-4 w-4 fill-white" />
                   <span>Continuar no WhatsApp</span>
@@ -178,7 +222,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
           ) : (
             <div>
               {/* Balão de Acolhimento estilo Chat */}
-              <div className="relative mb-5 p-3.5 sm:p-4 rounded-2xl bg-white border border-[#DAD2C4] shadow-xs space-y-1">
+              <div className="relative mb-5 p-3.5 sm:p-4 rounded-sm bg-white border border-[#DAD2C4] shadow-xs space-y-1">
                 <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#075E54] uppercase tracking-wider">
                   <ShieldCheck className="h-3.5 w-3.5 text-[#25D366]" />
                   <span>Agende sua consulta</span>
@@ -188,8 +232,42 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 </p>
               </div>
 
+              {crmMismatchAlert.show && (
+                <div className="mb-4 rounded-sm bg-[#FFF8E7] border border-[#F5A623] p-3 text-xs text-[#7A4B00] flex flex-col gap-2">
+                  <div className="flex items-start gap-2">
+                    <RefreshCw className="h-4 w-4 text-[#F5A623] shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold">WhatsApp diferente encontrado no seu cadastro</p>
+                      <p className="text-[11px] mt-0.5">
+                        Identificamos seu e-mail cadastrado com o WhatsApp <strong>{crmMismatchAlert.existingWhatsapp}</strong>.
+                        Deseja atualizar seu número para <strong>{crmMismatchAlert.newWhatsapp}</strong>?
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 ml-6">
+                    <button
+                      type="button"
+                      onClick={() => setCrmMismatchAlert({ show: false, existingWhatsapp: '', newWhatsapp: '' })}
+                      className="px-2.5 py-1 text-[11px] font-bold bg-[#1b1463] text-white rounded-sm hover:opacity-90 transition-opacity cursor-pointer"
+                    >
+                      Sim, atualizar número
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData((prev) => ({ ...prev, whatsapp: crmMismatchAlert.existingWhatsapp }));
+                        setCrmMismatchAlert({ show: false, existingWhatsapp: '', newWhatsapp: '' });
+                      }}
+                      className="px-2.5 py-1 text-[11px] text-[#7A4B00] underline cursor-pointer"
+                    >
+                      Manter número anterior
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {errors.form && (
-                <div className="mb-4 flex items-center gap-2 rounded-xl bg-red-50 p-3 text-xs text-[#B71C1C] border border-red-200">
+                <div className="mb-4 flex items-center gap-2 rounded-sm bg-red-50 p-3 text-xs text-[#B71C1C] border border-red-200">
                   <AlertCircle className="h-4 w-4 shrink-0" />
                   <span>{errors.form}</span>
                 </div>
@@ -209,10 +287,12 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       id="firstName"
                       name="firstName"
                       required
+                      maxLength={15}
+                      autoComplete="given-name"
                       placeholder="Seu primeiro nome"
                       value={formData.firstName}
                       onChange={handleChange}
-                      className="w-full rounded-xl border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-sm text-[#211D35] placeholder-[#7A7394] focus:border-[#25D366] focus:outline-none focus:ring-1 focus:ring-[#25D366]"
+                      className="w-full rounded-sm border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-sm text-[#211D35] placeholder-[#7A7394] focus:border-[#25D366] focus:outline-none focus:ring-1 focus:ring-[#25D366]"
                     />
                     {errors.firstName && <p className="mt-1 text-[11px] text-[#B71C1C]">{errors.firstName}</p>}
                   </div>
@@ -226,10 +306,12 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       id="lastName"
                       name="lastName"
                       required
+                      maxLength={15}
+                      autoComplete="family-name"
                       placeholder="Seu sobrenome"
                       value={formData.lastName}
                       onChange={handleChange}
-                      className="w-full rounded-xl border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-sm text-[#211D35] placeholder-[#7A7394] focus:border-[#25D366] focus:outline-none focus:ring-1 focus:ring-[#25D366]"
+                      className="w-full rounded-sm border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-sm text-[#211D35] placeholder-[#7A7394] focus:border-[#25D366] focus:outline-none focus:ring-1 focus:ring-[#25D366]"
                     />
                     {errors.lastName && <p className="mt-1 text-[11px] text-[#B71C1C]">{errors.lastName}</p>}
                   </div>
@@ -238,17 +320,18 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 {/* Campo 3: WhatsApp */}
                 <div>
                   <label htmlFor="whatsapp" className="block text-[11px] font-bold uppercase tracking-wider text-[#22205A] mb-1">
-                    WhatsApp (com DDD) *
+                    WhatsApp *
                   </label>
                   <input
                     type="tel"
                     id="whatsapp"
                     name="whatsapp"
                     required
+                    autoComplete="tel"
                     placeholder="Ex: 11 99999-9999"
                     value={formData.whatsapp}
                     onChange={handleChange}
-                    className="w-full rounded-xl border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-sm text-[#211D35] placeholder-[#7A7394] focus:border-[#25D366] focus:outline-none focus:ring-1 focus:ring-[#25D366]"
+                    className="w-full rounded-sm border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-sm text-[#211D35] placeholder-[#7A7394] focus:border-[#25D366] focus:outline-none focus:ring-1 focus:ring-[#25D366]"
                   />
                   {errors.whatsapp && <p className="mt-1 text-[11px] text-[#B71C1C]">{errors.whatsapp}</p>}
                 </div>
@@ -263,10 +346,12 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     id="email"
                     name="email"
                     required
+                    autoComplete="email"
                     placeholder="seuemail@exemplo.com"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full rounded-xl border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-sm text-[#211D35] placeholder-[#7A7394] focus:border-[#25D366] focus:outline-none focus:ring-1 focus:ring-[#25D366]"
+                    onBlur={handleEmailBlur}
+                    className="w-full rounded-sm border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-sm text-[#211D35] placeholder-[#7A7394] focus:border-[#25D366] focus:outline-none focus:ring-1 focus:ring-[#25D366]"
                   />
                   {errors.email && <p className="mt-1 text-[11px] text-[#B71C1C]">{errors.email}</p>}
                 </div>
@@ -282,7 +367,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     required
                     value={formData.serviceId}
                     onChange={handleChange}
-                    className="w-full rounded-xl border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-sm text-[#211D35] focus:border-[#25D366] focus:outline-none focus:ring-1 focus:ring-[#25D366]"
+                    className="w-full rounded-sm border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-sm text-[#211D35] focus:border-[#25D366] focus:outline-none focus:ring-1 focus:ring-[#25D366]"
                   >
                     {OFFICIAL_SERVICES.map((srv) => (
                       <option key={srv.id} value={srv.id}>
@@ -298,7 +383,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full flex items-center justify-center gap-2 rounded-full bg-[#25D366] hover:bg-[#20ba5a] py-3.5 text-sm font-extrabold text-white shadow-md disabled:opacity-50 transition-all cursor-pointer transform active:scale-98"
+                    className="w-full flex items-center justify-center gap-2 rounded-sm bg-[#25D366] hover:bg-[#20ba5a] py-3.5 text-sm font-extrabold text-white shadow-md disabled:opacity-50 transition-all cursor-pointer transform active:scale-98"
                   >
                     <MessageCircle className="h-5 w-5 fill-white" />
                     {isSubmitting ? (

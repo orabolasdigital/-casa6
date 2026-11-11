@@ -34,7 +34,8 @@ import {
   MessageCircle,
   ExternalLink,
   Loader2,
-  Gift
+  Gift,
+  AlertCircle
 } from 'lucide-react';
 import {
   MERCADO_PAGO_CONFIG,
@@ -46,6 +47,15 @@ import {
   generateVoucherCode,
   CustomerRecord
 } from '../../services/mercadopago';
+import {
+  sanitizeName,
+  validateName,
+  formatWhatsAppNumber,
+  validateWhatsAppNumber,
+  validateEmailAddress,
+  lookupCRMContactByEmail,
+  saveCRMContactRecord
+} from '../../services/formValidation';
 import { SITE_CONFIG } from '../../config/site';
 import { BirthData, ShippingAddress } from '../../types';
 
@@ -127,6 +137,13 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
   const [confirmedOrderId, setConfirmedOrderId] = useState('');
   const [confirmedVoucher, setConfirmedVoucher] = useState('');
   const [confirmedBonus, setConfirmedBonus] = useState('');
+
+  // 7.1 Alerta de Divergência de Contato no CRM
+  const [crmMismatchAlert, setCrmMismatchAlert] = useState<{
+    show: boolean;
+    existingWhatsapp: string;
+    newWhatsapp: string;
+  }>({ show: false, existingWhatsapp: '', newWhatsapp: '' });
 
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -420,28 +437,71 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
     }
   };
 
-  // Validação e Avanço da Etapa 1
-  const handleNextFromStep1 = (e: React.FormEvent) => {
+  // Busca e Autopreenchimento de CRM ao sair do campo E-mail
+  const handleEmailBlur = async () => {
+    if (!email || !email.includes('@')) return;
+    try {
+      const contact = await lookupCRMContactByEmail(email);
+      if (contact) {
+        if (!firstName && contact.firstName) setFirstName(contact.firstName);
+        if (!lastName && contact.lastName) setLastName(contact.lastName);
+
+        const cleanExisting = contact.whatsapp.replace(/\D/g, '');
+        const cleanCurrent = whatsapp.replace(/\D/g, '');
+        if (cleanExisting && cleanCurrent && cleanExisting !== cleanCurrent) {
+          setCrmMismatchAlert({
+            show: true,
+            existingWhatsapp: contact.whatsapp,
+            newWhatsapp: whatsapp
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('[CRM Lookup Error]', err);
+    }
+  };
+
+  // Validação e Avanço da Etapa 1 (Regras Padronizadas)
+  const handleNextFromStep1 = async (e: React.FormEvent) => {
     e.preventDefault();
     setStepError('');
 
-    if (!firstName.trim() || firstName.trim().length < 2) {
-      setStepError('Informe seu primeiro nome (mínimo 2 caracteres).');
+    const nameVal = validateName(firstName, 'Nome');
+    if (!nameVal.isValid && nameVal.error) {
+      setStepError(nameVal.error);
       return;
     }
-    if (!lastName.trim() || lastName.trim().length < 2) {
-      setStepError('Informe seu sobrenome.');
+
+    const lastNameVal = validateName(lastName, 'Sobrenome');
+    if (!lastNameVal.isValid && lastNameVal.error) {
+      setStepError(lastNameVal.error);
       return;
     }
-    const cleanPhone = whatsapp.replace(/\D/g, '');
-    if (cleanPhone.length < 10) {
-      setStepError('Informe um WhatsApp válido com DDD.');
+
+    const phoneVal = validateWhatsAppNumber(whatsapp);
+    if (!phoneVal.isValid && phoneVal.error) {
+      setStepError(phoneVal.error);
       return;
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim() || !emailRegex.test(email.trim())) {
-      setStepError('Informe um e-mail válido.');
+
+    const emailVal = validateEmailAddress(email);
+    if (!emailVal.isValid && emailVal.error) {
+      setStepError(emailVal.error);
       return;
+    }
+
+    // Salvar/Sincronizar no CRM
+    try {
+      await saveCRMContactRecord({
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        fullName: `${firstName.trim()} ${lastName.trim()}`,
+        email: email.trim().toLowerCase(),
+        whatsapp: whatsapp.trim(),
+        lastSource: serviceType
+      });
+    } catch (crmErr) {
+      console.warn('[CRM Sync Warning]', crmErr);
     }
 
     setCurrentStep(2);
@@ -691,11 +751,14 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   <input
                     type="text"
                     required
+                    maxLength={15}
+                    autoComplete="given-name"
                     placeholder="Ex: Mariana"
                     value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
+                    onChange={(e) => setFirstName(sanitizeName(e.target.value))}
                     className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#2B2566] focus:outline-none transition-colors"
                   />
+                  <span className="text-[10px] text-[#68638C]">3 a 15 letras (sem números ou símbolos)</span>
                 </div>
 
                 <div>
@@ -705,27 +768,32 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   <input
                     type="text"
                     required
+                    maxLength={15}
+                    autoComplete="family-name"
                     placeholder="Ex: Duarte"
                     value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    onChange={(e) => setLastName(sanitizeName(e.target.value))}
                     className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#2B2566] focus:outline-none transition-colors"
                   />
+                  <span className="text-[10px] text-[#68638C]">3 a 15 letras (sem números ou símbolos)</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block text-[11px] font-semibold text-[#2B2566] mb-1">
-                    Telefone WhatsApp *
+                    WhatsApp *
                   </label>
                   <input
                     type="tel"
                     required
+                    autoComplete="tel"
                     placeholder="(11) 99999-9999"
                     value={whatsapp}
-                    onChange={(e) => setWhatsapp(formatWhatsapp(e.target.value))}
+                    onChange={(e) => setWhatsapp(formatWhatsAppNumber(e.target.value))}
                     className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#2B2566] focus:outline-none transition-colors"
                   />
+                  <span className="text-[10px] text-[#68638C]">DDD + Número válido ou internacional (+...)</span>
                 </div>
 
                 <div>
@@ -735,13 +803,52 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   <input
                     type="email"
                     required
-                    placeholder="mariana@exemplo.com"
+                    autoComplete="email"
+                    placeholder="mariana@gmail.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onBlur={handleEmailBlur}
                     className="w-full text-xs rounded-sm border border-[#D5CEBF] bg-white px-3.5 py-2.5 text-[#2B2566] focus:border-[#2B2566] focus:outline-none transition-colors"
                   />
+                  <span className="text-[10px] text-[#68638C]">Provedores válidos (Gmail, Hotmail, Outlook, etc.)</span>
                 </div>
               </div>
+
+              {/* Alerta de Divergência de Contato no CRM */}
+              {crmMismatchAlert.show && (
+                <div className="p-3 bg-[#F4EFE6] border border-[#F0B55E] text-[#2B2566] text-xs space-y-2">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="h-4 w-4 text-[#B87314] shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold text-[11px] text-[#B87314]">
+                        Cadastro Existente Localizado no CRM
+                      </p>
+                      <p className="text-[11px] text-[#423C7B] mt-0.5">
+                        Identificamos que seu e-mail já possui o WhatsApp <strong>{crmMismatchAlert.existingWhatsapp}</strong> cadastrado. Deseja atualizar seu WhatsApp de contato para <strong>{crmMismatchAlert.newWhatsapp}</strong>?
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 pt-1 pl-6">
+                    <button
+                      type="button"
+                      onClick={() => setCrmMismatchAlert({ show: false, existingWhatsapp: '', newWhatsapp: '' })}
+                      className="px-3 py-1 bg-[#2B2566] text-white text-[10px] font-bold uppercase rounded-sm hover:bg-[#362E7A] cursor-pointer"
+                    >
+                      Sim, Atualizar WhatsApp
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setWhatsapp(crmMismatchAlert.existingWhatsapp);
+                        setCrmMismatchAlert({ show: false, existingWhatsapp: '', newWhatsapp: '' });
+                      }}
+                      className="px-3 py-1 bg-white border border-[#D5CEBF] text-[#2B2566] text-[10px] font-bold uppercase rounded-sm hover:bg-[#F4EFE6] cursor-pointer"
+                    >
+                      Manter Número Anterior
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="pt-2">
                 <button
@@ -778,6 +885,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   <input
                     type="text"
                     required
+                    autoComplete="postal-code"
                     placeholder="00000-000"
                     value={cep}
                     onChange={(e) => handleCepChange(e.target.value)}
@@ -804,6 +912,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   <input
                     type="text"
                     required
+                    autoComplete="address-line1"
                     placeholder="Preenchido pelo CEP"
                     value={street}
                     onChange={(e) => setStreet(e.target.value)}
@@ -818,6 +927,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   <input
                     type="text"
                     required
+                    autoComplete="address-line2"
                     placeholder="123"
                     value={number}
                     onChange={(e) => setNumber(e.target.value)}
@@ -833,6 +943,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   </label>
                   <input
                     type="text"
+                    autoComplete="address-line3"
                     placeholder="Apto 101, Bloco B"
                     value={complement}
                     onChange={(e) => setComplement(e.target.value)}
@@ -847,6 +958,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   <input
                     type="text"
                     required
+                    autoComplete="address-level3"
                     placeholder="Bairro"
                     value={neighborhood}
                     onChange={(e) => setNeighborhood(e.target.value)}
@@ -863,6 +975,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   <input
                     type="text"
                     required
+                    autoComplete="address-level2"
                     placeholder="Cidade"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
@@ -877,6 +990,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                   <input
                     type="text"
                     required
+                    autoComplete="address-level1"
                     placeholder="SP"
                     maxLength={2}
                     value={state}

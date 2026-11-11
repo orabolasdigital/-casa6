@@ -9,6 +9,12 @@ import { SITE_CONFIG, OFFICIAL_SERVICES } from '../config/site';
 import { DeviceCategory, Lead, LeadFormInput, LeadStatus } from '../types';
 import { trackAnalyticsEvent } from './analytics';
 import { db, isFirebaseReady, handleFirestoreError, OperationType } from './firebase';
+import {
+  validateName,
+  validateWhatsAppNumber,
+  validateEmailAddress,
+  saveCRMContactRecord
+} from './formValidation';
 
 const LOCAL_STORAGE_LEADS_KEY = 'casa6_leads_repository';
 
@@ -46,30 +52,32 @@ export function getUtmParameters(): {
 
 /**
  * Validação rigorosa dos 5 campos do formulário global
+ * Regras:
+ * - Nome e Sobrenome: apenas letras/acentos, mín 3 e máx 15 caracteres.
+ * - WhatsApp: validação de DDD real brasileiro ou internacional, sem repetições fake.
+ * - E-mail: sintaxe e provedores confiáveis.
  */
 export function validateLeadForm(input: LeadFormInput): { isValid: boolean; errors: Record<string, string> } {
   const errors: Record<string, string> = {};
 
-  if (!input.firstName || input.firstName.trim().length < 2) {
-    errors.firstName = 'Informe seu primeiro nome (mínimo 2 caracteres).';
-  } else if (input.firstName.trim().length > 50) {
-    errors.firstName = 'Nome muito longo (máximo 50 caracteres).';
+  const nameVal = validateName(input.firstName, 'Nome');
+  if (!nameVal.isValid && nameVal.error) {
+    errors.firstName = nameVal.error;
   }
 
-  if (!input.lastName || input.lastName.trim().length < 2) {
-    errors.lastName = 'Informe seu sobrenome (mínimo 2 caracteres).';
-  } else if (input.lastName.trim().length > 60) {
-    errors.lastName = 'Sobrenome muito longo (máximo 60 caracteres).';
+  const lastNameVal = validateName(input.lastName, 'Sobrenome');
+  if (!lastNameVal.isValid && lastNameVal.error) {
+    errors.lastName = lastNameVal.error;
   }
 
-  const phoneDigits = input.whatsapp.replace(/\D/g, '');
-  if (phoneDigits.length < 10 || phoneDigits.length > 15) {
-    errors.whatsapp = 'Informe um WhatsApp válido com DDD (ex: 11 99999-9999).';
+  const phoneVal = validateWhatsAppNumber(input.whatsapp);
+  if (!phoneVal.isValid && phoneVal.error) {
+    errors.whatsapp = phoneVal.error;
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!input.email || !emailRegex.test(input.email.trim())) {
-    errors.email = 'Informe um endereço de e-mail válido.';
+  const emailVal = validateEmailAddress(input.email);
+  if (!emailVal.isValid && emailVal.error) {
+    errors.email = emailVal.error;
   }
 
   if (!input.serviceId) {
@@ -119,7 +127,7 @@ export async function submitLeadBooking(
     updatedAt: now
   };
 
-  // 1. Persistência de Dados (Firestore quando conectado; fallback em armazenamento local quando em estágio PREPARADO)
+  // 1. Persistência de Dados (Firestore quando conectado; fallback em armazenamento local)
   if (isFirebaseReady && db) {
     try {
       const docRef = doc(db, 'leads', leadId);
@@ -132,6 +140,20 @@ export async function submitLeadBooking(
     const existing = getLocalLeads();
     existing.unshift(newLead);
     saveLocalLeads(existing);
+  }
+
+  // 1.1 Sincronização Automática na coleção de CRM (crm_contatos)
+  try {
+    await saveCRMContactRecord({
+      firstName: newLead.firstName,
+      lastName: newLead.lastName,
+      fullName: newLead.fullName,
+      email: newLead.email,
+      whatsapp: newLead.whatsapp,
+      lastSource: sourcePageTitle
+    });
+  } catch (crmErr) {
+    console.warn('[CRM Sync Warning]', crmErr);
   }
 
   // 2. Disparo de Evento Analítico

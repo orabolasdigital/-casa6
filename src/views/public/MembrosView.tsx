@@ -144,6 +144,7 @@ export const MembrosView: React.FC = () => {
               <input
                 type="email"
                 required
+                autoComplete="username"
                 placeholder="seuemail@exemplo.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -156,6 +157,7 @@ export const MembrosView: React.FC = () => {
               <input
                 type="password"
                 required
+                autoComplete="current-password"
                 placeholder="Digite seu CPF (apenas números ou pontuado)"
                 value={cpf}
                 onChange={(e) => setCpf(e.target.value)}
