@@ -66,7 +66,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
       {/* =========================================================================
           SESSÃO 1: BANNER PRINCIPAL COM VÍDEO EM LOOPING, TÍTULO RESTAURADO E CTA
           ========================================================================= */}
-      <section className="relative w-full bg-[#2B2566] text-[#FFFFFF] pt-20 sm:pt-28 pb-20 sm:pb-28 px-4 sm:px-6 lg:px-8">
+      <section className="relative w-full bg-[#2B2566] text-[#FFFFFF] pt-24 sm:pt-36 lg:pt-44 pb-36 sm:pb-52 lg:pb-68 px-4 sm:px-6 lg:px-8">
         {/* Vídeo de Fundo em Looping Oficial */}
         <video
           src="https://video.wixstatic.com/video/02c8e0_bbdf46bd6f6f4c45937fb5989df57687/720p/mp4/file.mp4"
@@ -88,7 +88,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
           <div className="absolute top-36 right-1/4 text-[#E6E3F1] opacity-40 text-[10px]">★</div>
         </div>
 
-        <div className="relative mx-auto max-w-5xl z-10 space-y-6">
+        <div className="relative mx-auto max-w-5xl z-10 space-y-6 pb-12 sm:pb-20 lg:pb-28">
           {/* Box / Selo Casa 6 Bianca Tofoli com Favicon, Borda Suave e Fundo Transparente */}
           <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-white/25 bg-transparent backdrop-blur-xs">
             <img
@@ -122,7 +122,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             Descubra a Casa 6 e se conecte com a sua essência através da astrologia com um olhar lúcido e acolhedor.
           </p>
 
-          <div className="pt-2 flex items-center">
+          <div className="pt-4 flex items-center">
             <button
               onClick={() => onNavigate('/atendimentos')}
               className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[#F0B55E] px-8 py-4 text-xs sm:text-sm font-bold text-[#2B2566] shadow-xl hover:bg-[#dfa247] transition-all transform hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer uppercase tracking-wider"
@@ -133,45 +133,45 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
           </div>
         </div>
 
-        {/* Transição Orgânica Hiper-Arqueada com Degradê Curvilíneo Acompanhando o Arco */}
+        {/* Transição Orgânica Hiper-Arqueada com Ângulo Elevado e Degradê Curvilíneo Acompanhando o Arco */}
         <div className="absolute -bottom-px left-0 right-0 w-full overflow-hidden leading-none pointer-events-none z-15">
           <svg
-            viewBox="0 0 1440 200"
+            viewBox="0 0 1440 280"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="w-full h-24 sm:h-36 lg:h-48 block"
+            className="w-full h-32 sm:h-48 lg:h-64 xl:h-76 block"
             preserveAspectRatio="none"
           >
             <defs>
               {/* Gradiente que acompanha o arco, indo da transparência e tom escuro para o tom claro Lua */}
               <linearGradient id="arcDegradeCurvilineo" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#2B2566" stopOpacity="0" />
-                <stop offset="35%" stopColor="#F4EFE6" stopOpacity="0.45" />
-                <stop offset="70%" stopColor="#F4EFE6" stopOpacity="0.85" />
+                <stop offset="30%" stopColor="#F4EFE6" stopOpacity="0.45" />
+                <stop offset="65%" stopColor="#F4EFE6" stopOpacity="0.85" />
                 <stop offset="100%" stopColor="#F4EFE6" stopOpacity="1" />
               </linearGradient>
               <linearGradient id="arcGlowSuave" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#F4EFE6" stopOpacity="0" />
-                <stop offset="50%" stopColor="#F4EFE6" stopOpacity="0.3" />
-                <stop offset="100%" stopColor="#F4EFE6" stopOpacity="0.7" />
+                <stop offset="45%" stopColor="#F4EFE6" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#F4EFE6" stopOpacity="0.75" />
               </linearGradient>
             </defs>
 
-            {/* Faixa Superior do Arco com Degradê Suave Acompanhando a Curvatura */}
+            {/* Faixa Superior do Arco com Degradê Suave Acompanhando a Curvatura Profunda */}
             <path
-              d="M0,0 C320,150 1120,150 1440,0 L1440,200 L0,200 Z"
+              d="M0,0 C360,230 1080,230 1440,0 L1440,280 L0,280 Z"
               fill="url(#arcGlowSuave)"
             />
 
             {/* Faixa Intermediária Arqueada com o Degradê Principal */}
             <path
-              d="M0,15 C320,170 1120,170 1440,15 L1440,200 L0,200 Z"
+              d="M0,25 C360,255 1080,255 1440,25 L1440,280 L0,280 Z"
               fill="url(#arcDegradeCurvilineo)"
             />
 
             {/* Base Sólida do Arco que Conecta com a Sessão Clara */}
             <path
-              d="M0,45 C320,195 1120,195 1440,45 L1440,200 L0,200 Z"
+              d="M0,60 C360,280 1080,280 1440,60 L1440,280 L0,280 Z"
               fill="#F4EFE6"
             />
           </svg>
@@ -179,26 +179,44 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
       </section>
 
       {/* =========================================================================
-          SESSÃO 2: DESTAQUE PARA BIANCA TOFOLI (FOTO INTEIRA POR CIMA, SEM CORTES, TEXTO QUADRADINHO)
+          SESSÃO 2: DESTAQUE PARA BIANCA TOFOLI (FOTO EM CÍRCULO SOBREPOSTA E ELEMENTOS ANIMADOS)
           ========================================================================= */}
-      <section className="relative pt-0 pb-10 sm:pb-14 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] z-20">
+      <section className="relative pt-0 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] z-20">
         <div className="mx-auto max-w-7xl relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             
-            {/* Foto Circular da Bianca Sobreposta Integralmente (z-30, Sem Cortar) */}
-            <div className="lg:col-span-5 flex justify-center -mt-16 sm:-mt-24 lg:-mt-32 relative z-30">
-              <div className="relative w-76 sm:w-88 lg:w-[410px] aspect-square">
-                {/* Disco Sol decorativo ao fundo deslocado conforme Brand Guide */}
-                <div className="absolute -left-5 top-1/2 -translate-y-1/2 w-44 sm:w-52 h-44 sm:h-52 rounded-full bg-[#F0B55E] opacity-90 pointer-events-none"></div>
-                {/* Órbitas concêntricas hairline */}
-                <div className="absolute inset-0 rounded-full border border-[#2B2566]/20 scale-105 pointer-events-none"></div>
-                <div className="absolute inset-0 rounded-full border border-[#8C987F]/30 rotate-45 scale-115 pointer-events-none"></div>
+            {/* Foto Circular da Bianca Sobreposta Invasiva (z-30, Invadindo a 1ª Seção) */}
+            <div className="lg:col-span-5 flex justify-center -mt-24 sm:-mt-40 lg:-mt-56 relative z-30">
+              <div className="relative w-80 sm:w-92 lg:w-[420px] aspect-square flex items-center justify-center">
+                {/* 1. Disco Sol decorativo ao fundo com pulso cósmico delicado */}
+                <div className="absolute -left-6 sm:-left-8 top-1/2 w-48 sm:w-56 h-48 sm:h-56 rounded-full bg-gradient-to-br from-[#F0B55E] to-[#E5A548] opacity-90 pointer-events-none animate-celestial-sun shadow-xl shadow-[#F0B55E]/25"></div>
 
-                <div className="relative w-full h-full rounded-full overflow-hidden shadow-2xl border-4 border-white bg-white">
+                {/* 2. Anel de Cintilação / Brilho Suave */}
+                <div className="absolute inset-[-14px] sm:inset-[-18px] rounded-full border border-[#F0B55E]/40 pointer-events-none animate-celestial-shimmer"></div>
+
+                {/* 3. Órbita Externa Pontilhada com Rotação Lenta Suave e Marcadores Astrais */}
+                <div className="absolute inset-[-28px] sm:inset-[-36px] rounded-full border border-dashed border-[#2B2566]/30 dark:border-[#F0B55E]/30 pointer-events-none animate-celestial-orbit-slow">
+                  {/* Pérola Cósmica no topo da órbita */}
+                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#F0B55E] shadow-sm shadow-[#F0B55E]/80 flex items-center justify-center">
+                    <span className="w-1 h-1 rounded-full bg-white"></span>
+                  </div>
+                  {/* Estrela de 4 pontas decorativa na órbita */}
+                  <div className="absolute top-1/3 -right-1 text-[10px] text-[#F0B55E] font-heading select-none">✦</div>
+                  {/* Marcador Oliva */}
+                  <div className="absolute -bottom-1 left-1/3 w-2 h-2 rounded-full bg-[#8C987F] opacity-75"></div>
+                </div>
+
+                {/* 4. Órbita Interna com Rotação Reversa Suave */}
+                <div className="absolute inset-[-10px] sm:inset-[-14px] rounded-full border border-[#8C987F]/40 rotate-45 pointer-events-none animate-celestial-orbit-reverse">
+                  <div className="absolute top-1 right-12 w-2 h-2 rounded-full bg-[#2B2566]/60"></div>
+                </div>
+
+                {/* 5. Moldura Circular Principal da Foto com Borda Branca e Anel Dourado Suave */}
+                <div className="relative w-full h-full rounded-full overflow-hidden shadow-2xl border-4 sm:border-5 border-white bg-white ring-1 ring-[#F0B55E]/30">
                   <img
                     src="https://static.wixstatic.com/media/02c8e0_54a33eeb476d45c49b7f4953c34177fc~mv2.jpeg"
                     alt="Bianca Tofoli — Fundadora da Casa 6"
-                    className="w-full h-full object-cover object-center protected-img"
+                    className="w-full h-full object-cover object-center protected-img transition-transform duration-700 hover:scale-103"
                     draggable={false}
                   />
                 </div>
@@ -206,7 +224,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             </div>
 
             {/* Texto Editorial Compacto e Quadradinho */}
-            <div className="lg:col-span-7 space-y-5 max-w-lg pt-4 lg:pt-0">
+            <div className="lg:col-span-7 space-y-5 max-w-lg pt-6 sm:pt-10 lg:pt-0">
               <div className="space-y-2">
                 <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#8C987F] block">
                   FUNDADORA DA CASA 6 • ASTRÓLOGA • PALESTRANTE

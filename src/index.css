@@ -479,3 +479,74 @@ img.protected-img {
   }
 }
 
+/* --------------------------------------------------------------------------
+   ANIMAÇÕES CELESTES DELICADAS — FOTO BIANCA TOFOLI (PÁGINA INICIAL)
+   Respiração cósmica suave, rotação lenta de órbitas e cintilação sutil
+   -------------------------------------------------------------------------- */
+@keyframes celestialBreathPulse {
+  0%, 100% {
+    transform: translateY(-50%) scale(1);
+    opacity: 0.88;
+  }
+  50% {
+    transform: translateY(-50%) scale(1.07);
+    opacity: 1;
+    filter: drop-shadow(0 0 22px rgba(240, 181, 94, 0.45));
+  }
+}
+
+@keyframes celestialOrbitRotateSlow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes celestialOrbitRotateReverse {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes celestialShimmerRing {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1.01);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.06);
+  }
+}
+
+.animate-celestial-sun {
+  animation: celestialBreathPulse 6s ease-in-out infinite;
+}
+
+.animate-celestial-orbit-slow {
+  animation: celestialOrbitRotateSlow 35s linear infinite;
+}
+
+.animate-celestial-orbit-reverse {
+  animation: celestialOrbitRotateReverse 28s linear infinite;
+}
+
+.animate-celestial-shimmer {
+  animation: celestialShimmerRing 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-celestial-sun,
+  .animate-celestial-orbit-slow,
+  .animate-celestial-orbit-reverse,
+  .animate-celestial-shimmer {
+    animation: none !important;
+  }
+}
+
+
