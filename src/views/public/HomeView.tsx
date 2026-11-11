@@ -18,6 +18,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowRight, Sparkles, Star, Quote, MessageCircle, Compass, Play, Youtube, Sun, Moon } from 'lucide-react';
 import { OFFICIAL_SERVICES, OFFICIAL_TESTIMONIALS, SITE_CONFIG } from '../../config/site';
 import { FlipTarotCard } from '../../components/common/FlipTarotCard';
+import { AstrologicalTestimonialCard } from '../../components/common/AstrologicalTestimonialCard';
 import { ServiceDetailModal } from '../../components/common/ServiceDetailModal';
 import { ServiceItem } from '../../types';
 import { syncCatalogWithFirestore, CATALOG_BLOG_POSTS } from '../../services/catalogService';
@@ -104,6 +105,28 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
     imageUrl: p.imageUrl,
     date: p.publishedAt
   }));
+
+  // 3 Grupos de 4 Depoimentos Oficiais para a Sessão 4 (Alternados a cada período)
+  const testimonialGroups = [
+    OFFICIAL_TESTIMONIALS.slice(0, 4),
+    OFFICIAL_TESTIMONIALS.slice(4, 8),
+    [
+      OFFICIAL_TESTIMONIALS[8],
+      OFFICIAL_TESTIMONIALS[9],
+      OFFICIAL_TESTIMONIALS[10],
+      OFFICIAL_TESTIMONIALS[12] || OFFICIAL_TESTIMONIALS[11]
+    ]
+  ];
+
+  const [testimonialGroupIndex, setTestimonialGroupIndex] = useState(0);
+
+  // Troca automática periódica suave (muda o combo de 4 depoimentos a cada 8.5s)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTestimonialGroupIndex((prev) => (prev + 1) % testimonialGroups.length);
+    }, 8500);
+    return () => clearInterval(timer);
+  }, [testimonialGroups.length]);
 
   return (
     <div className="bg-[#F4EFE6] text-[#2B2566] overflow-x-hidden font-body">
@@ -347,62 +370,75 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
       </section>
 
       {/* =========================================================================
-          SESSÃO 4: DEPOIMENTOS (TÍTULO LIMPO: RELATOS DE CONSULENTES)
+          SESSÃO 4: DEPOIMENTOS DE CLIENTES (FUNDO CLARO ELEGANTE & PAGINAÇÃO COM 3 BOLINHAS)
           ========================================================================= */}
-      <section className="py-20 sm:py-28 border-y border-[#F0B55E]/20 bg-[#2B2566] text-white overflow-hidden relative">
-        {/* Órbitas Decorativas Hairline ao fundo */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full border border-white/5"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-[#F0B55E]/10"></div>
+      <section className="py-20 sm:py-28 border-y border-[#E2DCCF] bg-[#FAF7F2] text-[#2B2566] relative overflow-hidden">
+        {/* Órbitas Decorativas Sutis no Fundo Claro */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full border border-[#2B2566]/4"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-[#F0B55E]/15"></div>
+          <div className="absolute top-12 left-1/4 text-[#F0B55E] opacity-30 text-xs">✦</div>
+          <div className="absolute bottom-12 right-1/4 text-[#8C987F] opacity-30 text-xs">★</div>
         </div>
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-4 text-center mb-10 z-10">
-          <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#F0B55E]">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-4 text-center mb-12 z-10">
+          <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#8C987F]">
             EXPERIÊNCIAS REAIS • ACOLHIMENTO E CLAREZA
           </span>
-          <h2 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-white">
+          <h2 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-[#2B2566]">
             Depoimentos de clientes
           </h2>
           <div className="flex items-center justify-center gap-3 py-1">
-            <span className="w-12 h-px bg-white/20"></span>
+            <span className="w-12 h-px bg-[#2B2566]/20"></span>
             <span className="w-1.5 h-1.5 rounded-full bg-[#F0B55E]"></span>
-            <span className="w-12 h-px bg-white/20"></span>
+            <span className="w-12 h-px bg-[#2B2566]/20"></span>
           </div>
-          <p className="text-xs sm:text-sm text-[#E6E3F1]/85 max-w-lg mx-auto font-light">
+          <p className="text-xs sm:text-sm text-[#423C7B] max-w-lg mx-auto font-light">
             Depoimentos de quem encontrou clareza prática, acolhimento e direção nas consultas e na Patota Astral com Bianca Tofoli.
           </p>
         </div>
 
-        {/* Marquee Contínuo Lento */}
-        <div className="relative w-full overflow-hidden py-4 z-10">
-          <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-[#2B2566] to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-[#2B2566] to-transparent z-10 pointer-events-none" />
-
-          <div className="animate-marquee-continuous flex gap-6">
-            {OFFICIAL_TESTIMONIALS.concat(OFFICIAL_TESTIMONIALS).map((item, idx) => (
-              <div
-                key={`t-${item.id}-${idx}`}
-                className="w-[320px] sm:w-[420px] rounded-2xl bg-[#FFFFFF] text-[#2B2566] border border-[#F0B55E]/40 p-6 sm:p-7 shadow-xl shrink-0 flex flex-col justify-between space-y-4 hover:border-[#F0B55E] transition-colors"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Quote className="h-6 w-6 text-[#F0B55E]" />
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-[#8C987F]">
-                      {item.serviceTitle}
-                    </span>
-                  </div>
-                  <p className="font-heading italic text-xs sm:text-sm text-[#423C7B] leading-relaxed">
-                    “{item.content}”
-                  </p>
-                </div>
-                <div className="pt-3 border-t border-[#E2DCCF] flex items-center justify-between">
-                  <span className="font-heading font-bold text-xs text-[#2B2566]">
-                    {item.authorName}
-                  </span>
-                  <div className="flex text-[#F0B55E] text-xs">★★★★★</div>
-                </div>
-              </div>
+        {/* Combo com 4 Depoimentos Atuais com Adornos Astrológicos Exclusivos */}
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 z-10">
+          <div
+            key={testimonialGroupIndex}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-500 ease-in-out"
+          >
+            {testimonialGroups[testimonialGroupIndex].map((item, idx) => (
+              <AstrologicalTestimonialCard
+                key={item.id}
+                testimonial={item}
+                cardIndex={idx}
+                groupIndex={testimonialGroupIndex}
+              />
             ))}
+          </div>
+
+          {/* Paginação com Três Bolinhas (3 Grupos de Depoimentos que Alternam a cada período) */}
+          <div className="flex flex-col items-center justify-center gap-3 pt-10">
+            <div className="flex items-center gap-3">
+              {testimonialGroups.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setTestimonialGroupIndex(idx)}
+                  className={`transition-all duration-300 rounded-full cursor-pointer flex items-center justify-center ${
+                    testimonialGroupIndex === idx
+                      ? 'w-9 h-3 bg-[#B87314] shadow-xs'
+                      : 'w-3 h-3 bg-[#2B2566]/20 hover:bg-[#2B2566]/40'
+                  }`}
+                  aria-label={`Visualizar grupo de depoimentos ${idx + 1} de 3`}
+                >
+                  {testimonialGroupIndex === idx && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-white select-none" />
+                  )}
+                </button>
+              ))}
+            </div>
+
+            <span className="text-[10px] uppercase tracking-widest text-[#8C987F] font-semibold">
+              Grupo {testimonialGroupIndex + 1} de {testimonialGroups.length} • Alterna periodicamente
+            </span>
           </div>
         </div>
       </section>
