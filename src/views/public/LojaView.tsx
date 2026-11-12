@@ -2,166 +2,575 @@
  * @license
  * Casa 6 — Bianca Tofoli
  * Visão Pública: /lojinha & /loja
- * Lojinha Oficial com Box Semeadura, Coleção Ritos do Universo e Checkout Mercado Pago
+ * Lojinha Oficial Casa 6 com Design Leve, Sofisticado e Formato E-commerce
+ * 
+ * Funcionalidades & Design:
+ * - Fundo suave, luminoso e acolhedor (#FAF8F5).
+ * - Sem logotipo no cabeçalho.
+ * - Linha-ponto dourada do Brand Guide e tipografia editorial de alta legibilidade.
+ * - 4 produtos cadastrados, organizados em 1 produto por linha (stacked horizontal cards).
+ * - Produto 1: Box SEMEADURA
+ *   - Tag "Esgotado".
+ *   - Botão "Avise-me quando chegar" direcionando para o WhatsApp.
+ *   - Carrossel / miniaturas interativas com as 9 fotos reais enviadas pelo usuário.
+ *   - Lista de conteúdo da box e detalhes da Coleção Ritos do Universo.
+ * - Produtos 2, 3 e 4: Box ACOLHIMENTO, Box CRESCIMENTO e Box CELEBRAÇÃO
+ *   - Imagem estilizada com o fundo cósmico das cartas de tarô da Home.
+ *   - Texto "Em Breve" com efeito pulsante (pulse glow) avisando que logo haverá novos produtos.
+ *   - Botão "Entrar na lista de espera" via WhatsApp.
+ * - Totalmente expansível para cadastrar mais produtos no futuro.
  */
 
-import React, { useState } from 'react';
-import { Package, Sparkles, CheckCircle2, ShieldCheck, ArrowRight, Truck } from 'lucide-react';
-import { CATALOG_LOJINHA, LojinhaProduct } from '../../services/catalogService';
-import { MercadoPagoCheckoutModal } from '../../components/common/MercadoPagoCheckoutModal';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  Package,
+  Sparkles,
+  CheckCircle2,
+  ShieldCheck,
+  ArrowRight,
+  Truck,
+  MessageCircle,
+  Bell,
+  Clock,
+  Star,
+  Layers,
+  Heart
+} from 'lucide-react';
+import { CATALOG_LOJINHA } from '../../services/catalogService';
 
 interface LojaViewProps {
-  onOpenBooking?: () => void;
+  onOpenBooking?: (serviceId?: string) => void;
 }
 
-export const LojaView: React.FC<LojaViewProps> = () => {
-  const [selectedProduct, setSelectedProduct] = useState<LojinhaProduct | null>(null);
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
+/**
+ * Componente utilitário para animação suave de subida ao rolar a página (como nuvens)
+ */
+const RevealOnScroll: React.FC<{
+  children: React.ReactNode;
+  delayMs?: number;
+  className?: string;
+}> = ({ children, delayMs = 0, className = '' }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const domRef = useRef<HTMLDivElement>(null);
 
-  const product = CATALOG_LOJINHA[0];
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+    );
 
-  const handleBuy = (item: LojinhaProduct) => {
-    setSelectedProduct(item);
-    setCheckoutOpen(true);
+    const current = domRef.current;
+    if (current) observer.observe(current);
+
+    return () => {
+      if (current) observer.unobserve(current);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={domRef}
+      style={{ transitionDelay: `${delayMs}ms` }}
+      className={`transition-all duration-1000 ease-out transform ${
+        isVisible
+          ? 'opacity-100 translate-y-0 scale-100'
+          : 'opacity-0 translate-y-10 scale-[0.99]'
+      } ${className}`}
+    >
+      {children}
+    </div>
+  );
+};
+
+// 9 Fotos Oficiais do Box Semeadura fornecidas pelo usuário
+const BOX_SEMEADURA_PHOTOS = [
+  'https://static.wixstatic.com/media/02c8e0_ba9bbb820abf45ceaf08609f65cdd001~mv2.jpeg',
+  'https://static.wixstatic.com/media/02c8e0_bffe59c202114da5976eac816b4d7f14~mv2.jpeg',
+  'https://static.wixstatic.com/media/02c8e0_9dd6cf6b3ee04b91abaf08201cb06526~mv2.jpeg',
+  'https://static.wixstatic.com/media/02c8e0_2086a601c1f7408bbd79045e0d8d7cfd~mv2.jpeg',
+  'https://static.wixstatic.com/media/02c8e0_1f8e06ce84064aaca200e427d51066fc~mv2.jpeg',
+  'https://static.wixstatic.com/media/02c8e0_e7e4c5ed222845cdac78fe934a92429b~mv2.jpeg',
+  'https://static.wixstatic.com/media/02c8e0_7b018edeb5574a28bd5dc9093f2a0b7e~mv2.jpeg',
+  'https://static.wixstatic.com/media/02c8e0_6dd7990883014184bb6c9bf76a7fbff2~mv2.jpeg',
+  'https://static.wixstatic.com/media/02c8e0_44566d2ebbd841d9811abe172df16624~mv2.jpeg'
+];
+
+// Dados dos 4 Produtos Oficiais da Lojinha (Extensível para novos itens)
+const STORE_PRODUCTS = [
+  {
+    id: 'box-semeadura',
+    title: 'Box SEMEADURA',
+    collectionName: 'COLEÇÃO RITOS DO UNIVERSO',
+    collectionDescription: 'Feita para você despertar o seu florescer ASTRAL em uma jornada de crescimento e transformação. A Box Semeadura celebra a abertura do ano novo astrológico com itens curados para ritualizar intenções de renovação.',
+    description: 'A box semeadura é um convite para você semear novos caminhos ritualizando a chegada do ano novo astrológico. Mais do que uma curadoria de produtos, é um portal para o autoconhecimento e para sua renovação.',
+    status: 'sold_out',
+    statusBadge: 'Esgotado',
+    price: 147,
+    priceFormatted: 'R$ 147,00',
+    images: BOX_SEMEADURA_PHOTOS,
+    boxItems: [
+      '3 incensos de alecrim naturais (sem carvão);',
+      '1 incensário artesanal de pedras naturais (citrino);',
+      '2 mini velas laranjas para conexão solar;',
+      '1 vela de proteção com sal grosso;',
+      '1 kit prosperidade (pirita e citrino) com saquinho de organza;',
+      '1 mini buquê ornamental de ervas;',
+      '1 ebook sobre o ano novo astrológico e manual explicativo;',
+      '1 playlist personalizada para acompanhar o seu ritual.'
+    ]
+  },
+  {
+    id: 'box-acolhimento',
+    title: 'Box ACOLHIMENTO',
+    collectionName: 'COLEÇÃO RITOS DO UNIVERSO',
+    collectionDescription: 'O segundo capítulo da Coleção Ritos do Universo. Um mergulho no elemento Água e na energia lunar para nutrir emoções, fortalecer o autocuidado e acolher suas vulnerabilidades.',
+    description: 'Um convite ao recolhimento e à nutrição da alma. Elementos aromáticos, infusões botânicas e rituais de restauração energética para acalmar a mente e honrar seus sentimentos mais profundos.',
+    status: 'coming_soon',
+    statusBadge: 'Em Breve',
+    price: 147,
+    priceFormatted: 'R$ 147,00 (Previsão)',
+    romanNumeral: 'II',
+    teaserText: 'Em breve disponível na Lojinha Casa 6.',
+    boxItems: [
+      'Velas botânicas aromáticas com óleos essenciais relaxantes;',
+      'Banho de ervas calmantes para purificação áurica;',
+      'Cristal de quartzo rosa lapidado para ancoragem do afeto;',
+      'Guia de rituais lunares de acolhimento e perdão;',
+      'Acesso à meditação guiada de conexão com a criança interior.'
+    ]
+  },
+  {
+    id: 'box-crescimento',
+    title: 'Box CRESCIMENTO',
+    collectionName: 'COLEÇÃO RITOS DO UNIVERSO',
+    collectionDescription: 'A terceira fase da colheita astrológica. Alinhada ao elemento Terra e Fogo, estimula o florescimento de planos, a fertilidade de novos projetos e a expansão de metas.',
+    description: 'A energia da germinação e do desenvolvimento prático. Amuletos, essências revigorantes e ferramentas de planejamento astral para dar forma e firmeza às suas realizações na vida real.',
+    status: 'coming_soon',
+    statusBadge: 'Em Breve',
+    price: 147,
+    priceFormatted: 'R$ 147,00 (Previsão)',
+    romanNumeral: 'III',
+    teaserText: 'Em preparação para o próximo ciclo astrológico.',
+    boxItems: [
+      'Incensos artesanais de canela e louro para atração e foco;',
+      'Pedra pirita bruta para materialização de objetivos;',
+      'Caderno de intenções e metas astrais;',
+      'Essência botânica energizante para o ambiente de trabalho;',
+      'Áudio explicativo sobre os trânsitos de expansão.'
+    ]
+  },
+  {
+    id: 'box-celebracao',
+    title: 'Box CELEBRAÇÃO',
+    collectionName: 'COLEÇÃO RITOS DO UNIVERSO',
+    collectionDescription: 'A consagração e o encerramento do ciclo zodiacal. Rituais de gratidão pelas colheitas recebidas, limpeza de encerramento e celebração da própria trajetória.',
+    description: 'A celebração da colheita e da plenitude. Uma curadoria especial para agradecer conquistas, harmonizar energias e selar com luz os aprendizados do ciclo que se completa.',
+    status: 'coming_soon',
+    statusBadge: 'Em Breve',
+    price: 147,
+    priceFormatted: 'R$ 147,00 (Previsão)',
+    romanNumeral: 'IV',
+    teaserText: 'Edição comemorativa de final de ciclo.',
+    boxItems: [
+      'Vela dourada com essência festiva e brilho natural;',
+      'Incenso de mirra e olíbano para consagração;',
+      'Amuletos comemorativos da Casa 6;',
+      'Manual de ritualização de gratidão e transição;',
+      'Playlist especial de celebração astral.'
+    ]
+  }
+];
+
+export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
+  // Estado para foto ativa da galeria do Box Semeadura
+  const [activeSemeaduraPhoto, setActiveSemeaduraPhoto] = useState<number>(0);
+
+  // Ação de WhatsApp para Notificação de Estoque / Lista de Espera
+  const handleWhatsAppNotify = (productTitle: string, isSoldOut: boolean = false) => {
+    if (onOpenBooking) {
+      onOpenBooking(`lojinha-${productTitle.toLowerCase().replace(/\s+/g, '-')}`);
+    } else {
+      const message = isSoldOut
+        ? `Olá Bianca! Gostaria de ser avisado(a) quando a ${productTitle} tiver novo estoque disponível na Lojinha Casa 6.`
+        : `Olá Bianca! Gostaria de entrar na lista de espera para o lançamento da ${productTitle} na Lojinha Casa 6.`;
+      const url = `https://wa.me/5511980295452?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
+    }
   };
 
   return (
-    <div className="bg-[#F4EFE6] text-[#2B2566] min-h-screen py-12 sm:py-16 px-4 sm:px-6 lg:px-8 space-y-12">
-      <div className="max-w-6xl mx-auto space-y-12">
-        
-        {/* Header Institucional */}
-        <div className="text-center space-y-3 max-w-3xl mx-auto">
-          <div className="flex justify-center pb-1">
-            <img
-              src="https://static.wixstatic.com/media/02c8e0_75b529b0748c4e54adf4e58bfa7c78dc~mv2.png"
-              alt="Casa 6"
-              className="h-10 w-auto object-contain"
-            />
-          </div>
-          <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#8C987F]">
-            LOJINHA OFICIAL CASA 6 • RITUAIS & OBJETOS
-          </span>
-          <h1 className="font-heading text-4xl sm:text-6xl font-extrabold text-[#2B2566] tracking-tight">
-            Lojinha Casa 6
-          </h1>
-          <p className="text-sm sm:text-base text-[#423C7B] leading-relaxed">
-            Curadorias rituais e amuletos desenhados para materializar os ciclos astrológicos na sua rotina com sensibilidade e presença.
-          </p>
-        </div>
-
-        {/* Card Destaque: Box SEMEADURA */}
-        <div className="bg-[#FCFAF7] rounded-sm border border-[#DAD2C4] shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 font-sans">
-          
-          {/* Imagem Oficial da Box */}
-          <div className="lg:col-span-6 bg-[#2B2566]/5 relative flex items-center justify-center border-b lg:border-b-0 lg:border-r border-[#DAD2C4] p-6 sm:p-10">
-            <div className="relative w-full aspect-4/3 rounded-sm overflow-hidden shadow-lg border border-[#DAD2C4] bg-white">
-              <img
-                src={product.image}
-                alt={product.title}
-                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              />
-              <span className="absolute top-3 left-3 bg-[#1b1463] text-[#F0B55E] text-xs font-bold px-3 py-1 rounded-sm uppercase tracking-wider">
-                EDIÇÃO LIMITADA
-              </span>
-            </div>
-          </div>
-
-          {/* Detalhamento Completo da Box */}
-          <div className="lg:col-span-6 p-6 sm:p-10 space-y-6 flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#C2593F] block">
-                  {product.collectionName}
-                </span>
-                <h2 className="font-heading text-3xl sm:text-4xl font-extrabold text-[#1b1463] tracking-tight">
-                  {product.title}
-                </h2>
-                <div className="font-heading text-3xl font-extrabold text-[#1b1463] pt-1">
-                  {product.priceFormatted}
-                </div>
-              </div>
-
-              <p className="text-xs sm:text-sm text-[#423C7B] leading-relaxed">
-                {product.description}
-              </p>
-
-              {/* Coleção Ritos do Universo */}
-              <div className="bg-white p-4 rounded-sm border border-[#DAD2C4] space-y-1.5 text-xs text-[#534D6B]">
-                <p className="font-bold text-[#1b1463] uppercase tracking-wider text-[11px]">
-                  Sobre a {product.collectionName}:
-                </p>
-                <p className="leading-relaxed">
-                  {product.collectionDescription}
-                </p>
-              </div>
-
-              {/* Conteúdo da Box */}
-              <div className="space-y-2 pt-1">
-                <p className="text-xs font-bold uppercase tracking-wider text-[#1b1463] flex items-center gap-1.5">
-                  <Package className="h-4 w-4 text-[#F0B55E]" />
-                  <span>CONTEÚDO DA BOX:</span>
-                </p>
-                <ul className="space-y-1.5 text-xs text-[#534D6B]">
-                  {product.boxItems.map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-[#25D366] shrink-0 mt-0.5" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            {/* Ação de Compra */}
-            <div className="pt-6 border-t border-[#DAD2C4] space-y-3">
-              <div className="flex items-center gap-2 text-xs text-[#8C987F]">
-                <Truck className="h-4 w-4 text-[#1b1463]" />
-                <span>Envio para todo o Brasil com cálculo de frete por CEP na próxima etapa.</span>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => handleBuy(product)}
-                className="w-full flex items-center justify-center gap-2.5 rounded-sm bg-[#1b1463] hover:bg-[#2B2566] text-[#F0B55E] py-4 px-8 text-sm font-extrabold uppercase tracking-wider shadow-lg transition-all cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
-              >
-                <Sparkles className="h-4 w-4 text-[#F0B55E]" />
-                <span>COMPRAR BOX SEMEADURA ({product.priceFormatted})</span>
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-
-          </div>
-        </div>
-
-        {/* Garantia e Informações de Entrega */}
-        <div className="rounded-sm bg-[#FCFAF7] border border-[#DAD2C4] p-5 text-center flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-[#534D6B] font-sans">
-          <ShieldCheck className="h-5 w-5 text-[#25D366] shrink-0" />
-          <span>
-            Compra 100% segura com <strong>Mercado Pago Oficial</strong>. Coleta de endereço com preenchimento automático por CEP e código de rastreamento enviado por e-mail e WhatsApp.
-          </span>
-        </div>
-
+    <div className="bg-[#FAF8F5] text-[#2B2566] min-h-screen py-10 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 font-sans overflow-hidden relative">
+      
+      {/* Elementos Cósmicos Decorativos Efémeros ao Fundo */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+        <div className="absolute top-20 right-[-80px] w-96 h-96 rounded-full border border-[#F0B55E]/15 opacity-40 animate-celestial-orbit-slow" />
+        <div className="absolute top-1/2 left-[-100px] w-[500px] h-[500px] rounded-full border border-[#8C987F]/10 opacity-50 animate-celestial-orbit-reverse" />
+        <div className="absolute top-36 left-12 text-[#F0B55E]/40 text-xs animate-pulse">✦</div>
+        <div className="absolute bottom-48 right-1/4 text-[#8C987F]/30 text-[10px]">★</div>
       </div>
 
-      {/* Modal de Checkout Mercado Pago */}
-      {selectedProduct && (
-        <MercadoPagoCheckoutModal
-          isOpen={checkoutOpen}
-          onClose={() => setCheckoutOpen(false)}
-          serviceType="loja"
-          itemTitle={`${selectedProduct.title} — ${selectedProduct.collectionName}`}
-          amount={selectedProduct.price}
-          customerData={{
-            firstName: '',
-            lastName: '',
-            email: '',
-            whatsapp: ''
-          }}
-          onSuccess={() => {
-            setCheckoutOpen(false);
-          }}
-        />
-      )}
+      <div className="mx-auto max-w-5xl space-y-12 sm:space-y-16 relative z-10">
+        
+        {/* =========================================================================
+            HEADER INSTITUCIONAL & E-COMMERCE (SEM LOGO, LEVE E SOFISTICADO)
+            ========================================================================= */}
+        <RevealOnScroll delayMs={50}>
+          <div className="max-w-3xl mx-auto text-center space-y-3">
+            <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#8C987F] block">
+              LOJINHA OFICIAL CASA 6 • RITUAIS & OBJETOS
+            </span>
+            <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-[#2B2566] tracking-tight">
+              Lojinha Casa 6
+            </h1>
+            
+            {/* Linha-Ponto do Brand Guide */}
+            <div className="flex items-center justify-center gap-3 py-1">
+              <span className="w-12 h-px bg-[#2B2566]/20" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#F0B55E]" />
+              <span className="w-20 h-px bg-[#2B2566]/20" />
+            </div>
+
+            <p className="text-xs sm:text-sm md:text-[15px] text-[#423C7B] leading-relaxed font-normal">
+              Curadorias rituais e amuletos desenhados para materializar os ciclos astrológicos na sua rotina com sensibilidade, presença e beleza.
+            </p>
+          </div>
+        </RevealOnScroll>
+
+        {/* =========================================================================
+            BANNER INFORMATIVO DE PRODUÇÃO ARTESANAL & PRÓXIMOS LANÇAMENTOS
+            ========================================================================= */}
+        <RevealOnScroll delayMs={80}>
+          <div className="bg-white/80 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left shadow-[0_6px_20px_rgba(43,37,102,0.02)]">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#F0B55E]/15 flex items-center justify-center text-[#F0B55E] shrink-0">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <div className="space-y-0.5">
+                <h4 className="font-heading text-sm font-bold text-[#2B2566]">
+                  Lotes Artesanais & Edições Limitadas
+                </h4>
+                <p className="text-xs text-[#534D6B]">
+                  Nossas boxes são produzidas em tiragens exclusivas e numeradas para preservar a energia e qualidade de cada elemento.
+                </p>
+              </div>
+            </div>
+
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FAF8F5] border border-[#EADBCC] text-[11px] font-semibold text-[#8C987F] shrink-0">
+              <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
+              <span>4 Produtos Cadastrados</span>
+            </div>
+          </div>
+        </RevealOnScroll>
+
+        {/* =========================================================================
+            LISTAGEM DOS 4 PRODUTOS: 1 PRODUTO POR LINHA (STACKED HORIZONTAL CARDS)
+            ========================================================================= */}
+        <div className="space-y-8 sm:space-y-10">
+          
+          {/* ---------------------------------------------------------------------
+              PRODUTO 1: BOX SEMEADURA (ESGOTADO / AVISE-ME NO WHATSAPP)
+              --------------------------------------------------------------------- */}
+          <RevealOnScroll delayMs={100}>
+            <div className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl lg:rounded-[32px] border border-[#EADBCC]/70 shadow-[0_16px_40px_rgba(43,37,102,0.04)] hover:shadow-[0_20px_50px_rgba(43,37,102,0.07)] transition-all duration-500 overflow-hidden p-6 sm:p-8 lg:p-10">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 items-center">
+                
+                {/* Coluna da Imagem & Galeria de Miniaturas (9 fotos) */}
+                <div className="lg:col-span-6 space-y-3">
+                  {/* Foto Principal com Badge Esgotado */}
+                  <div className="relative w-full aspect-4/3 rounded-2xl overflow-hidden border border-[#EADBCC]/60 bg-black/5 shadow-sm group">
+                    <img
+                      src={BOX_SEMEADURA_PHOTOS[activeSemeaduraPhoto]}
+                      alt="Box SEMEADURA — Casa 6"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-104"
+                    />
+                    
+                    {/* Tag Esgotado em Destaque */}
+                    <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-[#C2593F] text-white px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider shadow-md">
+                      <span>ESGOTADO</span>
+                    </div>
+
+                    {/* Tag Coleção */}
+                    <div className="absolute top-3 right-3 bg-[#2B2566]/85 backdrop-blur-xs text-[#F0B55E] px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-[#F0B55E]/30">
+                      1ª Edição
+                    </div>
+
+                    <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded-md bg-black/60 text-white text-[10px] backdrop-blur-xs">
+                      Foto {activeSemeaduraPhoto + 1} de {BOX_SEMEADURA_PHOTOS.length}
+                    </div>
+                  </div>
+
+                  {/* Grid de Miniaturas Interativas (9 fotos) */}
+                  <div className="grid grid-cols-9 gap-1.5 sm:gap-2">
+                    {BOX_SEMEADURA_PHOTOS.map((thumbUrl, tIdx) => (
+                      <button
+                        key={tIdx}
+                        type="button"
+                        onClick={() => setActiveSemeaduraPhoto(tIdx)}
+                        className={`aspect-square rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
+                          activeSemeaduraPhoto === tIdx
+                            ? 'border-[#F0B55E] scale-105 shadow-sm'
+                            : 'border-[#EADBCC]/70 opacity-60 hover:opacity-100 hover:border-[#2B2566]/40'
+                        }`}
+                        title={`Ver foto ${tIdx + 1}`}
+                      >
+                        <img
+                          src={thumbUrl}
+                          alt={`Miniatura ${tIdx + 1}`}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Coluna de Detalhes, Preço e Botão "Avise-me quando chegar" */}
+                <div className="lg:col-span-6 space-y-4 sm:space-y-5 text-center lg:text-left flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#C2593F] block">
+                        COLEÇÃO RITOS DO UNIVERSO
+                      </span>
+                      <h2 className="font-heading text-3xl sm:text-4xl font-bold text-[#2B2566] leading-tight tracking-tight">
+                        Box SEMEADURA
+                      </h2>
+                      <div className="flex items-center justify-center lg:justify-start gap-3 pt-1">
+                        <span className="font-heading text-3xl font-extrabold text-[#2B2566]">
+                          R$ 147,00
+                        </span>
+                        <span className="text-xs text-[#C2593F] font-bold bg-[#C2593F]/10 px-2.5 py-0.5 rounded-full">
+                          Lote Esgotado
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="text-xs sm:text-sm text-[#423C7B] leading-relaxed">
+                      A Box Semeadura é um convite para você semear novos caminhos ritualizando a chegada do ano novo astrológico. Mais do que uma curadoria de produtos, é um portal de autoconhecimento e renovação.
+                    </p>
+
+                    {/* Conteúdo da Box */}
+                    <div className="space-y-2 pt-2 border-t border-[#EADBCC]/50 text-left">
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-[#2B2566] flex items-center gap-1.5">
+                        <Package className="h-3.5 w-3.5 text-[#F0B55E]" />
+                        <span>O QUE ACOMPANHA A BOX:</span>
+                      </p>
+                      <ul className="space-y-1 text-xs text-[#534D6B]">
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-[#25D366] shrink-0 mt-0.5" />
+                          <span>3 incensos naturais de alecrim (sem carvão) + incensário de citrino</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-[#25D366] shrink-0 mt-0.5" />
+                          <span>Kit prosperidade (pirita e citrino) + 2 mini velas laranjas + vela de sal grosso</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-[#25D366] shrink-0 mt-0.5" />
+                          <span>Ebook exclusivo com manual ritualístico e playlist personalizada</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Botão Oficial: Avise-me quando chegar */}
+                  <div className="pt-4 border-t border-[#EADBCC]/60 space-y-2">
+                    <div className="flex items-center justify-center lg:justify-start gap-2 text-xs text-[#8C987F]">
+                      <Truck className="h-4 w-4 text-[#2B2566]" />
+                      <span>Envio nacional via Correios/Transportadora com rastreamento.</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleWhatsAppNotify('Box SEMEADURA', true)}
+                      className="w-full py-3.5 px-6 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 whitespace-nowrap"
+                    >
+                      <Bell className="h-4 w-4 fill-white" />
+                      <span>AVISE-ME QUANDO CHEGAR</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                    <span className="text-[11px] text-[#8C987F] block text-center lg:text-left">
+                      Receba uma notificação em primeira mão pelo WhatsApp quando abrirmos o próximo lote.
+                    </span>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </RevealOnScroll>
+
+          {/* ---------------------------------------------------------------------
+              PRODUTOS 2, 3 E 4: BOXES ACOLHIMENTO, CRESCIMENTO E CELEBRAÇÃO
+              (EM BREVE / COM FUNDO DA CARTA DE TARÔ DA HOME & EFEITO PULSANTE)
+              --------------------------------------------------------------------- */}
+          {STORE_PRODUCTS.slice(1).map((item, idx) => (
+            <RevealOnScroll key={item.id} delayMs={140 + idx * 60}>
+              <div className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl lg:rounded-[32px] border border-[#EADBCC]/70 shadow-[0_16px_40px_rgba(43,37,102,0.04)] hover:shadow-[0_20px_50px_rgba(43,37,102,0.07)] transition-all duration-500 overflow-hidden p-6 sm:p-8 lg:p-10">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 items-center">
+                  
+                  {/* Coluna da Imagem: Fundo Oficial da Carta de Tarô da Página Inicial com Efeito Pulsante */}
+                  <div className="lg:col-span-6 flex items-center justify-center">
+                    <div className="relative w-full aspect-4/3 sm:aspect-16/10 rounded-2xl overflow-hidden shadow-lg border-2 border-[#F0B55E]/40 bg-[#2B2566] text-white flex flex-col items-center justify-center p-6 text-center select-none group">
+                      
+                      {/* Órbitas e Linhas Circulares Sutis do Brand Guide (idêntico ao FlipTarotCard) */}
+                      <div className="absolute inset-0 opacity-25 pointer-events-none flex items-center justify-center">
+                        <svg className="w-96 h-96" viewBox="0 0 200 200" fill="none">
+                          <circle cx="100" cy="100" r="90" stroke="#F0B55E" strokeWidth="0.8" strokeDasharray="3 3" />
+                          <circle cx="100" cy="100" r="70" stroke="#F0B55E" strokeWidth="0.5" />
+                          <circle cx="100" cy="100" r="45" stroke="#F0B55E" strokeWidth="0.8" strokeDasharray="2 4" />
+                        </svg>
+                      </div>
+
+                      {/* Borda Dupla Estilizada Clássica de Tarô */}
+                      <div className="absolute inset-2.5 rounded-xl border border-[#F0B55E]/30 pointer-events-none" />
+
+                      {/* Brilho Dourado Pulsante ao Fundo */}
+                      <div className="absolute inset-0 bg-radial from-[#F0B55E]/15 via-transparent to-transparent pointer-events-none animate-pulse duration-[3000ms]" />
+
+                      {/* Conteúdo Central da Carta de Tarô */}
+                      <div className="relative z-10 space-y-3 flex flex-col items-center">
+                        {/* Número Romano */}
+                        <span className="font-heading tracking-widest text-lg font-bold text-[#F0B55E]">
+                          {item.romanNumeral}
+                        </span>
+
+                        {/* Favicon da Casa 6 no Centro */}
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 backdrop-blur-xs border border-[#F0B55E]/40 p-3 flex items-center justify-center shadow-lg transition-transform duration-500 group-hover:scale-110">
+                          <img
+                            src="https://static.wixstatic.com/media/02c8e0_75b529b0748c4e54adf4e58bfa7c78dc~mv2.png"
+                            alt="Casa 6"
+                            className="w-full h-full object-contain filter drop-shadow-xs"
+                          />
+                        </div>
+
+                        {/* Badge Pulsante "EM BREVE" com Aviso */}
+                        <div className="space-y-1">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F0B55E] text-[#2B2566] text-xs font-extrabold uppercase tracking-widest shadow-md animate-pulse">
+                            <Sparkles className="h-3.5 w-3.5 fill-[#2B2566]" />
+                            <span>EM BREVE</span>
+                          </span>
+
+                          <span className="text-[11px] text-[#E6E3F1]/80 block pt-1">
+                            ✦ Logo logo teremos novos produtos aqui!
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Estrelas Decorativas nos Cantos */}
+                      <div className="absolute top-4 left-4 text-[#F0B55E]/50 text-xs">✦</div>
+                      <div className="absolute top-4 right-4 text-[#F0B55E]/50 text-xs">★</div>
+                      <div className="absolute bottom-4 left-4 text-[#F0B55E]/50 text-xs">★</div>
+                      <div className="absolute bottom-4 right-4 text-[#F0B55E]/50 text-xs">✦</div>
+                    </div>
+                  </div>
+
+                  {/* Coluna de Detalhes, Previsão e Botão "Entrar na Lista de Espera" */}
+                  <div className="lg:col-span-6 space-y-4 sm:space-y-5 text-center lg:text-left flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C987F] block">
+                          {item.collectionName}
+                        </span>
+                        <h3 className="font-heading text-3xl sm:text-4xl font-bold text-[#2B2566] leading-tight tracking-tight">
+                          {item.title}
+                        </h3>
+                        <div className="flex items-center justify-center lg:justify-start gap-3 pt-1">
+                          <span className="font-heading text-2xl sm:text-3xl font-extrabold text-[#2B2566]">
+                            {item.priceFormatted}
+                          </span>
+                          <span className="text-xs text-[#8C987F] font-bold bg-[#FAF8F5] border border-[#EADBCC] px-2.5 py-0.5 rounded-full">
+                            Próximo Lançamento
+                          </span>
+                        </div>
+                      </div>
+
+                      <p className="text-xs sm:text-sm text-[#423C7B] leading-relaxed">
+                        {item.description}
+                      </p>
+
+                      {/* Prévia do Conteúdo */}
+                      {item.boxItems && (
+                        <div className="space-y-1.5 pt-2 border-t border-[#EADBCC]/50 text-left">
+                          <p className="text-[11px] font-bold uppercase tracking-wider text-[#2B2566] flex items-center gap-1.5">
+                            <Sparkles className="h-3.5 w-3.5 text-[#F0B55E]" />
+                            <span>PRÉVIA DOS ITENS EM CRIAÇÃO:</span>
+                          </p>
+                          <ul className="space-y-1 text-xs text-[#534D6B]">
+                            {item.boxItems.slice(0, 3).map((feat, fIdx) => (
+                              <li key={fIdx} className="flex items-start gap-2">
+                                <span className="text-[#F0B55E] font-bold">•</span>
+                                <span>{feat}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Botão Oficial: Entrar na Lista de Espera */}
+                    <div className="pt-4 border-t border-[#EADBCC]/60 space-y-2">
+                      <div className="flex items-center justify-center lg:justify-start gap-2 text-xs text-[#8C987F]">
+                        <Clock className="h-4 w-4 text-[#F0B55E]" />
+                        <span>{item.teaserText}</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleWhatsAppNotify(item.title, false)}
+                        className="w-full py-3.5 px-6 rounded-full border border-[#F0B55E] hover:bg-[#F0B55E]/10 text-[#2B2566] font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 whitespace-nowrap"
+                      >
+                        <MessageCircle className="h-4 w-4 text-[#F0B55E]" />
+                        <span>ENTRAR NA LISTA DE ESPERA VIA WHATSAPP</span>
+                        <ArrowRight className="h-4 w-4 text-[#F0B55E]" />
+                      </button>
+                      <span className="text-[11px] text-[#8C987F] block text-center lg:text-left">
+                        Garanta prioridade de compra e desconto exclusivo no primeiro lote.
+                      </span>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </RevealOnScroll>
+          ))}
+
+        </div>
+
+        {/* =========================================================================
+            RODAPÉ DE CONFIANÇA & EXPERIÊNCIA DE COMPRA SEGURA
+            ========================================================================= */}
+        <RevealOnScroll delayMs={240}>
+          <div className="rounded-3xl bg-white/90 backdrop-blur-xs border border-[#EADBCC]/60 p-6 sm:p-8 text-center flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_10px_30px_rgba(43,37,102,0.03)]">
+            <div className="flex items-center gap-4 text-left">
+              <div className="w-12 h-12 rounded-2xl bg-[#25D366]/10 flex items-center justify-center text-[#25D366] shrink-0">
+                <ShieldCheck className="h-6 w-6" />
+              </div>
+              <div className="space-y-0.5">
+                <h4 className="font-heading text-sm sm:text-base font-bold text-[#2B2566]">
+                  Compra Segura & Atendimento Personalizado
+                </h4>
+                <p className="text-xs text-[#534D6B]">
+                  Pagamento protegido com Mercado Pago Oficial, código de rastreamento enviado por WhatsApp e canal aberto diretamente com a Bianca.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => handleWhatsAppNotify('Lojinha Casa 6')}
+              className="px-6 py-3 rounded-full bg-[#2B2566] hover:bg-[#1E1B4B] text-white text-xs font-bold uppercase tracking-wider transition-all shrink-0 cursor-pointer shadow-sm hover:shadow-md"
+            >
+              Tirar Dúvidas sobre Produtos
+            </button>
+          </div>
+        </RevealOnScroll>
+
+      </div>
     </div>
   );
 };
