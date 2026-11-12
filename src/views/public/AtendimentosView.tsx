@@ -274,8 +274,8 @@ export const AtendimentosView: React.FC<AtendimentosViewProps> = () => {
             email: '',
             whatsapp: ''
           }}
-          onSuccess={() => {
-            setSelectedProduct(null);
+          onSuccess={(orderId) => {
+            trackAnalyticsEvent('checkout_complete', { service: 'atendimento', orderId });
           }}
         />
       )}

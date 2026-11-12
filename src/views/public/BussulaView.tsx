@@ -622,9 +622,8 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
             state
           }
         }}
-        onSuccess={() => {
-          setCheckoutOpen(false);
-          window.location.href = '/membros';
+        onSuccess={(orderId) => {
+          trackAnalyticsEvent('checkout_complete', { service: 'bussula', orderId });
         }}
       />
 

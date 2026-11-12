@@ -326,31 +326,47 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
       setConfirmedVoucher(orderVoucher);
       setConfirmedBonus(bonusCode);
 
-      // (A) Canal Síncrono Aprovado Imediato
+      // (A) Canal Síncrono Aprovado Imediato: Mantém na modal e avança para a Etapa 4
       if (result.status === 'approved') {
+        setIsProcessingPayment(false);
         setCurrentStep(4);
-        if (onSuccess) onSuccess(result.orderId);
+        if (onSuccess) {
+          try {
+            onSuccess(result.orderId);
+          } catch (e) {
+            console.warn('[onSuccess callback error]', e);
+          }
+        }
         return;
       }
 
-      // (B) Canal Pix Pendente (Exibe QR Code + Copia e Cola + Ativa Polling de 3s)
+      // (B) Canal Pix Pendente ou Análise da Operadora
       if (result.status === 'pending' || result.status === 'in_process') {
-        setPendingPaymentId(result.id);
-        const qr = result.point_of_interaction?.transaction_data?.qr_code || '';
-        const qrBase64 = result.point_of_interaction?.transaction_data?.qr_code_base64 || '';
+        setIsProcessingPayment(false);
+        if (formData.payment_method_id === 'pix' || result.point_of_interaction?.transaction_data?.qr_code) {
+          setPendingPaymentId(result.id);
+          const qr = result.point_of_interaction?.transaction_data?.qr_code || '';
+          const qrBase64 = result.point_of_interaction?.transaction_data?.qr_code_base64 || '';
 
-        setPixQrCode(qr);
-        setPixQrCodeBase64(qrBase64);
-        setIsPollingActive(true);
-        return;
+          setPixQrCode(qr);
+          setPixQrCodeBase64(qrBase64);
+          setIsPollingActive(true);
+          return;
+        } else {
+          // Cartão de crédito em análise da operadora: vai para a Etapa 4 confirmando a transação
+          setCurrentStep(4);
+          return;
+        }
       }
 
-      // (C) Rejeitado
+      // (C) Rejeitado pela Operadora
       if (result.status === 'rejected') {
-        setStepError('O pagamento não pôde ser aprovado pela operadora. Verifique os dados ou tente outro cartão.');
+        setIsProcessingPayment(false);
+        setStepError('A operadora do cartão não autorizou a transação. Verifique o limite disponível, os dados digitados ou tente via Pix.');
       }
     } catch (err: any) {
       console.error('[Mercado Pago Brick Submit Error]', err);
+      setIsProcessingPayment(false);
       setStepError(err.message || 'Falha ao processar o pagamento com o Mercado Pago.');
     } finally {
       setIsProcessingPayment(false);
@@ -572,7 +588,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
     }
   };
 
-  // Mensagem WhatsApp formatada
+  // Mensagem WhatsApp formatada com todos os dados da transação
   const getWhatsAppApprovedMessage = () => {
     const fullName = `${firstName.trim()} ${lastName.trim()}`;
     if (isLoja) {
@@ -586,17 +602,43 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
         `📍 Endereço de Envio:\n` +
         `${street}, nº ${number}${complement ? ` - ${complement}` : ''}\n` +
         `Bairro: ${neighborhood} - ${city}/${state} (CEP: ${cep})\n` +
-        (shippingNotes ? `Obs: ${shippingNotes}\n` : '');
+        (shippingNotes ? `Obs: ${shippingNotes}\n` : '') +
+        `\nTransação aprovada com sucesso! Gostaria de confirmar meu pedido.`;
     }
 
-    return `Olá, Bianca! Fiz a adesão de "${itemTitle}" pelo site da Casa 6.\n\n` +
+    if (isPatota) {
+      return `Olá, Bianca! Acabei de realizar a assinatura da Patota Astral ("${itemTitle}") pelo site da Casa 6.\n\n` +
+        `• Pedido: #${confirmedOrderId}\n` +
+        `• Voucher Oficial: ${confirmedVoucher}\n` +
+        `• Valor: R$ ${amount.toFixed(2).replace('.', ',')}\n` +
+        `• Nome: ${fullName}\n` +
+        `• WhatsApp: ${whatsapp}\n` +
+        `• E-mail: ${email}\n` +
+        (cpf ? `• CPF: ${cpf}\n` : '') +
+        `\nTransação aprovada com sucesso! Gostaria de confirmar meu acesso ao grupo VIP da Patota Astral no WhatsApp.`;
+    }
+
+    if (serviceType === 'bussula') {
+      return `Olá, Bianca! Acabei de assinar a Bússola Guia ("${itemTitle}") pelo site da Casa 6.\n\n` +
+        `• Pedido: #${confirmedOrderId}\n` +
+        `• Voucher Oficial: ${confirmedVoucher}\n` +
+        `• Valor: R$ ${amount.toFixed(2).replace('.', ',')}\n` +
+        `• Nome: ${fullName}\n` +
+        `• WhatsApp: ${whatsapp}\n` +
+        `• E-mail: ${email}\n` +
+        (cpf ? `• CPF: ${cpf}\n` : '') +
+        `\nTransação aprovada com sucesso! Gostaria de receber minhas orientações astrais no WhatsApp.`;
+    }
+
+    return `Olá, Bianca! Acabei de realizar o pagamento de "${itemTitle}" pelo site da Casa 6.\n\n` +
       `• Pedido: #${confirmedOrderId}\n` +
-      `• Voucher: ${confirmedVoucher}\n` +
+      `• Voucher Oficial: ${confirmedVoucher}\n` +
+      `• Valor: R$ ${amount.toFixed(2).replace('.', ',')}\n` +
       `• Nome: ${fullName}\n` +
       `• WhatsApp: ${whatsapp}\n` +
       `• E-mail: ${email}\n` +
-      `• CPF: ${cpf}\n\n` +
-      `Pode confirmar meu acesso à Patota Astral?`;
+      (cpf ? `• CPF: ${cpf}\n` : '') +
+      `\nTransação aprovada com sucesso! Gostaria de confirmar meu agendamento no WhatsApp.`;
   };
 
   const patotaGroupInviteUrl = 'https://chat.whatsapp.com/invite/patota-astral-casa6-oficial';
@@ -609,6 +651,32 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
     >
       {/* Container Principal: Cantos Retos (rounded-sm) e Visual Sóbrio */}
       <div className="relative w-full max-w-xl rounded-sm bg-[#FCFAF7] border border-[#D5CEBF] shadow-2xl overflow-hidden flex flex-col max-h-[94vh] checkout-modal font-sans">
+        
+        {/* =========================================================================
+            OVERLAY DE PROCESSAMENTO SEGURO (MANTÉM A TELA VISÍVEL SEM DESAPARECER)
+            ========================================================================= */}
+        {isProcessingPayment && (
+          <div className="absolute inset-0 bg-[#FCFAF7]/95 backdrop-blur-xs z-50 flex flex-col items-center justify-center p-6 text-center space-y-4 animate-in fade-in duration-200">
+            <div className="w-16 h-16 rounded-full bg-[#F0B55E]/15 border-2 border-[#F0B55E] flex items-center justify-center shadow-md animate-pulse">
+              <Loader2 className="h-8 w-8 animate-spin text-[#F0B55E]" />
+            </div>
+            <div className="space-y-1.5 max-w-sm">
+              <span className="text-[10px] uppercase font-bold tracking-widest text-[#F0B55E]">
+                Comunicação Criptografada
+              </span>
+              <h4 className="text-base sm:text-lg font-bold text-[#2B2566]">
+                Processando Transação...
+              </h4>
+              <p className="text-xs text-[#423C7B] leading-relaxed">
+                Estamos validando os dados com a operadora do seu cartão e o Mercado Pago. Por favor, <strong>não feche nem recarregue esta janela</strong>.
+              </p>
+            </div>
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#12BB40] bg-green-50 px-3.5 py-1.5 rounded-full border border-green-200 shadow-xs">
+              <Lock className="h-3.5 w-3.5" />
+              <span>Ambiente Seguro Criptografado PCI-DSS</span>
+            </div>
+          </div>
+        )}
         
         {/* =========================================================================
             HEADER OFICIAL CASA 6 (FONTES SÓBRIAS E CANTOS RETOS)
@@ -1356,30 +1424,46 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
               ===================================================================== */}
           {currentStep === 4 && (
             <div className="text-center py-3 space-y-4 font-sans">
-              <div className="w-12 h-12 rounded-sm bg-[#12BB40]/15 text-[#12BB40] mx-auto flex items-center justify-center border border-[#12BB40]/30">
-                <CheckCircle className="h-7 w-7 text-[#12BB40]" />
+              <div className="w-14 h-14 rounded-full bg-[#12BB40]/15 text-[#12BB40] mx-auto flex items-center justify-center border-2 border-[#12BB40] shadow-sm animate-in zoom-in-75 duration-300">
+                <CheckCircle className="h-8 w-8 text-[#12BB40]" />
               </div>
 
-              <div className="space-y-1">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-[#12BB40]">
-                  PAGAMENTO APROVADO & CONFIRMADO
-                </span>
+              <div className="space-y-1.5">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 border border-green-200">
+                  <span className="w-2 h-2 rounded-full bg-[#12BB40] animate-ping" />
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#12BB40]">
+                    TRANSAÇÃO CONCLUÍDA COM SUCESSO
+                  </span>
+                </div>
                 <h3 className="text-lg sm:text-xl font-bold text-[#2B2566] tracking-normal font-sans">
-                  {isPatota ? 'Bem-vinda(o) à Patota Astral!' : 'Compra Confirmada com Sucesso!'}
+                  {isPatota
+                    ? 'Assinatura Confirmada com Sucesso!'
+                    : serviceType === 'bussula'
+                    ? 'Bússola Guia Confirmada com Sucesso!'
+                    : isLoja
+                    ? 'Compra Confirmada com Sucesso!'
+                    : 'Atendimento Confirmado com Sucesso!'}
                 </h3>
                 <p className="text-xs text-[#423C7B] max-w-md mx-auto leading-relaxed">
                   {isPatota
-                    ? `Sua assinatura da Patota Astral foi confirmada (Pedido #${confirmedOrderId}). Seu acesso ao círculo mensal já está liberado!`
-                    : `Seu pedido #${confirmedOrderId} foi aprovado e o voucher oficial já está gerado.`}
+                    ? `Sua assinatura da Patota Astral foi aprovada com sucesso pela operadora (Pedido #${confirmedOrderId}). Seu voucher oficial está ativo e seu acesso liberado!`
+                    : `Sua transação do pedido #${confirmedOrderId} foi autorizada e aprovada com sucesso. Seu voucher oficial já foi gerado!`}
                 </p>
               </div>
 
-              {/* Cartão do Voucher e Bônus de 1ª Compra (Cantos Retos) */}
-              <div className="p-4 rounded-sm bg-gradient-to-br from-[#2B2566] to-[#362E7A] text-white text-left space-y-2 max-w-md mx-auto shadow-xs border border-[#F0B55E]/40 font-sans">
+              {/* Cartão do Voucher e Resumo Oficial da Transação (Cantos Retos e Elegante) */}
+              <div className="p-4 rounded-sm bg-gradient-to-br from-[#2B2566] to-[#362E7A] text-white text-left space-y-2 max-w-md mx-auto shadow-md border border-[#F0B55E]/40 font-sans">
                 <div className="flex items-center justify-between border-b border-white/10 pb-2">
                   <span className="text-xs text-[#E6E3F1]">Código do Voucher:</span>
                   <span className="font-mono text-sm font-bold text-[#F0B55E] tracking-wider">
                     {confirmedVoucher || 'C6261111-CONFIRMADO'}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span className="text-xs text-[#E6E3F1]">Número do Pedido:</span>
+                  <span className="font-mono text-xs font-semibold text-[#E6E3F1]">
+                    #{confirmedOrderId}
                   </span>
                 </div>
 
@@ -1401,6 +1485,19 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 </div>
 
                 <div className="flex items-center justify-between text-xs">
+                  <span className="text-[#E6E3F1]">Valor Pago:</span>
+                  <span className="font-bold text-[#F0B55E]">R$ {amount.toFixed(2).replace('.', ',')}</span>
+                </div>
+
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-[#E6E3F1]">Status da Transação:</span>
+                  <span className="inline-flex items-center gap-1 font-bold text-[#12BB40]">
+                    <Check className="h-3.5 w-3.5" />
+                    <span>Aprovado & Concluído</span>
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-xs">
                   <span className="text-[#E6E3F1]">E-mail Registrado:</span>
                   <span className="text-white truncate max-w-[180px]">{email}</span>
                 </div>
@@ -1413,27 +1510,29 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 )}
               </div>
 
-              {/* Botões de Ação no WhatsApp (Cantos Retos) */}
+              {/* Botões de Ação no WhatsApp: Direcionamento Imediato */}
               <div className="space-y-2.5 max-w-md mx-auto pt-1 font-sans">
-                {isLoja ? (
-                  <a
-                    href={`https://wa.me/${SITE_CONFIG.whatsappNumberRaw}?text=${encodeURIComponent(getWhatsAppApprovedMessage())}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-sm bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 px-5 text-xs uppercase tracking-wider shadow-xs transition-colors cursor-pointer"
-                  >
-                    <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
-                    <span>ENVIAR COMPROVANTE VIA WHATSAPP</span>
-                  </a>
-                ) : (
+                {/* Botão em Destaque Oficial: Direcionar para o WhatsApp */}
+                <a
+                  href={`https://wa.me/${SITE_CONFIG.whatsappNumberRaw}?text=${encodeURIComponent(getWhatsAppApprovedMessage())}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full inline-flex items-center justify-center gap-2.5 rounded-sm bg-[#25D366] hover:bg-[#20bd5a] active:scale-98 text-white font-bold py-3.5 px-5 text-xs sm:text-sm uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer"
+                >
+                  <MessageCircle className="h-5 w-5 fill-white text-[#25D366]" />
+                  <span>DIRECIONAR PARA O WHATSAPP</span>
+                </a>
+
+                {/* Se for Patota Astral, também exibe o botão direto do Grupo VIP */}
+                {isPatota && (
                   <a
                     href={patotaGroupInviteUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-sm bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 px-5 text-xs uppercase tracking-wider shadow-xs transition-colors cursor-pointer"
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-sm bg-[#128C7E] hover:bg-[#075E54] text-white font-semibold py-2.5 px-4 text-xs uppercase tracking-wider shadow-xs transition-colors cursor-pointer"
                   >
-                    <MessageCircle className="h-4 w-4 fill-white text-[#25D366]" />
-                    <span>ENTRAR NO GRUPO VIP DA PATOTA NO WHATSAPP</span>
+                    <span>Entrar no Grupo VIP da Patota no WhatsApp</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
                   </a>
                 )}
 

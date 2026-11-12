@@ -728,9 +728,8 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
             state
           }
         }}
-        onSuccess={() => {
-          setCheckoutOpen(false);
-          window.location.href = '/membros';
+        onSuccess={(orderId) => {
+          trackAnalyticsEvent('checkout_complete', { service: 'patota', orderId });
         }}
       />
 
