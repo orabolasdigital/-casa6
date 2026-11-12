@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Cookie } from 'lucide-react';
 import { SITE_CONFIG } from '../../config/site';
 
 interface FooterProps {
@@ -56,17 +56,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               Plataforma oficial de Bianca Tofoli: enfermeira, gestora, palestrante e astróloga. Consultas individuais de Mapa Natal, Bússola Guia, comunidade Patota Astral e palestras corporativas.
             </p>
 
-            {/* Selo de Cuidado */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#F0B55E]/30 bg-[#F0B55E]/10 text-[#F0B55E] text-[10px] font-bold tracking-wider uppercase">
-              <ShieldCheck className="h-3.5 w-3.5" />
-              <span>ATENDIMENTO & CUIDADO DESDE 2021</span>
-            </div>
-
-            {/* Redes Sociais Oficiais em Grande Destaque e Cores Vibrantes */}
-            <div className="pt-2 space-y-2.5">
-              <span className="block text-[10px] font-bold uppercase tracking-[0.18em] text-[#F0B55E]">
-                CONECTE-SE COM A CASA 6
-              </span>
+            {/* Redes Sociais Oficiais em Grande Destaque e Cores Vibrantes (Apenas Ícones) */}
+            <div className="pt-1">
               <div className="flex items-center gap-2.5">
                 {/* Instagram Oficial */}
                 <a
@@ -152,10 +143,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               ========================================================================= */}
           <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
             
-            {/* Coluna 1: Atendimentos e Serviços */}
+            {/* Coluna 1: Atendimentos */}
             <div className="space-y-3">
               <h3 className="font-bold text-xs uppercase tracking-wider text-[#F0B55E] border-b border-[#F0B55E]/20 pb-2">
-                Atendimentos e Serviços
+                Atendimentos
               </h3>
               <ul className="space-y-2.5 text-xs text-[#E6E3F1]/85">
                 <li>
@@ -201,10 +192,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               </ul>
             </div>
 
-            {/* Coluna 2: Palestras e Encontros */}
+            {/* Coluna 2: Encontros */}
             <div className="space-y-3">
               <h3 className="font-bold text-xs uppercase tracking-wider text-[#F0B55E] border-b border-[#F0B55E]/20 pb-2">
-                Palestras e Encontros
+                Encontros
               </h3>
               <ul className="space-y-2.5 text-xs text-[#E6E3F1]/85">
                 <li>
@@ -279,10 +270,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               </ul>
             </div>
 
-            {/* Coluna 4: Leituras, Lojinha & Membros */}
+            {/* Coluna 4: Conteúdos */}
             <div className="space-y-3">
               <h3 className="font-bold text-xs uppercase tracking-wider text-[#F0B55E] border-b border-[#F0B55E]/20 pb-2">
-                Conteúdo & Acesso
+                Conteúdos
               </h3>
               <ul className="space-y-2.5 text-xs text-[#E6E3F1]/85">
                 <li>
@@ -330,50 +321,81 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             ========================================================================= */}
         <div className="space-y-4 text-xs text-[#E6E3F1]/70">
           
+          {/* Linha 1: Copyright e Links de LGPD / Cookies / Privacidade */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
             <p className="text-[11px]">
               © {new Date().getFullYear()} {SITE_CONFIG.commercialName}. Todos os direitos reservados.
             </p>
 
+            {/* Links e Botão de LGPD / Consentimento de Cookies */}
+            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-x-4 gap-y-2 text-[11px]">
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new Event('open-casa6-cookies'))}
+                className="inline-flex items-center gap-1.5 text-[#E6E3F1]/80 hover:text-[#F0B55E] transition-colors cursor-pointer"
+              >
+                <Cookie className="h-3.5 w-3.5 text-[#F0B55E]" />
+                <span>Preferências de Cookies</span>
+              </button>
+              <span className="text-white/20 select-none">•</span>
+              <button
+                type="button"
+                onClick={() => onNavigate('/politica-de-privacidade')}
+                className="text-[#E6E3F1]/80 hover:text-[#F0B55E] transition-colors cursor-pointer"
+              >
+                Privacidade (LGPD)
+              </button>
+              <span className="text-white/20 select-none">•</span>
+              <button
+                type="button"
+                onClick={() => onNavigate('/politica-de-cookies')}
+                className="text-[#E6E3F1]/80 hover:text-[#F0B55E] transition-colors cursor-pointer"
+              >
+                Política de Cookies
+              </button>
+            </div>
+          </div>
+
+          {/* Linha 2: Desenvolvido por @orabolasdigital Alinhado com Site Protegido contra Cópia */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3 pt-3 border-t border-white/5 text-[11px] text-center md:text-left">
+            {/* Crédito Desenvolvido por @orabolasdigital com Ícone Espiral */}
+            <div className="flex items-center justify-center md:justify-start gap-2">
+              {/* Ícone Espiral Cósmica Oficial */}
+              <svg
+                className="h-4 w-4 text-[#F0B55E] shrink-0 transition-transform duration-700 hover:rotate-180"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-label="Espiral Oras Bolas"
+              >
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 8-3.58 8-8-3.58-6-7-6-5 2.24-5 5 2.24 4 4 4 3-1.34 3-3-1.34-2-2-2" />
+              </svg>
+
+              <span>
+                Desenvolvido por{' '}
+                <a
+                  href={SITE_CONFIG.developerCreditUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white hover:text-[#F0B55E] underline underline-offset-2 font-bold transition-colors"
+                >
+                  @orabolasdigital
+                </a>{' '}
+                com estratégia humana e IA. Propriedade intelectual protegida.
+              </span>
+            </div>
+
             {/* Proteção / Site Seguro nos termos da Lei Federal nº 9.610/1998 */}
-            <div className="flex items-center justify-center gap-1.5 text-[11px] text-[#25D366]">
+            <div className="flex items-center justify-center md:justify-end gap-1.5 text-[11px] text-[#25D366] shrink-0">
               <ShieldCheck className="h-4 w-4 shrink-0 text-[#25D366]" />
               <span className="text-[#E6E3F1]/75">
                 {SITE_CONFIG.legalNotice}
               </span>
             </div>
           </div>
-
-          {/* Crédito Desenvolvido por @orabolasdigital com Ícone Espiral */}
-          <div className="flex items-center justify-center sm:justify-start gap-2 pt-3 border-t border-white/5 text-[11px]">
-            {/* Ícone Espiral Cósmica Oficial */}
-            <svg
-              className="h-4 w-4 text-[#F0B55E] shrink-0 transition-transform duration-700 hover:rotate-180"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-label="Espiral Oras Bolas"
-            >
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 8-3.58 8-8-3.58-6-7-6-5 2.24-5 5 2.24 4 4 4 3-1.34 3-3-1.34-2-2-2" />
-            </svg>
-
-            <span>
-              Desenvolvido por{' '}
-              <a
-                href={SITE_CONFIG.developerCreditUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:text-[#F0B55E] underline underline-offset-2 font-bold transition-colors"
-              >
-                @orabolasdigital
-              </a>{' '}
-              com estratégia humana e IA. Propriedade intelectual protegida.
-            </span>
-          </div>
-
         </div>
 
       </div>
