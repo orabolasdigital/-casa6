@@ -816,7 +816,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
 
           {/* BANNER 1: YOUTUBE (FUNDO RUBI CÓSMICO, VÍDEO NA ESQUERDA, TEXTO E BOTÃO NA DIREITA) */}
           <div className="relative pt-12 sm:pt-16 lg:pt-20">
-            <div className="relative rounded-3xl bg-gradient-to-r from-[#7D0B17] via-[#9E121E] to-[#5C0610] border border-white/20 shadow-[0_24px_60px_rgba(125,11,23,0.25)] p-6 sm:p-8 lg:p-10 min-h-[220px] sm:min-h-[230px] lg:min-h-[240px] flex flex-col justify-center overflow-visible text-white">
+            <div className="relative rounded-3xl bg-gradient-to-r from-[#7D0B17] via-[#9E121E] to-[#5C0610] border border-white/20 shadow-[0_24px_60px_rgba(125,11,23,0.25)] p-6 sm:p-8 lg:p-10 xl:p-12 min-h-[220px] sm:min-h-[230px] lg:min-h-[240px] flex flex-col justify-center overflow-visible text-white">
               
               {/* Fundo Cósmico Animado: Galáxia Espiral Rubi, Nebulosa Escura e Feixes Estelares */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl select-none">
@@ -842,21 +842,21 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                 <div className="absolute bottom-10 right-1/3 text-[#F0B55E]/40 text-xs animate-pulse" style={{ animationDelay: '1.8s' }}>★</div>
               </div>
 
-              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 xl:gap-10 items-center">
-                {/* Imagem do Vídeo / Podcast no YouTube Proporcional, Sem Sombra Escura Pesada e com Respiros Equilibrados */}
-                <div className="lg:col-span-5 flex justify-center lg:justify-start">
-                  <div className="-mt-10 sm:-mt-14 lg:-mt-16 xl:-mt-20 shrink-0">
+              <div className="relative z-10 flex flex-col lg:flex-row items-center gap-6 lg:gap-10 xl:gap-12">
+                {/* Imagem do Vídeo / Podcast no YouTube Proporcional, com Cantos Arredondados e Espaçamento Perfeitamente Equilibrado */}
+                <div className="shrink-0 flex justify-center lg:justify-start -mt-8 sm:-mt-12 lg:-mt-14 xl:-mt-16">
+                  <div className="rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-black/40">
                     <img
                       src="https://static.wixstatic.com/media/02c8e0_d34c417ab4f148fcaf82c0354538ae59~mv2.png"
                       alt="Canal da Bianca no YouTube — Podcast"
-                      className="w-64 sm:w-80 md:w-[350px] lg:w-[380px] xl:w-[410px] 2xl:w-[430px] h-auto object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,0.18)] transition-transform duration-500 hover:scale-[1.02]"
+                      className="w-64 sm:w-80 md:w-[370px] lg:w-[410px] xl:w-[450px] 2xl:w-[470px] h-auto object-cover block rounded-xl sm:rounded-2xl transition-transform duration-500 hover:scale-[1.02]"
                       draggable={false}
                     />
                   </div>
                 </div>
 
                 {/* Conteúdo: Título Unificado, Texto e Botão */}
-                <div className="lg:col-span-7 flex flex-col justify-center space-y-3.5 text-white text-center lg:text-left">
+                <div className="flex-1 flex flex-col justify-center space-y-3.5 text-white text-center lg:text-left">
                   <h3 className="font-heading text-2xl sm:text-3xl lg:text-3xl xl:text-4xl font-bold tracking-tight text-white leading-tight">
                     Acompanhe o canal da Bianca no YouTube!
                   </h3>
