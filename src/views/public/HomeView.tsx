@@ -480,33 +480,96 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
 
       {/* =========================================================================
           SESSÃO 5: BANNERS PROMOCIONAIS OFICIAIS (PATOTA ASTRAL & GUIA BÚSSOLA)
-          Fiel ao design de referência: cores exatas, mesma proporção de box,
-          mesma distância do logo 3D e elementos celestes sutis nos cantos
+          Fiel ao design de referência: cores exatas, mesma proporção e tamanho de box,
+          botão alinhado à lateral ao lado do texto e elementos celestes visíveis e animados
           ========================================================================= */}
       <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] space-y-16 lg:space-y-24 relative overflow-hidden">
-        {/* Elementos Soltos Celestiais nos Cantos em Branco (Órbitas, Linhas Circulares e Pontilhadas com Animação Suave) */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {/* Canto Superior Esquerdo */}
-          <div className="absolute top-4 left-6 w-48 sm:w-64 h-48 sm:h-64 rounded-full border border-dashed border-[#8C987F]/25 animate-celestial-orbit-slow" />
-          <div className="absolute top-12 left-14 w-32 sm:w-40 h-32 sm:h-40 rounded-full border border-dotted border-[#2B2566]/15 animate-celestial-orbit-reverse" />
-          <div className="absolute top-10 left-32 text-[#F0B55E] opacity-35 text-xs">✦</div>
+        {/* Elementos Soltos Celestiais no Fundo: Círculos Outline, Linhas Pontilhadas, Pérolas, Constelações e Signos */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+          {/* 1. Conjunto Canto Superior Esquerdo */}
+          <div className="absolute top-2 left-4 sm:left-10 w-56 sm:w-72 h-56 sm:h-72">
+            <div className="absolute inset-0 rounded-full border border-[#2B2566]/20 animate-celestial-orbit-slow">
+              <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#F0B55E] shadow-sm flex items-center justify-center">
+                <span className="w-1 h-1 rounded-full bg-white"></span>
+              </div>
+              <div className="absolute bottom-4 right-6 text-xs text-[#B87314] font-bold">♈</div>
+              <div className="absolute top-10 left-3 text-xs text-[#8C987F] font-bold">♎</div>
+            </div>
+            <div className="absolute inset-6 rounded-full border border-dashed border-[#B87314]/35 animate-celestial-orbit-reverse">
+              <div className="absolute top-1/2 -left-1 text-[9px] text-[#F0B55E]">✦</div>
+              <div className="absolute -bottom-1 left-1/2 text-xs text-[#2B2566]/60 font-bold">♌</div>
+            </div>
+            <div className="absolute inset-14 rounded-full border border-dotted border-[#8C987F]/40 animate-celestial-shimmer" />
+            <svg className="absolute inset-0 w-full h-full text-[#B87314]/40" viewBox="0 0 100 100" fill="none">
+              <line x1="25" y1="30" x2="45" y2="25" stroke="currentColor" strokeWidth="0.8" strokeDasharray="2 2" />
+              <line x1="45" y1="25" x2="70" y2="40" stroke="currentColor" strokeWidth="0.8" strokeDasharray="2 2" />
+              <circle cx="25" cy="30" r="1.5" fill="#F0B55E" />
+              <circle cx="45" cy="25" r="2" fill="#B87314" />
+              <circle cx="70" cy="40" r="1.5" fill="#F0B55E" />
+            </svg>
+          </div>
 
-          {/* Canto Superior Direito */}
-          <div className="absolute top-8 right-8 w-56 sm:w-72 h-56 sm:h-72 rounded-full border border-[#F0B55E]/20 animate-celestial-orbit-slow" />
-          <div className="absolute top-16 right-16 w-36 sm:w-48 h-36 sm:h-48 rounded-full border border-dashed border-[#2B2566]/15 animate-celestial-orbit-reverse" />
-          <div className="absolute top-24 right-36 text-[#8C987F] opacity-35 text-xs">★</div>
+          {/* 2. Conjunto Canto Superior Direito */}
+          <div className="absolute top-4 right-4 sm:right-12 w-64 sm:w-80 h-64 sm:h-80">
+            <div className="absolute inset-0 rounded-full border border-[#B87314]/25 animate-celestial-orbit-reverse">
+              <div className="absolute top-2 right-1/3 text-xs text-[#2B2566]/60 font-bold">♊</div>
+              <div className="absolute bottom-6 left-1/4 text-xs text-[#B87314] font-bold">♐</div>
+              <div className="absolute -top-1.5 left-1/2 w-3 h-3 rounded-full bg-[#F0B55E] shadow-sm flex items-center justify-center">
+                <span className="w-1 h-1 rounded-full bg-white"></span>
+              </div>
+            </div>
+            <div className="absolute inset-8 rounded-full border border-dashed border-[#2B2566]/30 animate-celestial-orbit-slow">
+              <div className="absolute top-1/3 -right-1 text-[10px] text-[#F0B55E]">✦</div>
+              <div className="absolute bottom-2 right-1/3 text-xs text-[#8C987F] font-bold">♓</div>
+            </div>
+            <div className="absolute inset-16 rounded-full border border-dotted border-[#F0B55E]/40 animate-celestial-shimmer" />
+            <svg className="absolute inset-0 w-full h-full text-[#2B2566]/35" viewBox="0 0 100 100" fill="none">
+              <line x1="30" y1="70" x2="55" y2="60" stroke="currentColor" strokeWidth="0.8" strokeDasharray="2 2" />
+              <line x1="55" y1="60" x2="75" y2="75" stroke="currentColor" strokeWidth="0.8" strokeDasharray="2 2" />
+              <circle cx="30" cy="70" r="1.8" fill="#B87314" />
+              <circle cx="55" cy="60" r="2" fill="#F0B55E" />
+              <circle cx="75" cy="75" r="1.5" fill="#2B2566" />
+            </svg>
+          </div>
 
-          {/* Margem Central Entre os Banners */}
-          <div className="absolute top-1/2 left-4 w-36 h-36 rounded-full border border-dotted border-[#B87314]/20 animate-celestial-orbit-reverse" />
-          <div className="absolute top-1/2 right-6 w-44 h-44 rounded-full border border-dashed border-[#8C987F]/25 animate-celestial-orbit-slow" />
+          {/* 3. Conjunto Margem Central Entre os Banners */}
+          <div className="absolute top-1/2 left-2 sm:left-8 -translate-y-1/2 w-48 sm:w-60 h-48 sm:h-60">
+            <div className="absolute inset-0 rounded-full border border-[#8C987F]/30 animate-celestial-orbit-slow">
+              <div className="absolute top-4 left-6 text-xs text-[#B87314] font-bold">♉</div>
+              <div className="absolute bottom-4 right-8 text-xs text-[#2B2566]/60 font-bold">♏</div>
+            </div>
+            <div className="absolute inset-6 rounded-full border border-dashed border-[#F0B55E]/35 animate-celestial-orbit-reverse">
+              <div className="absolute -top-1 left-1/3 text-[9px] text-[#F0B55E]">★</div>
+            </div>
+          </div>
 
-          {/* Canto Inferior Esquerdo */}
-          <div className="absolute bottom-6 left-8 w-48 sm:w-60 h-48 sm:h-60 rounded-full border border-[#2B2566]/15 animate-celestial-orbit-reverse" />
-          <div className="absolute bottom-12 left-16 w-32 sm:w-40 h-32 sm:h-40 rounded-full border border-dashed border-[#F0B55E]/25 animate-celestial-orbit-slow" />
+          {/* 4. Conjunto Canto Inferior Esquerdo */}
+          <div className="absolute bottom-4 left-4 sm:left-12 w-60 sm:w-72 h-60 sm:h-72">
+            <div className="absolute inset-0 rounded-full border border-[#2B2566]/25 animate-celestial-orbit-reverse">
+              <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#F0B55E] flex items-center justify-center">
+                <span className="w-1 h-1 rounded-full bg-white"></span>
+              </div>
+              <div className="absolute top-6 right-8 text-xs text-[#B87314] font-bold">♋</div>
+              <div className="absolute bottom-8 left-6 text-xs text-[#2B2566]/60 font-bold">♑</div>
+            </div>
+            <div className="absolute inset-8 rounded-full border border-dashed border-[#B87314]/30 animate-celestial-orbit-slow">
+              <div className="absolute top-1/2 -right-1 text-[9px] text-[#F0B55E]">✦</div>
+            </div>
+          </div>
 
-          {/* Canto Inferior Direito */}
-          <div className="absolute bottom-8 right-6 w-44 sm:w-56 h-44 sm:h-56 rounded-full border border-dashed border-[#8C987F]/25 animate-celestial-orbit-slow" />
-          <div className="absolute bottom-16 right-14 w-28 sm:w-36 h-28 sm:h-36 rounded-full border border-dotted border-[#2B2566]/20 animate-celestial-orbit-reverse" />
+          {/* 5. Conjunto Canto Inferior Direito */}
+          <div className="absolute bottom-4 right-4 sm:right-10 w-56 sm:w-68 h-56 sm:h-68">
+            <div className="absolute inset-0 rounded-full border border-[#F0B55E]/30 animate-celestial-orbit-slow">
+              <div className="absolute top-8 left-6 text-xs text-[#8C987F] font-bold">♍</div>
+              <div className="absolute bottom-6 right-8 text-xs text-[#B87314] font-bold">♒</div>
+              <div className="absolute -bottom-1.5 left-1/2 w-3 h-3 rounded-full bg-[#8C987F] flex items-center justify-center">
+                <span className="w-1 h-1 rounded-full bg-white"></span>
+              </div>
+            </div>
+            <div className="absolute inset-6 rounded-full border border-dashed border-[#2B2566]/25 animate-celestial-orbit-reverse">
+              <div className="absolute top-2 right-1/3 text-[9px] text-[#F0B55E]">✦</div>
+            </div>
+          </div>
         </div>
 
         <div className="mx-auto max-w-7xl space-y-16 lg:space-y-24 relative z-10">
@@ -516,7 +579,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             {/* Linhas circulares discretas no canto do box */}
             <div className="absolute -top-6 -right-6 w-40 h-40 rounded-full border border-dashed border-[#8C987F]/30 pointer-events-none animate-celestial-orbit-slow hidden md:block" />
 
-            <div className="relative rounded-3xl bg-[#516443] border border-[#647C53]/60 shadow-[0_20px_50px_rgba(43,37,102,0.12)] p-6 sm:p-8 lg:p-10 overflow-visible text-white">
+            <div className="relative rounded-3xl bg-[#516443] border border-[#647C53]/60 shadow-[0_20px_50px_rgba(43,37,102,0.12)] p-6 sm:p-8 lg:p-10 overflow-visible text-white min-h-[220px] lg:min-h-[230px] flex flex-col justify-center">
               {/* Animação Astrológica de Fundo: Órbitas Girando e Ondulações Circulares */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
                 <div className="absolute -left-12 -top-12 w-80 h-80 rounded-full border border-white/10" />
@@ -562,12 +625,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             </div>
           </div>
 
-          {/* BANNER 2: GUIA BÚSSOLA (TOM PÊSSEGO/ÂMBAR EXATO, TEXTO NA ESQUERDA, LOGO NA DIREITA) */}
+          {/* BANNER 2: GUIA BÚSSOLA (TOM PÊSSEGO/ÂMBAR EXATO, TEXTO NA ESQUERDA, BOTÃO NA LATERAL, LOGO NA DIREITA) */}
           <div className="relative pt-12 sm:pt-16 lg:pt-20">
             {/* Linhas circulares discretas no canto do box */}
             <div className="absolute -top-6 -left-6 w-40 h-40 rounded-full border border-dashed border-[#B87314]/25 pointer-events-none animate-celestial-orbit-slow hidden md:block" />
 
-            <div className="relative rounded-3xl bg-gradient-to-r from-[#FEDEA8] via-[#FDCF8A] to-[#FCA84E] border border-white/70 shadow-[0_20px_50px_rgba(43,37,102,0.12)] p-6 sm:p-8 lg:p-10 overflow-visible text-[#2B2566]">
+            <div className="relative rounded-3xl bg-gradient-to-r from-[#FEDEA8] via-[#FDCF8A] to-[#FCA84E] border border-white/70 shadow-[0_20px_50px_rgba(43,37,102,0.12)] p-6 sm:p-8 lg:p-10 overflow-visible text-[#2B2566] min-h-[220px] lg:min-h-[230px] flex flex-col justify-center">
               {/* Animação Astrológica de Fundo: Órbitas Girando e Cintilações */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
                 <div className="absolute -left-10 -bottom-10 w-60 h-60 rounded-full border border-[#2B2566]/10 animate-celestial-orbit-slow" />
@@ -580,20 +643,20 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
               <div className="absolute right-44 lg:right-60 top-1/2 -translate-y-1/2 w-8 h-8 bg-gradient-to-br from-[#FDCF8A] to-[#FCA84E] rotate-45 pointer-events-none hidden lg:block opacity-60" />
 
               <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
-                {/* Conteúdo na Esquerda: Título Solicitado, Texto e Botão Roxo */}
+                {/* Conteúdo na Esquerda: Título, Texto e Botão Alinhado à Lateral (Mesmo layout e altura do Patota) */}
                 <div className="lg:col-span-8 flex flex-col justify-center space-y-4 text-[#2B2566] text-center lg:text-left order-2 lg:order-1">
-                  <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#2B2566] leading-[1.1]">
+                  <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-[#2B2566] leading-[1.12]">
                     Seu guia mensal na <span className="block font-bold">palma da sua Mão</span>
                   </h3>
 
-                  <p className="text-xs sm:text-[13px] md:text-sm text-[#2B2566]/90 leading-relaxed font-normal max-w-xl">
-                    Mapa individual completo. Entregue mensalmente para você planejar trabalho, relações e rotina com clareza estratégica.
-                  </p>
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
+                    <p className="text-xs sm:text-[13px] md:text-sm text-[#2B2566]/90 leading-relaxed font-normal max-w-lg text-center lg:text-left">
+                      Mapa individual completo. Entregue mensalmente para você planejar trabalho, relações e rotina com clareza estratégica.
+                    </p>
 
-                  <div className="pt-1">
                     <button
                       onClick={() => onNavigate('/bussola')}
-                      className="inline-flex items-center justify-center gap-2 rounded-full bg-[#2B2566] hover:bg-[#1E1B4B] text-white px-6 py-3 text-xs font-bold uppercase tracking-wider shadow-md transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-[#2B2566] hover:bg-[#1E1B4B] text-white px-6 py-3 text-xs font-bold uppercase tracking-wider shadow-md transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shrink-0"
                     >
                       <span>CONTRATAR BÚSSOLA GUIA</span>
                       <ArrowRight className="h-3.5 w-3.5 text-[#F0B55E]" />
@@ -786,34 +849,97 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
 
       {/* =========================================================================
           SESSÃO 8: DESTAQUES DE MÍDIA — BANNERS YOUTUBE & SPOTIFY
-          Fiel à proporção e arte da referência: YouTube na esquerda com fundo rubi,
-          Spotify na direita com selo Mapa Aberto e fundo verde floresta/marinho.
-          Elementos circulares celestes e linhas pontilhadas nos cantos.
+          Fiel à proporção e arte da referência: mesma altura e estrutura dos 4 banners,
+          YouTube na esquerda, Spotify na direita com selo Mapa Aberto.
+          Elementos circulares celestes, pontilhados, pérolas e signos nos cantos.
           ========================================================================= */}
       <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] border-t border-[#E2DCCF] space-y-16 lg:space-y-24 relative overflow-hidden">
-        {/* Elementos Soltos Celestiais nos Cantos em Branco (Órbitas, Linhas Circulares e Pontilhadas com Animação Suave) */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {/* Canto Superior Esquerdo */}
-          <div className="absolute top-4 left-6 w-48 sm:w-64 h-48 sm:h-64 rounded-full border border-dashed border-[#8C987F]/25 animate-celestial-orbit-slow" />
-          <div className="absolute top-12 left-14 w-32 sm:w-40 h-32 sm:h-40 rounded-full border border-dotted border-[#2B2566]/15 animate-celestial-orbit-reverse" />
-          <div className="absolute top-10 left-32 text-[#F0B55E] opacity-35 text-xs">✦</div>
+        {/* Elementos Soltos Celestiais no Fundo: Círculos Outline, Linhas Pontilhadas, Pérolas, Constelações e Signos */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+          {/* 1. Conjunto Canto Superior Esquerdo */}
+          <div className="absolute top-2 left-4 sm:left-10 w-56 sm:w-72 h-56 sm:h-72">
+            <div className="absolute inset-0 rounded-full border border-[#2B2566]/20 animate-celestial-orbit-slow">
+              <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#F0B55E] shadow-sm flex items-center justify-center">
+                <span className="w-1 h-1 rounded-full bg-white"></span>
+              </div>
+              <div className="absolute bottom-4 right-6 text-xs text-[#B87314] font-bold">♈</div>
+              <div className="absolute top-10 left-3 text-xs text-[#8C987F] font-bold">♎</div>
+            </div>
+            <div className="absolute inset-6 rounded-full border border-dashed border-[#B87314]/35 animate-celestial-orbit-reverse">
+              <div className="absolute top-1/2 -left-1 text-[9px] text-[#F0B55E]">✦</div>
+              <div className="absolute -bottom-1 left-1/2 text-xs text-[#2B2566]/60 font-bold">♌</div>
+            </div>
+            <div className="absolute inset-14 rounded-full border border-dotted border-[#8C987F]/40 animate-celestial-shimmer" />
+            <svg className="absolute inset-0 w-full h-full text-[#B87314]/40" viewBox="0 0 100 100" fill="none">
+              <line x1="25" y1="30" x2="45" y2="25" stroke="currentColor" strokeWidth="0.8" strokeDasharray="2 2" />
+              <line x1="45" y1="25" x2="70" y2="40" stroke="currentColor" strokeWidth="0.8" strokeDasharray="2 2" />
+              <circle cx="25" cy="30" r="1.5" fill="#F0B55E" />
+              <circle cx="45" cy="25" r="2" fill="#B87314" />
+              <circle cx="70" cy="40" r="1.5" fill="#F0B55E" />
+            </svg>
+          </div>
 
-          {/* Canto Superior Direito */}
-          <div className="absolute top-8 right-8 w-56 sm:w-72 h-56 sm:h-72 rounded-full border border-[#F0B55E]/20 animate-celestial-orbit-slow" />
-          <div className="absolute top-16 right-16 w-36 sm:w-48 h-36 sm:h-48 rounded-full border border-dashed border-[#2B2566]/15 animate-celestial-orbit-reverse" />
-          <div className="absolute top-24 right-36 text-[#8C987F] opacity-35 text-xs">★</div>
+          {/* 2. Conjunto Canto Superior Direito */}
+          <div className="absolute top-4 right-4 sm:right-12 w-64 sm:w-80 h-64 sm:h-80">
+            <div className="absolute inset-0 rounded-full border border-[#B87314]/25 animate-celestial-orbit-reverse">
+              <div className="absolute top-2 right-1/3 text-xs text-[#2B2566]/60 font-bold">♊</div>
+              <div className="absolute bottom-6 left-1/4 text-xs text-[#B87314] font-bold">♐</div>
+              <div className="absolute -top-1.5 left-1/2 w-3 h-3 rounded-full bg-[#F0B55E] shadow-sm flex items-center justify-center">
+                <span className="w-1 h-1 rounded-full bg-white"></span>
+              </div>
+            </div>
+            <div className="absolute inset-8 rounded-full border border-dashed border-[#2B2566]/30 animate-celestial-orbit-slow">
+              <div className="absolute top-1/3 -right-1 text-[10px] text-[#F0B55E]">✦</div>
+              <div className="absolute bottom-2 right-1/3 text-xs text-[#8C987F] font-bold">♓</div>
+            </div>
+            <div className="absolute inset-16 rounded-full border border-dotted border-[#F0B55E]/40 animate-celestial-shimmer" />
+            <svg className="absolute inset-0 w-full h-full text-[#2B2566]/35" viewBox="0 0 100 100" fill="none">
+              <line x1="30" y1="70" x2="55" y2="60" stroke="currentColor" strokeWidth="0.8" strokeDasharray="2 2" />
+              <line x1="55" y1="60" x2="75" y2="75" stroke="currentColor" strokeWidth="0.8" strokeDasharray="2 2" />
+              <circle cx="30" cy="70" r="1.8" fill="#B87314" />
+              <circle cx="55" cy="60" r="2" fill="#F0B55E" />
+              <circle cx="75" cy="75" r="1.5" fill="#2B2566" />
+            </svg>
+          </div>
 
-          {/* Margem Central Entre os Banners */}
-          <div className="absolute top-1/2 left-4 w-36 h-36 rounded-full border border-dotted border-[#B87314]/20 animate-celestial-orbit-reverse" />
-          <div className="absolute top-1/2 right-6 w-44 h-44 rounded-full border border-dashed border-[#8C987F]/25 animate-celestial-orbit-slow" />
+          {/* 3. Conjunto Margem Central Entre os Banners */}
+          <div className="absolute top-1/2 left-2 sm:left-8 -translate-y-1/2 w-48 sm:w-60 h-48 sm:h-60">
+            <div className="absolute inset-0 rounded-full border border-[#8C987F]/30 animate-celestial-orbit-slow">
+              <div className="absolute top-4 left-6 text-xs text-[#B87314] font-bold">♉</div>
+              <div className="absolute bottom-4 right-8 text-xs text-[#2B2566]/60 font-bold">♏</div>
+            </div>
+            <div className="absolute inset-6 rounded-full border border-dashed border-[#F0B55E]/35 animate-celestial-orbit-reverse">
+              <div className="absolute -top-1 left-1/3 text-[9px] text-[#F0B55E]">★</div>
+            </div>
+          </div>
 
-          {/* Canto Inferior Esquerdo */}
-          <div className="absolute bottom-6 left-8 w-48 sm:w-60 h-48 sm:h-60 rounded-full border border-[#2B2566]/15 animate-celestial-orbit-reverse" />
-          <div className="absolute bottom-12 left-16 w-32 sm:w-40 h-32 sm:h-40 rounded-full border border-dashed border-[#F0B55E]/25 animate-celestial-orbit-slow" />
+          {/* 4. Conjunto Canto Inferior Esquerdo */}
+          <div className="absolute bottom-4 left-4 sm:left-12 w-60 sm:w-72 h-60 sm:h-72">
+            <div className="absolute inset-0 rounded-full border border-[#2B2566]/25 animate-celestial-orbit-reverse">
+              <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#F0B55E] flex items-center justify-center">
+                <span className="w-1 h-1 rounded-full bg-white"></span>
+              </div>
+              <div className="absolute top-6 right-8 text-xs text-[#B87314] font-bold">♋</div>
+              <div className="absolute bottom-8 left-6 text-xs text-[#2B2566]/60 font-bold">♑</div>
+            </div>
+            <div className="absolute inset-8 rounded-full border border-dashed border-[#B87314]/30 animate-celestial-orbit-slow">
+              <div className="absolute top-1/2 -right-1 text-[9px] text-[#F0B55E]">✦</div>
+            </div>
+          </div>
 
-          {/* Canto Inferior Direito */}
-          <div className="absolute bottom-8 right-6 w-44 sm:w-56 h-44 sm:h-56 rounded-full border border-dashed border-[#8C987F]/25 animate-celestial-orbit-slow" />
-          <div className="absolute bottom-16 right-14 w-28 sm:w-36 h-28 sm:h-36 rounded-full border border-dotted border-[#2B2566]/20 animate-celestial-orbit-reverse" />
+          {/* 5. Conjunto Canto Inferior Direito */}
+          <div className="absolute bottom-4 right-4 sm:right-10 w-56 sm:w-68 h-56 sm:h-68">
+            <div className="absolute inset-0 rounded-full border border-[#F0B55E]/30 animate-celestial-orbit-slow">
+              <div className="absolute top-8 left-6 text-xs text-[#8C987F] font-bold">♍</div>
+              <div className="absolute bottom-6 right-8 text-xs text-[#B87314] font-bold">♒</div>
+              <div className="absolute -bottom-1.5 left-1/2 w-3 h-3 rounded-full bg-[#8C987F] flex items-center justify-center">
+                <span className="w-1 h-1 rounded-full bg-white"></span>
+              </div>
+            </div>
+            <div className="absolute inset-6 rounded-full border border-dashed border-[#2B2566]/25 animate-celestial-orbit-reverse">
+              <div className="absolute top-2 right-1/3 text-[9px] text-[#F0B55E]">✦</div>
+            </div>
+          </div>
         </div>
 
         <div className="mx-auto max-w-7xl space-y-16 lg:space-y-24 relative z-10">
@@ -823,7 +949,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             {/* Linha circular discreta no canto do box */}
             <div className="absolute -top-6 -right-6 w-40 h-40 rounded-full border border-dashed border-[#B87314]/25 pointer-events-none animate-celestial-orbit-slow hidden md:block" />
 
-            <div className="relative rounded-3xl bg-gradient-to-r from-[#940818] via-[#B31317] to-[#C83808] border border-white/40 shadow-[0_20px_50px_rgba(43,37,102,0.12)] p-6 sm:p-8 lg:p-10 overflow-visible text-white">
+            <div className="relative rounded-3xl bg-gradient-to-r from-[#940818] via-[#B31317] to-[#C83808] border border-white/40 shadow-[0_20px_50px_rgba(43,37,102,0.12)] p-6 sm:p-8 lg:p-10 overflow-visible text-white min-h-[220px] lg:min-h-[230px] flex flex-col justify-center">
               {/* Animação Astrológica de Fundo: Órbitas Girando e Ondulações Circulares */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
                 <div className="absolute -left-12 -top-12 w-80 h-80 rounded-full border border-white/10" />
@@ -834,33 +960,33 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
 
               <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
                 {/* Imagem do Vídeo / Podcast no YouTube na Esquerda Pulando Para Fora */}
-                <div className="lg:col-span-5 flex justify-center lg:justify-start">
+                <div className="lg:col-span-4 flex justify-center lg:justify-start">
                   <div className="-mt-16 sm:-mt-24 lg:-mt-32 -mb-4 lg:-mb-6 sm:-ml-4 shrink-0">
                     <img
                       src="https://static.wixstatic.com/media/02c8e0_d34c417ab4f148fcaf82c0354538ae59~mv2.png"
                       alt="Canal da Bianca no YouTube — Podcast"
-                      className="w-64 sm:w-80 lg:w-[420px] h-auto object-contain filter drop-shadow-[0_16px_32px_rgba(0,0,0,0.4)] transition-transform duration-500 hover:scale-105"
+                      className="w-56 sm:w-72 lg:w-80 h-auto object-contain filter drop-shadow-[0_16px_32px_rgba(0,0,0,0.4)] transition-transform duration-500 hover:scale-105"
                       draggable={false}
                     />
                   </div>
                 </div>
 
-                {/* Conteúdo: Título Exato, Texto Exato e Botão Vermelho Alinhado à Direita */}
-                <div className="lg:col-span-7 flex flex-col justify-center space-y-4 text-white text-center lg:text-left">
+                {/* Conteúdo: Título Exato, Texto Exato e Botão Vermelho Alinhado à Lateral */}
+                <div className="lg:col-span-8 flex flex-col justify-center space-y-4 text-white text-center lg:text-left">
                   <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-white leading-[1.12]">
                     Acompanhe o canal da <span className="block font-bold">Bianca no YouTube!</span>
                   </h3>
 
-                  <p className="text-xs sm:text-[13px] md:text-sm text-white/90 leading-relaxed font-light max-w-xl">
-                    Vídeos quase todas as semanas sobre reflexões, vida, astrologia, bem estar, rotina, trabalho e muito mais!
-                  </p>
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
+                    <p className="text-xs sm:text-[13px] md:text-sm text-white/90 leading-relaxed font-light max-w-lg text-center lg:text-left">
+                      Vídeos quase todas as semanas sobre reflexões, vida, astrologia, bem estar, rotina, trabalho e muito mais!
+                    </p>
 
-                  <div className="pt-2 flex justify-center lg:justify-end">
                     <a
                       href={SITE_CONFIG.youtubeUrl || 'https://www.youtube.com/@biancatofoli'}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 rounded-full bg-[#E50914] hover:bg-[#c90812] text-white px-7 py-3 text-xs font-bold uppercase tracking-wider shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shrink-0"
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-[#E50914] hover:bg-[#c90812] text-white px-6 py-3 text-xs font-bold uppercase tracking-wider shadow-md transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shrink-0"
                     >
                       <Play className="h-3.5 w-3.5 fill-white" />
                       <span>ASSISTIR NO YOUTUBE</span>
@@ -872,12 +998,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             </div>
           </div>
 
-          {/* BANNER 2: SPOTIFY (FUNDO VERDE FLORESTA/MARINHO, TEXTO NA ESQUERDA, SELO MAPA ABERTO NA DIREITA) */}
+          {/* BANNER 2: SPOTIFY (FUNDO VERDE FLORESTA/MARINHO, TEXTO NA ESQUERDA, BOTÃO NA LATERAL, SELO MAPA ABERTO NA DIREITA) */}
           <div className="relative pt-12 sm:pt-16 lg:pt-20">
             {/* Linha circular discreta no canto do box */}
             <div className="absolute -top-6 -left-6 w-40 h-40 rounded-full border border-dashed border-[#1DB954]/25 pointer-events-none animate-celestial-orbit-slow hidden md:block" />
 
-            <div className="relative rounded-3xl bg-gradient-to-r from-[#173D22] via-[#0E2E20] to-[#142339] border border-white/30 shadow-[0_20px_50px_rgba(43,37,102,0.12)] p-6 sm:p-8 lg:p-10 overflow-visible text-white">
+            <div className="relative rounded-3xl bg-gradient-to-r from-[#173D22] via-[#0E2E20] to-[#142339] border border-white/30 shadow-[0_20px_50px_rgba(43,37,102,0.12)] p-6 sm:p-8 lg:p-10 overflow-visible text-white min-h-[220px] lg:min-h-[230px] flex flex-col justify-center">
               {/* Animação Astrológica de Fundo: Órbitas Girando e Cintilações */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
                 <div className="absolute -left-10 -bottom-10 w-60 h-60 rounded-full border border-[#1DB954]/15 animate-celestial-orbit-slow" />
@@ -887,22 +1013,22 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
               </div>
 
               <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
-                {/* Conteúdo na Esquerda: Título Exato, Texto Exato e Botão Verde */}
+                {/* Conteúdo na Esquerda: Título Exato, Texto Exato e Botão Verde Alinhado à Lateral */}
                 <div className="lg:col-span-8 flex flex-col justify-center space-y-4 text-white text-center lg:text-left order-2 lg:order-1">
                   <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-white leading-[1.12]">
                     Astrologia com Bianca Tofoli <span className="block font-bold">para ouvir no Spotify</span>
                   </h3>
 
-                  <p className="text-xs sm:text-[13px] md:text-sm text-white/90 leading-relaxed font-light max-w-xl">
-                    Um podcast de mapa aberto para você acompanhar de onde estiver; no trânsito, no trabalho ou em suas pausas diárias de autocuidado.
-                  </p>
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
+                    <p className="text-xs sm:text-[13px] md:text-sm text-white/90 leading-relaxed font-light max-w-lg text-center lg:text-left">
+                      Um podcast de mapa aberto para você acompanhar de onde estiver; no trânsito, no trabalho ou em suas pausas diárias de autocuidado.
+                    </p>
 
-                  <div className="pt-2 flex justify-center lg:justify-start">
                     <a
                       href={SITE_CONFIG.spotifyUrl || 'https://open.spotify.com'}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1DB954] hover:bg-[#1AA34A] text-[#032412] px-7 py-3 text-xs font-bold uppercase tracking-wider shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shrink-0"
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1DB954] hover:bg-[#1AA34A] text-[#032412] px-6 py-3 text-xs font-bold uppercase tracking-wider shadow-md transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shrink-0"
                     >
                       <svg className="h-4 w-4 fill-current text-[#032412]" viewBox="0 0 24 24">
                         <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
