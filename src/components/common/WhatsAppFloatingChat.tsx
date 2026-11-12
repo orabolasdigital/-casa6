@@ -220,7 +220,7 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
       {!isOpen && (
         <aside
           aria-label="Atendimento via WhatsApp"
-          className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-40 print:hidden animate-in fade-in duration-200"
+          className="hidden lg:flex fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-40 print:hidden animate-in fade-in duration-200"
         >
           <button
             onClick={handleToggle}

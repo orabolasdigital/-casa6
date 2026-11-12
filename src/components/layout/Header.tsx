@@ -5,7 +5,7 @@
  * Paleta: Noite (#2B2566), Sol (#F0B55E), Lua (#F4EFE6), Névoa (#E6E3F1), Oliva (#8C987F)
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu, X, User, Settings } from 'lucide-react';
 
 interface HeaderProps {
@@ -14,8 +14,20 @@ interface HeaderProps {
   onOpenBooking: (serviceId?: string) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate }) => {
+export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate, onOpenBooking }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Trava scroll da tela quando menu sanduíche mobile estiver aberto
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
 
   // Ordem oficial exata em caixa alta conforme instrução:
   // SOBRE -> ATENDIMENTOS -> ENCONTROS -> BÚSSOLA (com tag NEW) -> PATOTA -> LEITURAS -> LOJINHA
@@ -50,6 +62,17 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate }) => {
 
   return (
     <header className="sticky top-0 z-40 w-full bg-[#2B2566]/98 backdrop-blur-md text-[#FFFFFF] border-b border-[#F0B55E]/20 shadow-lg">
+      {/* Botão Fixo em Barra no Topo para Mobile: Falar no WhatsApp (Verde, sem ícone) */}
+      <div className="lg:hidden w-full bg-[#25D366] active:bg-[#20ba5a] text-white text-center shadow-xs transition-colors">
+        <button
+          type="button"
+          onClick={() => onOpenBooking()}
+          className="w-full py-2 px-4 text-xs font-bold uppercase tracking-wider text-white text-center flex items-center justify-center cursor-pointer select-none"
+        >
+          <span>Falar no WhatsApp</span>
+        </button>
+      </div>
+
       <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         
         {/* Logotipo Oficial Casa 6 (Horizontal Branco para Fundo Escuro) — Ao clicar vai para a página início */}
@@ -89,15 +112,15 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate }) => {
           })}
         </nav>
 
-        {/* Ações Direitas: Botão Membros com tonalidade suave do cabeçalho e Engrenagem isolada */}
+        {/* Ações Direitas: Botão Membros e Engrenagem (Apenas em telas Desktop) + Hambúrguer Mobile */}
         <div className="flex items-center">
           
-          {/* Botão com ícone escrito "Membros" com a mesma tonalidade de fundo do cabeçalho e estilo de fonte do menu */}
+          {/* Botão com ícone escrito "Membros" — oculto no mobile, acessível pelo menu sanduíche */}
           <button
             onClick={() => handleLinkClick('/membros')}
             title="Área de Membros (Login com E-mail e CPF)"
             aria-label="Área de Membros"
-            className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.14em] transition-all cursor-pointer ${
+            className={`hidden lg:inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.14em] transition-all cursor-pointer ${
               isLinkActive('/membros')
                 ? 'border-[#F0B55E] text-[#F0B55E] bg-white/5 shadow-xs'
                 : 'border-[#F0B55E]/30 text-white/90 hover:border-[#F0B55E] hover:text-[#F0B55E] bg-transparent'
@@ -107,8 +130,8 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate }) => {
             <span>MEMBROS</span>
           </button>
 
-          {/* Botão com a engrenagem: FORA de qualquer box, afastado de membros para não confundir com o público */}
-          <div className="ml-4 sm:ml-6 pl-3 sm:pl-5 border-l border-white/15 flex items-center">
+          {/* Botão com a engrenagem: oculto no mobile, discreto no desktop */}
+          <div className="hidden lg:flex ml-4 sm:ml-6 pl-3 sm:pl-5 border-l border-white/15 items-center">
             <button
               onClick={() => handleLinkClick('/painel')}
               title="Acesso Administrativo (Painel de Controles)"
@@ -125,60 +148,89 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate }) => {
 
           {/* Hambúrguer Mobile */}
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 ml-3 lg:hidden text-white hover:text-[#F0B55E] focus:outline-none cursor-pointer"
+            onClick={() => setMobileMenuOpen(true)}
+            className="p-2 ml-2 lg:hidden text-white hover:text-[#F0B55E] focus:outline-none cursor-pointer"
             aria-expanded={mobileMenuOpen}
-            aria-label="Menu"
+            aria-label="Abrir Menu"
           >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            <Menu className="h-6 w-6" />
           </button>
         </div>
       </div>
 
-      {/* Menu Mobile */}
+      {/* =========================================================================
+          MENU SANDUÍCHE MOBILE (DRAWER 80% DA LARGURA ALINHADO À DIREITA)
+          Textos sempre alinhados à direita. Tag 'n' da bússola à esquerda do texto.
+          Apenas botão Área de Membros no rodapé, sem engrenagem.
+          ========================================================================= */}
+      {/* Backdrop com desfoque */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-white/10 bg-[#2B2566] px-4 pt-3 pb-6 space-y-1.5 shadow-2xl">
-          {navLinks.map((link) => {
-            const active = isLinkActive(link.path);
-            return (
-              <button
-                key={link.path}
-                onClick={() => handleLinkClick(link.path)}
-                className={`flex items-center justify-between w-full text-left py-2.5 px-3 rounded-lg text-xs uppercase tracking-wider font-medium cursor-pointer ${
-                  active
-                    ? 'bg-[#181343] text-[#F0B55E] font-bold'
-                    : 'text-[#E6E3F1] hover:bg-[#181343] hover:text-[#F0B55E]'
-                }`}
-              >
-                <span>{link.label}</span>
-                {link.hasNewBadge && (
-                  <span className="px-1.5 py-0.5 rounded-full bg-[#F0B55E] text-[#2B2566] text-[8px] font-black">
-                    NEW
-                  </span>
-                )}
-              </button>
-            );
-          })}
-          
-          <div className="pt-3 border-t border-white/10 flex items-center gap-3">
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 lg:hidden transition-opacity duration-300"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Container do Drawer à Direita */}
+      <div
+        className={`fixed top-0 right-0 h-full w-[80vw] max-w-[340px] bg-[#2B2566] text-[#FFFFFF] z-50 shadow-2xl flex flex-col justify-between p-6 lg:hidden overflow-y-auto transform transition-transform duration-300 ease-in-out border-l border-[#F0B55E]/20 ${
+          mobileMenuOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
+        }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu de Navegação"
+      >
+        <div>
+          {/* Topo do Menu Sanduíche: Botão Fechar à Direita */}
+          <div className="flex items-center justify-end pb-4 border-b border-white/10">
             <button
-              onClick={() => handleLinkClick('/membros')}
-              className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-transparent border border-[#F0B55E]/35 py-2.5 text-[11px] font-medium uppercase tracking-[0.14em] text-white hover:text-[#F0B55E] cursor-pointer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-1.5 text-white/70 hover:text-white transition-colors cursor-pointer rounded-lg hover:bg-white/5"
+              aria-label="Fechar menu"
             >
-              <User className="h-4 w-4 text-[#F0B55E]" />
-              <span>ÁREA DE MEMBROS</span>
-            </button>
-            <button
-              onClick={() => handleLinkClick('/painel')}
-              className="p-2.5 text-white/40 hover:text-[#F0B55E] cursor-pointer"
-              title="Painel de Controles"
-              aria-label="Painel de Controles"
-            >
-              <Settings className="h-5 w-5" />
+              <X className="h-6 w-6" />
             </button>
           </div>
+
+          {/* Lista de Navegação: Todos os itens estritamente alinhados à direita */}
+          <nav className="flex flex-col items-end gap-1.5 py-6 w-full" aria-label="Navegação Mobile">
+            {navLinks.map((link) => {
+              const active = isLinkActive(link.path);
+              return (
+                <button
+                  key={link.path}
+                  onClick={() => handleLinkClick(link.path)}
+                  className={`w-full py-3 px-2 text-right flex items-center justify-end gap-2 text-xs uppercase tracking-[0.14em] font-medium transition-colors cursor-pointer ${
+                    active
+                      ? 'text-[#F0B55E] font-bold'
+                      : 'text-[#E6E3F1]/85 hover:text-[#F0B55E]'
+                  }`}
+                >
+                  {/* Tag 'n' da bússola posicionada do lado esquerdo do texto */}
+                  {link.hasNewBadge && (
+                    <span className="px-1.5 py-0.5 rounded-full bg-[#F0B55E] text-[#2B2566] text-[9px] font-black leading-none uppercase tracking-tight">
+                      n
+                    </span>
+                  )}
+                  <span>{link.label}</span>
+                </button>
+              );
+            })}
+          </nav>
         </div>
-      )}
+
+        {/* Rodapé do Menu Sanduíche: Apenas botão 'Área de Membros' (sem engrenagem) */}
+        <div className="pt-4 border-t border-white/10 mt-auto">
+          <button
+            onClick={() => handleLinkClick('/membros')}
+            className="w-full flex items-center justify-center gap-2 rounded-full border border-[#F0B55E] bg-[#F0B55E] hover:bg-[#dfa247] text-[#2B2566] py-3 px-4 text-xs font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer active:scale-98"
+          >
+            <User className="h-4 w-4" />
+            <span>Área de Membros</span>
+          </button>
+        </div>
+      </div>
     </header>
   );
 };
