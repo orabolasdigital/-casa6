@@ -4,17 +4,17 @@
  * Visão Pública: /patota & /patota-astral
  * Comunidade Recorrente Patota Astral no WhatsApp com Bianca Tofoli
  * 
- * Funcionalidades & Design:
- * - Fundo suave, luminoso e acolhedor (#FAF8F5).
- * - Sem logotipo no topo, substituído pelo banner editorial com o logo oficial da Patota Astral 3D.
- * - Banner com frase de impacto da astrologia diária por assinatura.
- * - Seção "O que é a Patota Astral?" com o texto original da Bianca.
- * - Sem a seção de depoimentos.
- * - Conteúdo exclusivo da Patota em cards elegantes e bem formatados.
- * - Box dedicado falando sobre a Bianca Tofoli (quem faz as previsões diárias).
- * - Seção de Inscrição e Assinatura com destaque da tag "R$ 1,50 por dia" (Plano Anual, Semestral e Trimestral) e formulário seguro.
- * - FAQ completa com todas as 8 perguntas e respostas do site antigo em acordeão leve e bonito.
- * - Integração com Mercado Pago Checkout Modal.
+ * Atualizações de Design:
+ * - Logo 3D em tamanho maior, destacado e em primeiro plano.
+ * - Removida a tag "Comunidade VIP oficial do WhatsApp" abaixo do logo.
+ * - Texto abaixo do título em fonte secundária (font-sans) e tamanho menor e suave.
+ * - Ícones de benefícios exclusivos na cor roxa (#2B2566) com fundo suave para maior contraste.
+ * - Foto da Bianca Tofoli atualizada para a foto oficial da página inicial (Home).
+ * - Removida a tag "Assinatura VIP no WhatsApp" de cima do banner R$ 1,50 por dia.
+ * - Campos de Hora e Minuto de nascimento separados.
+ * - Cidade e Estado de nascimento adicionados ao formulário.
+ * - Botão de assinar com as cores padrão elegantes do projeto (#2B2566 com dourado #F0B55E).
+ * - Títulos das Perguntas Frequentes em fonte secundária normal e negrito (font-sans font-bold).
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -142,7 +142,7 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
 
   const currentPlan = plans.find((p) => p.id === selectedPlan) || plans[0];
 
-  // Benefícios exclusivos da Patota
+  // Benefícios exclusivos da Patota com ícones roxos em alto contraste
   const benefits = [
     {
       icon: MessageCircle,
@@ -260,23 +260,18 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
       <div className="mx-auto max-w-5xl space-y-12 sm:space-y-16 lg:space-y-20 relative z-10">
         
         {/* =========================================================================
-            1. BANNER COM LOGO & FRASE DE IMPACTO (ASTROLOGIA DIÁRIA POR ASSINATURA)
+            1. BANNER COM LOGO MAIOR & FRASE DE IMPACTO
             ========================================================================= */}
         <RevealOnScroll delayMs={50}>
           <div className="max-w-4xl mx-auto text-center space-y-5">
-            {/* Logo 3D Oficial da Patota Astral */}
-            <div className="flex justify-center pb-1">
+            {/* Logo 3D Oficial da Patota Astral em Tamanho Maior e Destaque */}
+            <div className="flex justify-center pb-2">
               <img
                 src="https://static.wixstatic.com/media/02c8e0_e5132493b4a14c0498c5df95ee68c593~mv2.png"
                 alt="Patota Astral — Casa 6"
-                className="h-28 sm:h-36 w-auto object-contain transition-transform duration-500 hover:scale-105 filter drop-shadow-[0_12px_28px_rgba(43,37,102,0.1)]"
+                className="h-36 sm:h-48 md:h-56 lg:h-64 w-auto object-contain transition-transform duration-500 hover:scale-105 filter drop-shadow-[0_16px_36px_rgba(43,37,102,0.15)]"
                 draggable={false}
               />
-            </div>
-
-            <div className="inline-flex items-center gap-2 rounded-full bg-[#25D366]/15 border border-[#25D366]/30 px-4 py-1.5 text-xs font-bold text-[#14532D]">
-              <MessageCircle className="h-4 w-4 text-[#25D366]" />
-              <span>COMUNIDADE VIP OFICIAL NO WHATSAPP</span>
             </div>
 
             <div className="space-y-2">
@@ -291,7 +286,8 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
                 <span className="w-20 h-px bg-[#2B2566]/20" />
               </div>
 
-              <p className="font-heading text-lg sm:text-2xl text-[#8C987F] max-w-3xl mx-auto font-medium leading-relaxed">
+              {/* Texto em fonte secundária (font-sans) e tamanho menor e suave */}
+              <p className="font-sans text-xs sm:text-sm md:text-[15px] text-[#423C7B] max-w-2xl mx-auto font-normal leading-relaxed">
                 "Conecte-se com as energias do céu e viva sua rotina com mais consciência, clareza e harmonia. Seja parte da nossa Patota Astral!"
               </p>
             </div>
@@ -338,7 +334,7 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
         </RevealOnScroll>
 
         {/* =========================================================================
-            3. CONTEÚDO EXCLUSIVO DA PATOTA (GRID DE BENEFÍCIOS SOFISTICADO)
+            3. CONTEÚDO EXCLUSIVO DA PATOTA (ÍCONES ROXOS COM MAIOR CONTRASTE)
             ========================================================================= */}
         <RevealOnScroll delayMs={140}>
           <div className="space-y-6">
@@ -360,8 +356,8 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
                     className="bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-5 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-2.5 flex flex-col justify-between"
                   >
                     <div className="space-y-2">
-                      <div className="w-10 h-10 rounded-xl bg-[#F0B55E]/15 flex items-center justify-center text-[#2B2566]">
-                        <IconComponent className="h-5 w-5 text-[#F0B55E]" />
+                      <div className="w-10 h-10 rounded-xl bg-[#2B2566]/10 flex items-center justify-center text-[#2B2566]">
+                        <IconComponent className="h-5 w-5 text-[#2B2566]" />
                       </div>
                       <h3 className="font-heading text-base font-bold text-[#2B2566]">
                         {item.title}
@@ -378,20 +374,20 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
         </RevealOnScroll>
 
         {/* =========================================================================
-            4. BOX COMPACTO SOBRE A BIANCA TOFOLI (QUEM FARÁ AS PREVISÕES)
+            4. BOX SOBRE BIANCA TOFOLI (COM A MESMA FOTO DA PÁGINA INICIAL)
             ========================================================================= */}
         <RevealOnScroll delayMs={160}>
           <div className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl border border-[#EADBCC]/70 p-6 sm:p-8 shadow-[0_12px_32px_rgba(43,37,102,0.03)]">
             <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left">
               
-              {/* Foto da Bianca com Moldura Redonda Elegante */}
+              {/* Foto Circular da Bianca idêntica à Home */}
               <div className="relative shrink-0">
-                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-[#F0B55E] p-1 shadow-md bg-white">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-[#F0B55E] p-1 shadow-md bg-white ring-1 ring-[#F0B55E]/25">
                   <img
-                    src="https://static.wixstatic.com/media/02c8e0_dd0430bc5bee4a5c93824bc5d867d23a~mv2.jpeg"
-                    alt="Bianca Tofoli"
+                    src="https://static.wixstatic.com/media/02c8e0_54a33eeb476d45c49b7f4953c34177fc~mv2.jpeg"
+                    alt="Bianca Tofoli — Fundadora da Casa 6"
                     className="w-full h-full object-cover rounded-full"
-                    style={{ objectPosition: '50% 12%' }}
+                    style={{ objectPosition: '50% 8%' }}
                   />
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-xs">
@@ -422,14 +418,9 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
         <RevealOnScroll delayMs={180}>
           <div id="secao-assinatura-patota" className="space-y-6">
             
-            {/* Tag em Grande Destaque: R$ 1,50 por dia */}
+            {/* Banner em Destaque: Apenas R$ 1,50 por dia (Sem a tag em cima) */}
             <div className="bg-gradient-to-r from-[#2B2566] via-[#382D78] to-[#2B2566] text-white rounded-3xl p-6 sm:p-8 text-center space-y-2 shadow-xl border border-[#F0B55E]/30 relative overflow-hidden">
               <div className="absolute top-0 right-1/4 w-60 h-60 bg-[#F0B55E]/10 rounded-full blur-2xl pointer-events-none" />
-              
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#25D366]/20 border border-[#25D366]/40 text-[#25D366] text-xs font-bold uppercase tracking-wider">
-                <MessageCircle className="h-3.5 w-3.5 fill-[#25D366]" />
-                <span>ASSINATURA VIP NO WHATSAPP</span>
-              </div>
 
               <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#F0B55E] tracking-tight">
                 Apenas R$ 1,50 por dia!
@@ -496,7 +487,7 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
                 </div>
               </div>
 
-              {/* Passo 2: Formulário de Dados */}
+              {/* Passo 2: Formulário de Dados com Cidade e Estado */}
               <form onSubmit={handleSubmit} className="space-y-5 pt-4 border-t border-[#EADBCC]/60">
                 <div className="space-y-1">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C987F] block">
@@ -564,7 +555,7 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
                   </div>
                 </div>
 
-                {/* Dados de Nascimento Opcionais */}
+                {/* Dados de Nascimento com Hora e Minuto Separados e Cidade/Estado */}
                 <div className="pt-2 border-t border-[#EADBCC]/40 space-y-2">
                   <span className="text-[11px] font-bold text-[#8C987F] uppercase tracking-wider block">
                     DADOS DE NASCIMENTO (OPCIONAL — PARA PERSONALIZAÇÃO DOS TRÂNSITOS)
@@ -594,27 +585,47 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
                     />
                     <input
                       type="text"
-                      placeholder="Hora (HH:MM)"
-                      value={birthHour ? `${birthHour}:${birthMinute}` : ''}
-                      onChange={(e) => {
-                        const parts = e.target.value.split(':');
-                        setBirthHour(parts[0] || '');
-                        setBirthMinute(parts[1] || '');
-                      }}
-                      className="px-3 py-2 rounded-lg border border-[#DAD2C4] bg-[#FAF8F5] text-xs text-center col-span-3 sm:col-span-2"
+                      placeholder="Hora (HH)"
+                      value={birthHour}
+                      onChange={(e) => setBirthHour(e.target.value)}
+                      className="px-3 py-2 rounded-lg border border-[#DAD2C4] bg-[#FAF8F5] text-xs text-center"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Minuto (MM)"
+                      value={birthMinute}
+                      onChange={(e) => setBirthMinute(e.target.value)}
+                      className="px-3 py-2 rounded-lg border border-[#DAD2C4] bg-[#FAF8F5] text-xs text-center"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <input
+                      type="text"
+                      placeholder="Cidade de nascimento"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="px-4 py-2.5 rounded-xl border border-[#DAD2C4] bg-[#FAF8F5] text-xs text-[#2B2566]"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Estado (UF, ex: SP)"
+                      value={state}
+                      onChange={(e) => setState(e.target.value)}
+                      className="px-4 py-2.5 rounded-xl border border-[#DAD2C4] bg-[#FAF8F5] text-xs text-[#2B2566]"
                     />
                   </div>
                 </div>
 
-                {/* Botão de Finalização da Assinatura */}
+                {/* Botão Oficial com Cores Padrões Elegantes do Projeto (#2B2566 com dourado) */}
                 <div className="pt-4 space-y-3">
                   <button
                     type="submit"
-                    className="w-full py-4 px-6 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold text-sm uppercase tracking-wider shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                    className="w-full py-4 px-6 rounded-full bg-[#2B2566] hover:bg-[#1E1B4B] text-[#F0B55E] font-extrabold text-sm uppercase tracking-wider shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
                   >
-                    <MessageCircle className="h-5 w-5 fill-white" />
+                    <Sparkles className="h-5 w-5 text-[#F0B55E]" />
                     <span>ASSINAR PATOTA ASTRAL ({currentPlan.priceFormatted})</span>
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="h-4 w-4 text-[#F0B55E]" />
                   </button>
 
                   <div className="flex items-center justify-center gap-2 text-xs text-[#8C987F]">
@@ -631,7 +642,7 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
         </RevealOnScroll>
 
         {/* =========================================================================
-            6. PERGUNTAS E RESPOSTAS (FAQ COMPLETA COM TODAS AS 8 PERGUNTAS DO SITE ANTIGO)
+            6. PERGUNTAS E RESPOSTAS (TÍTULOS EM FONTE SECUNDÁRIA NORMAL E NEGRITO)
             ========================================================================= */}
         <RevealOnScroll delayMs={200}>
           <div className="space-y-6">
@@ -655,7 +666,7 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
                     <button
                       type="button"
                       onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                      className="w-full p-5 text-left flex items-center justify-between gap-4 font-heading text-xs sm:text-sm font-bold text-[#2B2566] hover:text-[#F0B55E] transition-colors cursor-pointer"
+                      className="w-full p-5 text-left flex items-center justify-between gap-4 font-sans font-bold text-xs sm:text-sm text-[#2B2566] hover:text-[#F0B55E] transition-colors cursor-pointer"
                     >
                       <span>{faq.q}</span>
                       {isOpen ? (

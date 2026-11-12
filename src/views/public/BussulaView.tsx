@@ -4,15 +4,14 @@
  * Visão Pública: /bussola & /bussola-guia
  * Relatório Astrológico Mensal Personalizado em PDF + Área de Membros + Checkout Mercado Pago
  * 
- * Funcionalidades & Design:
- * - Fundo suave, luminoso e acolhedor (#FAF8F5).
- * - Sem logotipo no topo, substituído pelo banner editorial com o logo oficial da Bússola Guia 3D.
- * - Banner com frase de impacto e proposta de valor do relatório mensal.
- * - Seção "O que é a Bússola Guia?" em card arredondado e leve.
- * - Os 3 Pilares fundamentais da Bússola (WhatsApp, Área de Membros e 100% Personalizado).
- * - Box sobre Bianca Tofoli (quem calcula e orienta suas leituras).
- * - Seção de Inscrição e Assinatura com formulário de dados astrológicos essenciais e checkout Mercado Pago.
- * - FAQ completa sobre o serviço em acordeão leve e bonito.
+ * Atualizações de Design:
+ * - Logo 3D em tamanho maior, destacado e em primeiro plano.
+ * - Removida a tag "Relatório astral mensal personalizado" abaixo do logo.
+ * - Texto abaixo do título em fonte secundária (font-sans) e tamanho menor e suave.
+ * - Ícones dos pilares na cor roxa (#2B2566) com fundo suave para maior contraste com o fundo claro.
+ * - Foto da Bianca Tofoli atualizada para a foto oficial da página inicial (Home).
+ * - Removida a tag "Assinatura mensal recorrente" de cima do banner R$ 47 por mês.
+ * - Títulos das Perguntas Frequentes em fonte secundária normal e negrito (font-sans font-bold).
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -177,23 +176,18 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
       <div className="mx-auto max-w-5xl space-y-12 sm:space-y-16 lg:space-y-20 relative z-10">
         
         {/* =========================================================================
-            1. BANNER COM LOGO & FRASE DE IMPACTO (BÚSSOLA GUIA)
+            1. BANNER COM LOGO MAIOR & FRASE DE IMPACTO (BÚSSOLA GUIA)
             ========================================================================= */}
         <RevealOnScroll delayMs={50}>
           <div className="max-w-4xl mx-auto text-center space-y-5">
-            {/* Logo 3D Oficial da Bússola Guia */}
-            <div className="flex justify-center pb-1">
+            {/* Logo 3D Oficial da Bússola Guia em Tamanho Maior e Destaque */}
+            <div className="flex justify-center pb-2">
               <img
                 src="https://static.wixstatic.com/media/02c8e0_688edec712d4401984a6e1cf8afeb93e~mv2.png"
                 alt="Bússola Guia — Casa 6"
-                className="h-28 sm:h-36 w-auto object-contain transition-transform duration-500 hover:scale-105 filter drop-shadow-[0_12px_28px_rgba(43,37,102,0.1)]"
+                className="h-36 sm:h-48 md:h-56 lg:h-64 w-auto object-contain transition-transform duration-500 hover:scale-105 filter drop-shadow-[0_16px_36px_rgba(43,37,102,0.15)]"
                 draggable={false}
               />
-            </div>
-
-            <div className="inline-flex items-center gap-2 rounded-full bg-[#F0B55E]/15 border border-[#F0B55E]/30 px-4 py-1.5 text-xs font-bold text-[#2B2566]">
-              <Compass className="h-4 w-4 text-[#F0B55E]" />
-              <span>RELATÓRIO ASTRAL MENSAL PERSONALIZADO</span>
             </div>
 
             <div className="space-y-2">
@@ -208,7 +202,8 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
                 <span className="w-20 h-px bg-[#2B2566]/20" />
               </div>
 
-              <p className="font-heading text-lg sm:text-2xl text-[#8C987F] max-w-3xl mx-auto font-medium leading-relaxed">
+              {/* Texto em fonte secundária (font-sans) e tamanho menor e suave */}
+              <p className="font-sans text-xs sm:text-sm md:text-[15px] text-[#423C7B] max-w-2xl mx-auto font-normal leading-relaxed">
                 "Seu mapa mensal de navegação astral na palma da mão para planejar decisões, rotina e relações com clareza estratégica."
               </p>
             </div>
@@ -255,7 +250,7 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
         </RevealOnScroll>
 
         {/* =========================================================================
-            3. OS 3 PILARES DA BÚSSOLA GUIA
+            3. OS 3 PILARES DA BÚSSOLA GUIA (ÍCONES ROXOS COM MAIOR CONTRASTE)
             ========================================================================= */}
         <RevealOnScroll delayMs={140}>
           <div className="space-y-6">
@@ -270,8 +265,8 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <div className="bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-6 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-[#F0B55E]/15 flex items-center justify-center text-[#2B2566]">
-                  <Smartphone className="h-5 w-5 text-[#F0B55E]" />
+                <div className="w-10 h-10 rounded-xl bg-[#2B2566]/10 flex items-center justify-center text-[#2B2566]">
+                  <Smartphone className="h-5 w-5 text-[#2B2566]" />
                 </div>
                 <h3 className="font-heading text-lg font-bold text-[#2B2566]">
                   No Seu WhatsApp
@@ -282,8 +277,8 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
               </div>
 
               <div className="bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-6 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-[#F0B55E]/15 flex items-center justify-center text-[#2B2566]">
-                  <Lock className="h-5 w-5 text-[#F0B55E]" />
+                <div className="w-10 h-10 rounded-xl bg-[#2B2566]/10 flex items-center justify-center text-[#2B2566]">
+                  <Lock className="h-5 w-5 text-[#2B2566]" />
                 </div>
                 <h3 className="font-heading text-lg font-bold text-[#2B2566]">
                   Área de Membros
@@ -294,8 +289,8 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
               </div>
 
               <div className="bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-6 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-[#F0B55E]/15 flex items-center justify-center text-[#2B2566]">
-                  <Sparkles className="h-5 w-5 text-[#F0B55E]" />
+                <div className="w-10 h-10 rounded-xl bg-[#2B2566]/10 flex items-center justify-center text-[#2B2566]">
+                  <Sparkles className="h-5 w-5 text-[#2B2566]" />
                 </div>
                 <h3 className="font-heading text-lg font-bold text-[#2B2566]">
                   100% Personalizado
@@ -309,19 +304,19 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
         </RevealOnScroll>
 
         {/* =========================================================================
-            4. BOX SOBRE BIANCA TOFOLI
+            4. BOX SOBRE BIANCA TOFOLI (COM A MESMA FOTO DA PÁGINA INICIAL)
             ========================================================================= */}
         <RevealOnScroll delayMs={160}>
           <div className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl border border-[#EADBCC]/70 p-6 sm:p-8 shadow-[0_12px_32px_rgba(43,37,102,0.03)]">
             <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left">
               
               <div className="relative shrink-0">
-                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-[#F0B55E] p-1 shadow-md bg-white">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-[#F0B55E] p-1 shadow-md bg-white ring-1 ring-[#F0B55E]/25">
                   <img
-                    src="https://static.wixstatic.com/media/02c8e0_dd0430bc5bee4a5c93824bc5d867d23a~mv2.jpeg"
-                    alt="Bianca Tofoli"
+                    src="https://static.wixstatic.com/media/02c8e0_54a33eeb476d45c49b7f4953c34177fc~mv2.jpeg"
+                    alt="Bianca Tofoli — Fundadora da Casa 6"
                     className="w-full h-full object-cover rounded-full"
-                    style={{ objectPosition: '50% 12%' }}
+                    style={{ objectPosition: '50% 8%' }}
                   />
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-xs">
@@ -351,13 +346,9 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
         <RevealOnScroll delayMs={180}>
           <div id="secao-assinatura-bussola" className="space-y-6">
             
+            {/* Banner R$ 47 por mês (Sem a tag em cima) */}
             <div className="bg-gradient-to-r from-[#2B2566] via-[#382D78] to-[#2B2566] text-white rounded-3xl p-6 sm:p-8 text-center space-y-2 shadow-xl border border-[#F0B55E]/30 relative overflow-hidden">
               <div className="absolute top-0 right-1/4 w-60 h-60 bg-[#F0B55E]/10 rounded-full blur-2xl pointer-events-none" />
-              
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F0B55E]/20 border border-[#F0B55E]/40 text-[#F0B55E] text-xs font-bold uppercase tracking-wider">
-                <Compass className="h-3.5 w-3.5" />
-                <span>ASSINATURA MENSAL RECORRENTE</span>
-              </div>
 
               <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#F0B55E] tracking-tight">
                 R$ 47,00 por mês
@@ -512,7 +503,7 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
                   >
                     <Sparkles className="h-5 w-5 text-[#F0B55E]" />
                     <span>CONTRATAR BÚSSOLA GUIA (R$ 47,00/MÊS)</span>
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="h-4 w-4 text-[#F0B55E]" />
                   </button>
 
                   <div className="flex items-center justify-center gap-2 text-xs text-[#8C987F]">
@@ -528,7 +519,7 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
         </RevealOnScroll>
 
         {/* =========================================================================
-            6. PERGUNTAS FREQUENTES (FAQ BÚSSOLA GUIA)
+            6. PERGUNTAS FREQUENTES (TÍTULOS EM FONTE SECUNDÁRIA NORMAL E NEGRITO)
             ========================================================================= */}
         <RevealOnScroll delayMs={200}>
           <div className="space-y-6">
@@ -552,7 +543,7 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
                     <button
                       type="button"
                       onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                      className="w-full p-5 text-left flex items-center justify-between gap-4 font-heading text-xs sm:text-sm font-bold text-[#2B2566] hover:text-[#F0B55E] transition-colors cursor-pointer"
+                      className="w-full p-5 text-left flex items-center justify-between gap-4 font-sans font-bold text-xs sm:text-sm text-[#2B2566] hover:text-[#F0B55E] transition-colors cursor-pointer"
                     >
                       <span>{faq.q}</span>
                       {isOpen ? (
