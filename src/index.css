@@ -236,6 +236,29 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   letter-spacing: -0.015em;
 }
 
+/* Modal de Checkout / Pagamento: Fontes simples, limpas e sem serifa para títulos e textos, evitando quebras de linha */
+.checkout-modal,
+.checkout-modal h1,
+.checkout-modal h2,
+.checkout-modal h3,
+.checkout-modal h4,
+.checkout-modal h5,
+.checkout-modal h6,
+.checkout-modal p,
+.checkout-modal span,
+.checkout-modal label,
+.checkout-modal button,
+.checkout-modal div,
+.checkout-modal form,
+#paymentBrick_container,
+#paymentBrick_container *,
+.mp-brick-container,
+.mp-brick-container *,
+.svelte-payment-method,
+.svelte-payment-method * {
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+}
+
 /* Fonte Secundária Serifada Elegante (Cormorant Garamond) para Destaques em Amarelo Sol (ex: "para a", "depende", "rotina") */
 .font-highlight,
 .font-serif-italic,

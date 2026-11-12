@@ -225,7 +225,10 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
     },
     visual: {
       style: {
-        theme: 'default' as const
+        theme: 'default' as const,
+        customVariables: {
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+        }
       }
     }
   }), []);
@@ -600,12 +603,12 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#2B2566]/85 backdrop-blur-xs animate-in fade-in font-sans"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#2B2566]/85 backdrop-blur-xs animate-in fade-in font-sans checkout-modal"
       role="dialog"
       aria-modal="true"
     >
       {/* Container Principal: Cantos Retos (rounded-sm) e Visual Sóbrio */}
-      <div className="relative w-full max-w-xl rounded-sm bg-[#FCFAF7] border border-[#D5CEBF] shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
+      <div className="relative w-full max-w-xl rounded-sm bg-[#FCFAF7] border border-[#D5CEBF] shadow-2xl overflow-hidden flex flex-col max-h-[94vh] checkout-modal font-sans">
         
         {/* =========================================================================
             HEADER OFICIAL CASA 6 (FONTES SÓBRIAS E CANTOS RETOS)
@@ -735,7 +738,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
           {currentStep === 1 && (
             <form onSubmit={handleNextFromStep1} className="space-y-4">
               <div className="border-b border-[#E2DCCF] pb-2.5">
-                <h3 className="text-base font-bold text-[#2B2566] tracking-tight">
+                <h3 className="text-sm sm:text-base font-semibold text-[#2B2566] tracking-normal font-sans">
                   1. Seus Dados de Contato
                 </h3>
                 <p className="text-xs text-[#423C7B] mt-0.5">
@@ -868,7 +871,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
           {currentStep === 2 && isLoja && (
             <form onSubmit={handleNextFromStep2} className="space-y-4">
               <div className="border-b border-[#E2DCCF] pb-2.5">
-                <h3 className="text-base font-bold text-[#2B2566] flex items-center gap-2 tracking-tight">
+                <h3 className="text-sm sm:text-base font-semibold text-[#2B2566] flex items-center gap-2 tracking-normal font-sans">
                   <Truck className="h-4 w-4 text-[#B87314]" />
                   <span>2. Endereço de Envio</span>
                 </h3>
@@ -1040,7 +1043,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
           {currentStep === 2 && !isLoja && (
             <form onSubmit={handleNextFromStep2} className="space-y-4">
               <div className="border-b border-[#E2DCCF] pb-2.5">
-                <h3 className="text-base font-bold text-[#2B2566] flex items-center gap-2 tracking-tight">
+                <h3 className="text-sm sm:text-base font-semibold text-[#2B2566] flex items-center gap-2 tracking-normal font-sans">
                   <Sparkles className="h-4 w-4 text-[#F0B55E]" />
                   <span>2. Dados Astrais & CPF</span>
                 </h3>
@@ -1206,7 +1209,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
           {currentStep === 3 && (
             <div className="space-y-4">
               <div className="border-b border-[#E2DCCF] pb-2.5">
-                <h3 className="text-base font-bold text-[#2B2566] flex items-center gap-2 tracking-tight">
+                <h3 className="text-sm sm:text-base font-semibold text-[#2B2566] flex items-center gap-2 tracking-normal font-sans">
                   <ShieldCheck className="h-4 w-4 text-[#12BB40]" />
                   <span>3. Pagamento Transparente Mercado Pago</span>
                 </h3>
@@ -1361,7 +1364,7 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
                 <span className="text-[10px] uppercase font-bold tracking-wider text-[#12BB40]">
                   PAGAMENTO APROVADO & CONFIRMADO
                 </span>
-                <h3 className="text-xl sm:text-2xl font-bold text-[#2B2566] tracking-tight">
+                <h3 className="text-lg sm:text-xl font-bold text-[#2B2566] tracking-normal font-sans">
                   {isPatota ? 'Bem-vinda(o) à Patota Astral!' : 'Compra Confirmada com Sucesso!'}
                 </h3>
                 <p className="text-xs text-[#423C7B] max-w-md mx-auto leading-relaxed">
