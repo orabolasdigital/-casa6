@@ -305,12 +305,13 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                   <div className="absolute top-1 right-12 w-2.5 h-2.5 rounded-full bg-[#2B2566]/60"></div>
                 </div>
 
-                {/* 5. Moldura Circular Principal da Foto com Borda Branca e Anel Dourado Suave */}
-                <div className="relative w-full h-full rounded-full overflow-hidden shadow-2xl border-4 sm:border-6 lg:border-8 border-white bg-white ring-1 ring-[#F0B55E]/40">
+                {/* 5. Moldura Circular Principal da Foto Sem Borda Branca e Estática */}
+                <div className="relative w-full h-full rounded-full overflow-hidden shadow-xl ring-1 ring-[#F0B55E]/25">
                   <img
                     src="https://static.wixstatic.com/media/02c8e0_54a33eeb476d45c49b7f4953c34177fc~mv2.jpeg"
                     alt="Bianca Tofoli — Fundadora da Casa 6"
-                    className="w-full h-full object-cover object-center protected-img transition-transform duration-700 hover:scale-103"
+                    className="w-full h-full object-cover protected-img"
+                    style={{ objectPosition: '50% 8%' }}
                     draggable={false}
                   />
                 </div>
@@ -356,10 +357,10 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
               <div className="pt-2">
                 <button
                   onClick={() => onNavigate('/sobre')}
-                  className="inline-flex items-center gap-2.5 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] px-8 py-3.5 text-xs sm:text-sm font-bold text-[#2B2566] transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-md uppercase tracking-wider"
+                  className="inline-flex items-center gap-2.5 rounded-full border-2 border-[#F0B55E] bg-transparent hover:bg-[#F0B55E]/10 px-8 py-3.5 text-xs sm:text-sm font-bold text-[#2B2566] hover:text-[#B87314] transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer uppercase tracking-wider"
                 >
                   <span>CONHEÇA MINHA TRAJETÓRIA</span>
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 text-[#F0B55E]" />
                 </button>
               </div>
             </div>
