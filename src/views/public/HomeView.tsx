@@ -224,18 +224,6 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
         </div>
 
         <div className="relative mx-auto max-w-5xl z-10 space-y-6 pb-12 sm:pb-20 lg:pb-28">
-          {/* Box / Selo Casa 6 Bianca Tofoli com Favicon, Borda Suave e Fundo Transparente */}
-          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-white/25 bg-transparent backdrop-blur-xs">
-            <img
-              src="https://static.wixstatic.com/media/02c8e0_bce65db1891746ca848f16f8403ddaed~mv2.png"
-              alt="Casa 6"
-              className="h-4 w-4 object-contain"
-            />
-            <span className="text-[11px] font-light uppercase tracking-[0.2em] text-white/90">
-              Casa 6 • Bianca Tofoli
-            </span>
-          </div>
-
           <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.25em] text-[#E6E3F1] font-semibold">
             <span>ASTROLOGIA</span>
             <span className="text-[#F0B55E]">•</span>
@@ -260,10 +248,10 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
           <div className="pt-4 flex items-center">
             <button
               onClick={() => onNavigate('/atendimentos')}
-              className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[#F0B55E] px-8 py-4 text-xs sm:text-sm font-bold text-[#2B2566] shadow-xl hover:bg-[#dfa247] transition-all transform hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer uppercase tracking-wider"
+              className="inline-flex items-center justify-center gap-2.5 rounded-full border border-[#F0B55E] bg-transparent hover:bg-[#F0B55E]/15 px-8 py-3.5 text-xs sm:text-sm font-medium text-[#F0B55E] hover:text-white transition-all transform hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer uppercase tracking-wider backdrop-blur-xs"
             >
               <span>CONHEÇA NOSSOS ATENDIMENTOS</span>
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 text-[#2B2566]" />
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 text-[#F0B55E] group-hover:text-white" />
             </button>
           </div>
         </div>
@@ -357,7 +345,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
               <div className="pt-2">
                 <button
                   onClick={() => onNavigate('/sobre')}
-                  className="inline-flex items-center gap-2.5 rounded-full border-2 border-[#F0B55E] bg-transparent hover:bg-[#F0B55E]/10 px-8 py-3.5 text-xs sm:text-sm font-bold text-[#2B2566] hover:text-[#B87314] transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer uppercase tracking-wider"
+                  className="inline-flex items-center gap-2.5 rounded-full border border-[#F0B55E] bg-transparent hover:bg-[#F0B55E]/10 px-8 py-3.5 text-xs sm:text-sm font-medium text-[#2B2566] hover:text-[#B87314] transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer uppercase tracking-wider"
                 >
                   <span>CONHEÇA MINHA TRAJETÓRIA</span>
                   <ArrowRight className="h-4 w-4 text-[#F0B55E]" />
