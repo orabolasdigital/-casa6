@@ -230,7 +230,7 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
               LOJINHA OFICIAL CASA 6 • RITUAIS & OBJETOS
             </span>
             <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-[#2B2566] tracking-tight">
-              Lojinha Casa 6
+              Produtos Edição Limitada
             </h1>
             
             {/* Linha-Ponto do Brand Guide */}
@@ -243,32 +243,6 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
             <p className="text-xs sm:text-sm md:text-[15px] text-[#423C7B] leading-relaxed font-normal">
               Curadorias rituais e amuletos desenhados para materializar os ciclos astrológicos na sua rotina com sensibilidade, presença e beleza.
             </p>
-          </div>
-        </RevealOnScroll>
-
-        {/* =========================================================================
-            BANNER INFORMATIVO DE PRODUÇÃO ARTESANAL & PRÓXIMOS LANÇAMENTOS
-            ========================================================================= */}
-        <RevealOnScroll delayMs={80}>
-          <div className="bg-white/80 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left shadow-[0_6px_20px_rgba(43,37,102,0.02)]">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#F0B55E]/15 flex items-center justify-center text-[#F0B55E] shrink-0">
-                <Sparkles className="h-5 w-5" />
-              </div>
-              <div className="space-y-0.5">
-                <h4 className="font-heading text-sm font-bold text-[#2B2566]">
-                  Lotes Artesanais & Edições Limitadas
-                </h4>
-                <p className="text-xs text-[#534D6B]">
-                  Nossas boxes são produzidas em tiragens exclusivas e numeradas para preservar a energia e qualidade de cada elemento.
-                </p>
-              </div>
-            </div>
-
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FAF8F5] border border-[#EADBCC] text-[11px] font-semibold text-[#8C987F] shrink-0">
-              <span className="w-2 h-2 rounded-full bg-[#25D366]" />
-              <span>4 Produtos Cadastrados</span>
-            </div>
           </div>
         </RevealOnScroll>
 
