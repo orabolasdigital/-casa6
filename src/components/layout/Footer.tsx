@@ -356,10 +356,18 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          {/* Linha 2: Desenvolvido por @orabolasdigital Alinhado com Site Protegido contra Cópia */}
+          {/* Linha 2: Site Protegido contra Cópia na Esquerda e Desenvolvido por @orabolasdigital na Direita */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-3 pt-3 border-t border-white/5 text-[11px] text-center md:text-left">
+            {/* Proteção / Site Seguro nos termos da Lei Federal nº 9.610/1998 */}
+            <div className="flex items-center justify-center md:justify-start gap-1.5 text-[11px] text-[#25D366] shrink-0">
+              <ShieldCheck className="h-4 w-4 shrink-0 text-[#25D366]" />
+              <span className="text-[#E6E3F1]/75">
+                {SITE_CONFIG.legalNotice}
+              </span>
+            </div>
+
             {/* Crédito Desenvolvido por @orabolasdigital com Ícone Espiral */}
-            <div className="flex items-center justify-center md:justify-start gap-2">
+            <div className="flex items-center justify-center md:justify-end gap-2">
               {/* Ícone Espiral Cósmica Oficial */}
               <svg
                 className="h-4 w-4 text-[#F0B55E] shrink-0 transition-transform duration-700 hover:rotate-180"
@@ -385,14 +393,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                   @orabolasdigital
                 </a>{' '}
                 com estratégia humana e IA. Propriedade intelectual protegida.
-              </span>
-            </div>
-
-            {/* Proteção / Site Seguro nos termos da Lei Federal nº 9.610/1998 */}
-            <div className="flex items-center justify-center md:justify-end gap-1.5 text-[11px] text-[#25D366] shrink-0">
-              <ShieldCheck className="h-4 w-4 shrink-0 text-[#25D366]" />
-              <span className="text-[#E6E3F1]/75">
-                {SITE_CONFIG.legalNotice}
               </span>
             </div>
           </div>
