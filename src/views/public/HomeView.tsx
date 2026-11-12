@@ -501,22 +501,6 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
               ))}
             </div>
           </div>
-
-          {/* Indicadores de Página Suaves */}
-          <div className="flex items-center justify-center gap-2 pt-8">
-            {testimonialGroups.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => changeTestimonialGroup(i)}
-                aria-label={`Grupo ${i + 1}`}
-                className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${
-                  testimonialGroupIndex === i
-                    ? 'w-7 bg-[#2B2566]'
-                    : 'w-2 bg-[#2B2566]/20 hover:bg-[#2B2566]/40'
-                }`}
-              />
-            ))}
-          </div>
         </div>
       </section>
 
