@@ -169,10 +169,10 @@ export const APP_ROUTES: Record<string, RouteMeta> = {
   },
   bussula: {
     path: '/bussula',
-    title: 'Bússola Guia | Relatório Astral Mensal Personalizado — Casa 6',
-    description: 'Relatório astrológico mensal calculado individualmente a partir do seu mapa de nascimento. Entregue em PDF pelo WhatsApp e na Área de Membros.',
+    title: 'Bússolas Astrológicas Personalizadas | Casa6',
+    description: 'Descubra suas Bússolas Astrológicas: profissional, amorosa e pessoal. Autoconhecimento através do mapa astral com orientações personalizadas em PDF.',
     canonicalUrl: 'https://casa6.com.br/bussula',
-    section: 'Serviços',
+    section: 'Produtos',
     isAdmin: false,
     showInNav: true,
     navLabel: 'bússola guia'

@@ -112,7 +112,7 @@ export default function App() {
   const isAdminRoute = currentPath.startsWith('/painel');
 
   return (
-    <div className={`min-h-screen flex flex-col ${isAdminRoute ? 'admin-scope' : 'protected-content'}`}>
+    <div className={`min-h-screen flex flex-col overflow-x-hidden w-full max-w-full ${isAdminRoute ? 'admin-scope' : 'protected-content'}`}>
       {/* Injeção Dinâmica de SEO & JSON-LD */}
       <SEOMeta meta={currentMeta} />
 
