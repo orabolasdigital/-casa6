@@ -92,7 +92,7 @@ const RevealOnScroll: React.FC<{
 };
 
 export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
-  const [selectedPlan, setSelectedPlan] = useState<'anual' | 'semestral' | 'trimestral'>('anual');
+  const [selectedPlan, setSelectedPlan] = useState<'anual' | 'semestral' | 'trimestral' | 'mensal'>('anual');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -109,16 +109,25 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
-  // Planos com o Anual em destaque (R$ 1,50 por dia)
+  // Planos com o Anual em destaque (R$ 47,00/mês na renovação anual)
   const plans = [
     {
       id: 'anual',
       name: 'Plano Anual',
-      price: 43.0,
-      priceFormatted: 'R$ 43,00',
+      price: 47.0,
+      priceFormatted: 'R$ 47,00',
       periodText: 'por mês (renovação anual)',
       badge: 'R$ 1,50 por dia • Melhor Valor',
       highlight: true
+    },
+    {
+      id: 'mensal',
+      name: 'Plano Mensal',
+      price: 47.0,
+      priceFormatted: 'R$ 47,00',
+      periodText: 'por mês (renovação mensal)',
+      badge: 'Sem Fidelidade',
+      highlight: false
     },
     {
       id: 'semestral',
@@ -200,7 +209,7 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
     },
     {
       q: 'QUAL PLANO DE ASSINATURA É MAIS VANTAJOSO PARA MIM?',
-      a: 'O Plano Anual é o mais vantajoso, pois oferece a maior economia — saindo por apenas cerca de R$ 1,50 por dia (menos que um cafézinho) — e garante sua presença contínua em todos os 12 encontros e lunações do ano.'
+      a: 'O Plano Anual é o mais vantajoso, pois oferece a maior economia — saindo por apenas cerca de R$ 1,50 por dia (R$ 47,00/mês na renovação anual) — e garante sua presença contínua em todos os 12 encontros e lunações do ano.'
     },
     {
       q: 'TENHO UMA DÚVIDA OU PRECISO DE AJUDA COM MINHA ASSINATURA. O QUE FAÇO?',
@@ -450,7 +459,7 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
                   PASSO 1: ESCOLHA SEU PLANO DE ASSINATURA
                 </span>
 
-                <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-3 -mx-2 px-2 scrollbar-none md:mx-0 md:px-0 md:pb-0 md:overflow-visible md:grid md:grid-cols-3 md:gap-4">
+                <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-3 -mx-2 px-2 scrollbar-none md:mx-0 md:px-0 md:pb-0 md:overflow-visible md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-4">
                   {plans.map((plan) => {
                     const isSelected = selectedPlan === plan.id;
                     return (

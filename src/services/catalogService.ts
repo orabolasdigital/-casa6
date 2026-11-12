@@ -278,10 +278,23 @@ export const CATALOG_ASSINATURAS: AssinaturaProduct[] = [
     title: 'Patota Astral — Assinatura Anual',
     image: 'https://static.wixstatic.com/media/02c8e0_e5132493b4a14c0498c5df95ee68c593~mv2.png',
     description: 'Grupo VIP no WhatsApp com previsões diárias, encontros mensais ao vivo com Bianca Tofoli, materiais exclusivos e sorteios. Cerca de R$ 1,50 por dia.',
-    price: 43,
+    price: 47,
     billingPeriod: 'anual',
     isRecurring: true,
-    priceFormatted: 'R$ 43,00 (renovação automática)',
+    priceFormatted: 'R$ 47,00/mês (renovação anual)',
+    category: 'assinaturas',
+    ctaType: 'mercadopago'
+  },
+  {
+    id: 'patota-astral-mensal',
+    serviceId: 'patota',
+    title: 'Patota Astral — Assinatura Mensal',
+    image: 'https://static.wixstatic.com/media/02c8e0_e5132493b4a14c0498c5df95ee68c593~mv2.png',
+    description: 'Grupo VIP no WhatsApp com previsões diárias, encontros mensais ao vivo com Bianca Tofoli e materiais exclusivos.',
+    price: 47,
+    billingPeriod: 'mensal',
+    isRecurring: true,
+    priceFormatted: 'R$ 47,00/mês (renovação mensal)',
     category: 'assinaturas',
     ctaType: 'mercadopago'
   }
