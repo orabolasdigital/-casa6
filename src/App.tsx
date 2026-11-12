@@ -147,7 +147,11 @@ export default function App() {
         ) : currentPath === '/palestras' || currentPath === '/encontros' ? (
           <PalestrasView onOpenBooking={() => handleOpenBooking()} />
         ) : currentPath === '/leituras' || currentPath === '/blog' || currentPath.startsWith('/leituras/') || currentPath.startsWith('/blog/') ? (
-          <BlogView onNavigate={navigateTo} />
+          <BlogView
+            onNavigate={navigateTo}
+            currentPath={currentPath}
+            onOpenBooking={handleOpenBooking}
+          />
         ) : currentPath === '/lojinha' || currentPath === '/loja' || currentPath.startsWith('/lojinha/') || currentPath.startsWith('/loja/') ? (
           <LojaView onOpenBooking={() => handleOpenBooking()} />
         ) : currentPath === '/politica-de-privacidade' ? (

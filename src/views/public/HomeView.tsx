@@ -782,7 +782,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
 
                   <div className="pt-2">
                     <button
-                      onClick={() => onNavigate('/leituras')}
+                      onClick={() => onNavigate(`/leituras/${post.slug}`)}
                       className="whitespace-nowrap inline-flex items-center gap-1.5 rounded-full bg-[#2B2566] hover:bg-[#3D206B] text-white px-5 py-2.5 text-xs font-bold uppercase tracking-wider shadow-[0_4px_14px_rgba(43,37,102,0.25)] hover:shadow-[0_6px_20px_rgba(43,37,102,0.35)] transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shrink-0"
                     >
                       <span>Leia mais</span>
