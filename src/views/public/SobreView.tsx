@@ -156,10 +156,10 @@ export const SobreView: React.FC<SobreViewProps> = ({ onOpenBooking }) => {
                   {/* 5. Moldura Circular Principal da Foto com Enquadramento Oficial */}
                   <div className="relative w-full h-full rounded-full overflow-hidden shadow-xl ring-1 ring-[#F0B55E]/25">
                     <img
-                      src="https://static.wixstatic.com/media/02c8e0_54a33eeb476d45c49b7f4953c34177fc~mv2.jpeg"
+                      src="https://static.wixstatic.com/media/02c8e0_dd0430bc5bee4a5c93824bc5d867d23a~mv2.jpeg"
                       alt="Bianca Tofoli — Fundadora da Casa 6"
                       className="w-full h-full object-cover protected-img"
-                      style={{ objectPosition: '50% 8%' }}
+                      style={{ objectPosition: '50% 20%' }}
                       draggable={false}
                     />
                   </div>
@@ -242,14 +242,14 @@ export const SobreView: React.FC<SobreViewProps> = ({ onOpenBooking }) => {
               </p>
             </div>
 
-            {/* Os 3 Pilares Flutuantes (com Ícones 3D Celestiais Oficiais) */}
+            {/* Os 3 Pilares Flutuantes (com Ícones Oficiais) */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 pt-2">
               
               {/* Pilar 1: Autoconhecimento */}
               <div className="text-center space-y-3 p-4 rounded-2xl hover:bg-[#FAF8F5]/80 transition-all duration-300 transform hover:-translate-y-1">
                 <div className="w-24 h-24 sm:w-28 sm:h-28 mx-auto flex items-center justify-center">
                   <img
-                    src="/assets/aistudio/image_30c7e042.png"
+                    src="https://static.wixstatic.com/media/02c8e0_dc21f7c342a24e5794a3c0ce2003bb38~mv2.png"
                     alt="Pilar Autoconhecimento — Casa 6"
                     className="w-full h-full object-contain filter drop-shadow-[0_8px_16px_rgba(43,37,102,0.08)] transition-transform duration-500 hover:scale-110"
                     draggable={false}
@@ -267,7 +267,7 @@ export const SobreView: React.FC<SobreViewProps> = ({ onOpenBooking }) => {
               <div className="text-center space-y-3 p-4 rounded-2xl hover:bg-[#FAF8F5]/80 transition-all duration-300 transform hover:-translate-y-1">
                 <div className="w-24 h-24 sm:w-28 sm:h-28 mx-auto flex items-center justify-center">
                   <img
-                    src="/assets/aistudio/image_77bb79cb.png"
+                    src="https://static.wixstatic.com/media/02c8e0_79cfd35824e84726b79fbb06368323cf~mv2.png"
                     alt="Pilar Equilíbrio — Casa 6"
                     className="w-full h-full object-contain filter drop-shadow-[0_8px_16px_rgba(43,37,102,0.08)] transition-transform duration-500 hover:scale-110"
                     draggable={false}
@@ -285,7 +285,7 @@ export const SobreView: React.FC<SobreViewProps> = ({ onOpenBooking }) => {
               <div className="text-center space-y-3 p-4 rounded-2xl hover:bg-[#FAF8F5]/80 transition-all duration-300 transform hover:-translate-y-1">
                 <div className="w-24 h-24 sm:w-28 sm:h-28 mx-auto flex items-center justify-center">
                   <img
-                    src="/assets/aistudio/image_a6eb609e.png"
+                    src="https://static.wixstatic.com/media/02c8e0_17ca936af3aa4520b982764224b52394~mv2.png"
                     alt="Pilar Expansão — Casa 6"
                     className="w-full h-full object-contain filter drop-shadow-[0_8px_16px_rgba(43,37,102,0.08)] transition-transform duration-500 hover:scale-110"
                     draggable={false}
