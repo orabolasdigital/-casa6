@@ -242,11 +242,11 @@ export const SobreView: React.FC<SobreViewProps> = ({ onOpenBooking }) => {
               </p>
             </div>
 
-            {/* Os 3 Pilares Flutuantes (com Ícones Oficiais) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 pt-2">
+            {/* Os 3 Pilares Flutuantes: Carrossel no Mobile e Grid no Desktop */}
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 scrollbar-none md:mx-0 md:px-0 md:pb-0 md:overflow-visible md:grid md:grid-cols-3 md:gap-8 pt-2">
               
               {/* Pilar 1: Autoconhecimento */}
-              <div className="text-center space-y-3 p-4 rounded-2xl hover:bg-[#FAF8F5]/80 transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-[78vw] md:w-auto shrink-0 snap-center md:shrink text-center space-y-3 p-4 rounded-2xl bg-[#FAF8F5]/60 md:bg-transparent hover:bg-[#FAF8F5]/80 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between">
                 <div className="w-24 h-24 sm:w-28 sm:h-28 mx-auto flex items-center justify-center">
                   <img
                     src="https://static.wixstatic.com/media/02c8e0_dc21f7c342a24e5794a3c0ce2003bb38~mv2.png"
@@ -264,7 +264,7 @@ export const SobreView: React.FC<SobreViewProps> = ({ onOpenBooking }) => {
               </div>
 
               {/* Pilar 2: Equilíbrio */}
-              <div className="text-center space-y-3 p-4 rounded-2xl hover:bg-[#FAF8F5]/80 transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-[78vw] md:w-auto shrink-0 snap-center md:shrink text-center space-y-3 p-4 rounded-2xl bg-[#FAF8F5]/60 md:bg-transparent hover:bg-[#FAF8F5]/80 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between">
                 <div className="w-24 h-24 sm:w-28 sm:h-28 mx-auto flex items-center justify-center">
                   <img
                     src="https://static.wixstatic.com/media/02c8e0_79cfd35824e84726b79fbb06368323cf~mv2.png"
@@ -282,7 +282,7 @@ export const SobreView: React.FC<SobreViewProps> = ({ onOpenBooking }) => {
               </div>
 
               {/* Pilar 3: Expansão */}
-              <div className="text-center space-y-3 p-4 rounded-2xl hover:bg-[#FAF8F5]/80 transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-[78vw] md:w-auto shrink-0 snap-center md:shrink text-center space-y-3 p-4 rounded-2xl bg-[#FAF8F5]/60 md:bg-transparent hover:bg-[#FAF8F5]/80 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between">
                 <div className="w-24 h-24 sm:w-28 sm:h-28 mx-auto flex items-center justify-center">
                   <img
                     src="https://static.wixstatic.com/media/02c8e0_17ca936af3aa4520b982764224b52394~mv2.png"
@@ -299,6 +299,12 @@ export const SobreView: React.FC<SobreViewProps> = ({ onOpenBooking }) => {
                 </p>
               </div>
 
+            </div>
+
+            {/* Indicador sutil de carrossel no mobile */}
+            <div className="flex md:hidden items-center justify-center gap-1.5 text-[11px] font-semibold text-[#8C987F] -mt-2">
+              <span>Deslize para ver todos os pilares</span>
+              <ArrowRight className="h-3 w-3" />
             </div>
 
           </div>

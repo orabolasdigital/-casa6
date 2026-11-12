@@ -263,42 +263,54 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div className="bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-6 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-[#2B2566]/10 flex items-center justify-center text-[#2B2566]">
-                  <Smartphone className="h-5 w-5 text-[#2B2566]" />
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 scrollbar-none md:mx-0 md:px-0 md:pb-0 md:overflow-visible md:grid md:grid-cols-3 md:gap-5">
+              <div className="w-[82vw] md:w-auto shrink-0 snap-center md:shrink bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-6 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-3 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#2B2566]/10 flex items-center justify-center text-[#2B2566]">
+                    <Smartphone className="h-5 w-5 text-[#2B2566]" />
+                  </div>
+                  <h3 className="font-heading text-lg font-bold text-[#2B2566]">
+                    No Seu WhatsApp
+                  </h3>
+                  <p className="text-xs text-[#534D6B] leading-relaxed">
+                    Relatório completo diagramado em PDF entregue mensalmente no seu WhatsApp nos primeiros dias de cada ciclo astrológico.
+                  </p>
                 </div>
-                <h3 className="font-heading text-lg font-bold text-[#2B2566]">
-                  No Seu WhatsApp
-                </h3>
-                <p className="text-xs text-[#534D6B] leading-relaxed">
-                  Relatório completo diagramado em PDF entregue mensalmente no seu WhatsApp nos primeiros dias de cada ciclo astrológico.
-                </p>
               </div>
 
-              <div className="bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-6 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-[#2B2566]/10 flex items-center justify-center text-[#2B2566]">
-                  <Lock className="h-5 w-5 text-[#2B2566]" />
+              <div className="w-[82vw] md:w-auto shrink-0 snap-center md:shrink bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-6 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-3 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#2B2566]/10 flex items-center justify-center text-[#2B2566]">
+                    <Lock className="h-5 w-5 text-[#2B2566]" />
+                  </div>
+                  <h3 className="font-heading text-lg font-bold text-[#2B2566]">
+                    Área de Membros
+                  </h3>
+                  <p className="text-xs text-[#534D6B] leading-relaxed">
+                    Acesso permanente a uma plataforma exclusiva com login seguro para consultar seus relatórios atuais e históricos a qualquer hora.
+                  </p>
                 </div>
-                <h3 className="font-heading text-lg font-bold text-[#2B2566]">
-                  Área de Membros
-                </h3>
-                <p className="text-xs text-[#534D6B] leading-relaxed">
-                  Acesso permanente a uma plataforma exclusiva com login seguro para consultar seus relatórios atuais e históricos a qualquer hora.
-                </p>
               </div>
 
-              <div className="bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-6 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-[#2B2566]/10 flex items-center justify-center text-[#2B2566]">
-                  <Sparkles className="h-5 w-5 text-[#2B2566]" />
+              <div className="w-[82vw] md:w-auto shrink-0 snap-center md:shrink bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-6 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-3 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#2B2566]/10 flex items-center justify-center text-[#2B2566]">
+                    <Sparkles className="h-5 w-5 text-[#2B2566]" />
+                  </div>
+                  <h3 className="font-heading text-lg font-bold text-[#2B2566]">
+                    100% Personalizado
+                  </h3>
+                  <p className="text-xs text-[#534D6B] leading-relaxed">
+                    Não é horóscopo geral. É um cálculo astronômico rigoroso baseado na data, hora exata e cidade de nascimento.
+                  </p>
                 </div>
-                <h3 className="font-heading text-lg font-bold text-[#2B2566]">
-                  100% Personalizado
-                </h3>
-                <p className="text-xs text-[#534D6B] leading-relaxed">
-                  Não é horóscopo geral. É um cálculo astronômico rigoroso baseado na data, hora exata e cidade de nascimento.
-                </p>
               </div>
+            </div>
+
+            {/* Indicador sutil de carrossel no mobile */}
+            <div className="flex md:hidden items-center justify-center gap-1.5 text-[11px] font-semibold text-[#8C987F] -mt-2">
+              <span>Deslize para ver todos os pilares</span>
+              <ArrowRight className="h-3 w-3" />
             </div>
           </div>
         </RevealOnScroll>

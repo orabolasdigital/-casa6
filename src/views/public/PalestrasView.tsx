@@ -423,11 +423,11 @@ export const PalestrasView: React.FC<PalestrasViewProps> = ({ onOpenBooking }) =
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch">
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 scrollbar-none md:mx-0 md:px-0 md:pb-0 md:overflow-visible md:grid md:grid-cols-3 md:gap-8 items-stretch">
               {coreLectures.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white/95 backdrop-blur-xs rounded-3xl border border-[#EADBCC]/70 shadow-[0_14px_35px_rgba(43,37,102,0.04)] hover:shadow-[0_20px_45px_rgba(43,37,102,0.07)] transition-all duration-300 p-6 sm:p-7 flex flex-col justify-between"
+                  className="w-[84vw] md:w-auto shrink-0 snap-center md:shrink bg-white/95 backdrop-blur-xs rounded-3xl border border-[#EADBCC]/70 shadow-[0_14px_35px_rgba(43,37,102,0.04)] hover:shadow-[0_20px_45px_rgba(43,37,102,0.07)] transition-all duration-300 p-6 sm:p-7 flex flex-col justify-between"
                 >
                   <div className="space-y-4">
                     {/* Imagem 3D Centralizada */}
@@ -493,6 +493,12 @@ export const PalestrasView: React.FC<PalestrasViewProps> = ({ onOpenBooking }) =
                 </div>
               ))}
             </div>
+
+            {/* Indicador sutil de carrossel no mobile */}
+            <div className="flex md:hidden items-center justify-center gap-1.5 text-[11px] font-semibold text-[#8C987F] -mt-1">
+              <span>Deslize para ver todos os workshops</span>
+              <ArrowRight className="h-3 w-3" />
+            </div>
           </div>
         </RevealOnScroll>
 
@@ -512,11 +518,11 @@ export const PalestrasView: React.FC<PalestrasViewProps> = ({ onOpenBooking }) =
               </h2>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 items-stretch">
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-3 -mx-4 px-4 scrollbar-none sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:gap-4 items-stretch">
               {CORPORATE_METRICS.map((kpi, idx) => (
                 <div
                   key={idx}
-                  className="bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-4 shadow-[0_8px_20px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_28px_rgba(43,37,102,0.06)] transition-all duration-300 flex flex-col justify-between text-center space-y-2"
+                  className="w-[64vw] sm:w-auto shrink-0 snap-center sm:shrink bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-4 shadow-[0_8px_20px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_28px_rgba(43,37,102,0.06)] transition-all duration-300 flex flex-col justify-between text-center space-y-2"
                 >
                   <div className="space-y-1">
                     <span className="font-heading text-3xl sm:text-4xl font-extrabold text-[#F0B55E] tracking-tight block">
@@ -537,6 +543,12 @@ export const PalestrasView: React.FC<PalestrasViewProps> = ({ onOpenBooking }) =
                 </div>
               ))}
             </div>
+
+            {/* Indicador sutil de carrossel no mobile */}
+            <div className="flex sm:hidden items-center justify-center gap-1.5 text-[11px] font-semibold text-[#8C987F] -mt-1">
+              <span>Deslize para ver todas as evidências</span>
+              <ArrowRight className="h-3 w-3" />
+            </div>
           </div>
         </RevealOnScroll>
 
@@ -556,13 +568,13 @@ export const PalestrasView: React.FC<PalestrasViewProps> = ({ onOpenBooking }) =
               </h2>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 items-stretch">
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-3 -mx-4 px-4 scrollbar-none sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:gap-4 items-stretch">
               {TIMING_REASONS.map((timing, tIdx) => {
                 const IconComponent = timing.icon;
                 return (
                   <div
                     key={tIdx}
-                    className="p-4 rounded-2xl bg-white/80 border border-[#EADBCC]/60 space-y-2 text-center transition-all duration-300 hover:border-[#F0B55E]/60 hover:bg-white flex flex-col justify-between"
+                    className="w-[64vw] sm:w-auto shrink-0 snap-center sm:shrink p-4 rounded-2xl bg-white/80 border border-[#EADBCC]/60 space-y-2 text-center transition-all duration-300 hover:border-[#F0B55E]/60 hover:bg-white flex flex-col justify-between"
                   >
                     <div className="space-y-2">
                       <div className="w-9 h-9 mx-auto rounded-xl bg-[#F0B55E]/15 flex items-center justify-center text-[#2B2566]">
@@ -578,6 +590,12 @@ export const PalestrasView: React.FC<PalestrasViewProps> = ({ onOpenBooking }) =
                   </div>
                 );
               })}
+            </div>
+
+            {/* Indicador sutil de carrossel no mobile */}
+            <div className="flex sm:hidden items-center justify-center gap-1.5 text-[11px] font-semibold text-[#8C987F] -mt-1">
+              <span>Deslize para ver todos os momentos</span>
+              <ArrowRight className="h-3 w-3" />
             </div>
           </div>
         </RevealOnScroll>
@@ -603,12 +621,12 @@ export const PalestrasView: React.FC<PalestrasViewProps> = ({ onOpenBooking }) =
               </p>
             </div>
 
-            {/* Cards dos 5 Temas em Grid Suave */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {/* Cards dos 5 Temas: Carrossel no Mobile e Grid no Desktop */}
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 scrollbar-none sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-2 lg:grid-cols-5 sm:gap-4">
               {ADDITIONAL_THEMES.map((theme, thIdx) => (
                 <div
                   key={thIdx}
-                  className="bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-4 shadow-[0_6px_18px_rgba(43,37,102,0.02)] hover:shadow-[0_10px_24px_rgba(43,37,102,0.05)] transition-all duration-300 flex flex-col justify-between space-y-2"
+                  className="w-[75vw] sm:w-auto shrink-0 snap-center sm:shrink bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-4 shadow-[0_6px_18px_rgba(43,37,102,0.02)] hover:shadow-[0_10px_24px_rgba(43,37,102,0.05)] transition-all duration-300 flex flex-col justify-between space-y-2"
                 >
                   <div className="space-y-1">
                     <span className="text-[9px] font-bold uppercase tracking-wider text-[#8C987F] block">
@@ -638,20 +656,20 @@ export const PalestrasView: React.FC<PalestrasViewProps> = ({ onOpenBooking }) =
               ))}
             </div>
 
-            {/* Mosaico de Vídeos Expandido em Linha Única (7 vídeos no desktop) */}
+            {/* Mosaico de Vídeos: Carrossel no Mobile e Grid no Desktop */}
             <div className="space-y-3 pt-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C987F] block text-center sm:text-left">
                 ASSISTA AOS CONTEÚDOS COM A BIANCA NO YOUTUBE:
               </span>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+              <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-3 -mx-4 px-4 scrollbar-none sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-4 lg:grid-cols-7">
                 {YOUTUBE_VIDEOS.map((video, vIdx) => (
                   <a
                     key={vIdx}
                     href={video.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group bg-white rounded-xl overflow-hidden border border-[#EADBCC]/60 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+                    className="w-[65vw] sm:w-auto shrink-0 snap-center sm:shrink group bg-white rounded-xl overflow-hidden border border-[#EADBCC]/60 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between"
                   >
                     <div className="relative aspect-video w-full overflow-hidden bg-black/10">
                       <img
@@ -708,13 +726,13 @@ export const PalestrasView: React.FC<PalestrasViewProps> = ({ onOpenBooking }) =
               </p>
             </div>
 
-            {/* Mosaico de Fotos Reais da Bianca em Exatamente 2 Linhas na Largura Total */}
+            {/* Mosaico de Fotos Reais: Carrossel no Mobile e Grid 2 Linhas no Desktop */}
             <div className="space-y-2">
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+              <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-3 -mx-4 px-4 scrollbar-none sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:gap-4">
                 {GALLERY_PHOTOS.map((photo, pIdx) => (
                   <div
                     key={pIdx}
-                    className="relative overflow-hidden rounded-2xl group border border-[#EADBCC]/60 bg-black/5 shadow-xs hover:shadow-md transition-all duration-300 aspect-4/3 sm:aspect-square"
+                    className="w-[68vw] sm:w-auto shrink-0 snap-center sm:shrink relative overflow-hidden rounded-2xl group border border-[#EADBCC]/60 bg-black/5 shadow-xs hover:shadow-md transition-all duration-300 aspect-4/3 sm:aspect-square"
                   >
                     <img
                       src={photo.url}

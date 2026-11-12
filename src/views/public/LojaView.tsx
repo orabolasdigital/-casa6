@@ -273,15 +273,15 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
         </RevealOnScroll>
 
         {/* =========================================================================
-            LISTAGEM DOS 4 PRODUTOS: 1 PRODUTO POR LINHA (STACKED HORIZONTAL CARDS)
+            LISTAGEM DOS 4 PRODUTOS: CARROSSEL NO MOBILE E EMPILHADOS NO DESKTOP
             ========================================================================= */}
-        <div className="space-y-8 sm:space-y-10">
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-6 -mx-4 px-4 scrollbar-none sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:block sm:space-y-10">
           
           {/* ---------------------------------------------------------------------
               PRODUTO 1: BOX SEMEADURA (ESGOTADO / SLIDESHOW AUTOMÁTICO)
               --------------------------------------------------------------------- */}
-          <RevealOnScroll delayMs={100}>
-            <div className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl lg:rounded-[32px] border border-[#EADBCC]/70 shadow-[0_16px_40px_rgba(43,37,102,0.04)] hover:shadow-[0_20px_50px_rgba(43,37,102,0.07)] transition-all duration-500 overflow-hidden p-6 sm:p-8 lg:p-10">
+          <RevealOnScroll delayMs={100} className="w-[86vw] sm:w-full shrink-0 snap-center sm:shrink flex flex-col">
+            <div className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl lg:rounded-[32px] border border-[#EADBCC]/70 shadow-[0_16px_40px_rgba(43,37,102,0.04)] hover:shadow-[0_20px_50px_rgba(43,37,102,0.07)] transition-all duration-500 overflow-hidden p-6 sm:p-8 lg:p-10 h-full flex flex-col justify-between">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 items-center">
                 
                 {/* Coluna da Imagem & Galeria de Miniaturas com Slideshow Automático */}
@@ -416,8 +416,12 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
               (TAG FIXA SEM PULSAÇÃO, SEM A PALAVRA "PREVISÃO", TAG NA MESMA POSIÇÃO)
               --------------------------------------------------------------------- */}
           {STORE_PRODUCTS.slice(1).map((item, idx) => (
-            <RevealOnScroll key={item.id} delayMs={140 + idx * 60}>
-              <div className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl lg:rounded-[32px] border border-[#EADBCC]/70 shadow-[0_16px_40px_rgba(43,37,102,0.04)] hover:shadow-[0_20px_50px_rgba(43,37,102,0.07)] transition-all duration-500 overflow-hidden p-6 sm:p-8 lg:p-10">
+            <RevealOnScroll
+              key={item.id}
+              delayMs={140 + idx * 60}
+              className="w-[86vw] sm:w-full shrink-0 snap-center sm:shrink flex flex-col"
+            >
+              <div className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl lg:rounded-[32px] border border-[#EADBCC]/70 shadow-[0_16px_40px_rgba(43,37,102,0.04)] hover:shadow-[0_20px_50px_rgba(43,37,102,0.07)] transition-all duration-500 overflow-hidden p-6 sm:p-8 lg:p-10 h-full flex flex-col justify-between">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 items-center">
                   
                   {/* Coluna da Imagem: Fundo Oficial da Carta de Tarô da Página Inicial com Tag Fixa */}
@@ -548,6 +552,12 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
             </RevealOnScroll>
           ))}
 
+        </div>
+
+        {/* Indicador sutil de carrossel no mobile */}
+        <div className="flex sm:hidden items-center justify-center gap-1.5 text-[11px] font-semibold text-[#8C987F] -mt-6">
+          <span>Deslize para o lado para ver todos os produtos</span>
+          <ArrowRight className="h-3 w-3" />
         </div>
 
         {/* =========================================================================

@@ -327,14 +327,14 @@ export const BlogView: React.FC<BlogViewProps> = ({
                 Outras Leituras Astrais
               </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-3 -mx-4 px-4 scrollbar-none sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-2 sm:gap-4">
                 {CATALOG_BLOG_POSTS.filter((p) => p.id !== activePost.id)
                   .slice(0, 2)
                   .map((otherPost) => (
                     <div
                       key={otherPost.id}
                       onClick={() => handleNavigate('/leituras/' + otherPost.slug)}
-                      className="bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-4 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between space-y-3"
+                      className="w-[78vw] sm:w-auto shrink-0 snap-center sm:shrink bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-4 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between space-y-3"
                     >
                       <div className="space-y-2">
                         <span className="text-[10px] font-bold text-[#F0B55E] uppercase tracking-wider block">
@@ -388,11 +388,15 @@ export const BlogView: React.FC<BlogViewProps> = ({
             </div>
           </RevealOnScroll>
 
-          {/* Lista Oficial dos Artigos em Boxes Horizontais Flutuantes com Cantos Arredondados */}
-          <div className="space-y-6 sm:space-y-8">
+          {/* Lista Oficial dos Artigos em Boxes Horizontais: Carrossel no Mobile e Empilhados no Desktop */}
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-6 -mx-4 px-4 scrollbar-none sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:block sm:space-y-8">
             {CATALOG_BLOG_POSTS.map((post, idx) => (
-              <RevealOnScroll key={post.id} delayMs={100 + idx * 50}>
-                <article className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl lg:rounded-[32px] border border-[#EADBCC]/60 shadow-[0_16px_40px_rgba(43,37,102,0.04)] hover:shadow-[0_20px_50px_rgba(43,37,102,0.07)] transition-all duration-500 overflow-hidden p-6 sm:p-8">
+              <RevealOnScroll
+                key={post.id}
+                delayMs={100 + idx * 50}
+                className="w-[86vw] sm:w-full shrink-0 snap-center sm:shrink flex flex-col"
+              >
+                <article className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl lg:rounded-[32px] border border-[#EADBCC]/60 shadow-[0_16px_40px_rgba(43,37,102,0.04)] hover:shadow-[0_20px_50px_rgba(43,37,102,0.07)] transition-all duration-500 overflow-hidden p-6 sm:p-8 h-full flex flex-col justify-between">
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-center">
                     
                     {/* Imagem do Artigo */}
@@ -478,6 +482,12 @@ export const BlogView: React.FC<BlogViewProps> = ({
                 </article>
               </RevealOnScroll>
             ))}
+          </div>
+
+          {/* Indicador sutil de carrossel no mobile */}
+          <div className="flex sm:hidden items-center justify-center gap-1.5 text-[11px] font-semibold text-[#8C987F] -mt-2">
+            <span>Deslize para o lado para ver todos os artigos</span>
+            <ArrowRight className="h-3 w-3" />
           </div>
 
         </div>

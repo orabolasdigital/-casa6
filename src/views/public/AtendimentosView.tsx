@@ -120,21 +120,25 @@ export const AtendimentosView: React.FC<AtendimentosViewProps> = () => {
         </RevealOnScroll>
 
         {/* =========================================================================
-            BANNERS HORIZONTAIS EMPILHADOS COM LAYOUT ALTERNADO
+            BANNERS HORIZONTAIS: CARROSSEL NO MOBILE E EMPILHADOS NO DESKTOP
             1º: Imagem à Direita
             2º: Imagem à Esquerda
             3º: Imagem à Direita
             4º: Imagem à Esquerda
             ========================================================================= */}
-        <div className="space-y-8 sm:space-y-10">
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-6 -mx-4 px-4 scrollbar-none sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:block sm:space-y-10">
           {CATALOG_ATENDIMENTOS.map((item, index) => {
             // Alterna layout: se par, imagem na direita; se ímpar, imagem na esquerda
             const isImageOnRight = index % 2 === 0;
             const hasInstallments = installmentsServices.includes(item.id);
 
             return (
-              <RevealOnScroll key={item.id} delayMs={100 + index * 50}>
-                <div className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl lg:rounded-[32px] border border-[#EADBCC]/60 shadow-[0_16px_40px_rgba(43,37,102,0.04)] hover:shadow-[0_20px_50px_rgba(43,37,102,0.07)] transition-all duration-500 overflow-hidden p-6 sm:p-8 lg:p-10">
+              <RevealOnScroll
+                key={item.id}
+                delayMs={100 + index * 50}
+                className="w-[86vw] sm:w-full shrink-0 snap-center sm:shrink flex flex-col"
+              >
+                <div className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl lg:rounded-[32px] border border-[#EADBCC]/60 shadow-[0_16px_40px_rgba(43,37,102,0.04)] hover:shadow-[0_20px_50px_rgba(43,37,102,0.07)] transition-all duration-500 overflow-hidden p-6 sm:p-8 lg:p-10 h-full flex flex-col justify-between">
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 items-center">
                     
                     {/* Imagem 3D do Atendimento */}
@@ -234,6 +238,12 @@ export const AtendimentosView: React.FC<AtendimentosViewProps> = () => {
               </RevealOnScroll>
             );
           })}
+        </div>
+
+        {/* Indicador sutil de carrossel no mobile */}
+        <div className="flex sm:hidden items-center justify-center gap-1.5 text-[11px] font-semibold text-[#8C987F] -mt-4">
+          <span>Deslize para ver todos os atendimentos</span>
+          <ArrowRight className="h-3 w-3" />
         </div>
 
         {/* =========================================================================

@@ -347,13 +347,13 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 scrollbar-none sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-5">
               {benefits.map((item, bIdx) => {
                 const IconComponent = item.icon;
                 return (
                   <div
                     key={bIdx}
-                    className="bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-5 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-2.5 flex flex-col justify-between"
+                    className="w-[78vw] sm:w-auto shrink-0 snap-center sm:shrink bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-5 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-2.5 flex flex-col justify-between"
                   >
                     <div className="space-y-2">
                       <div className="w-10 h-10 rounded-xl bg-[#2B2566]/10 flex items-center justify-center text-[#2B2566]">
@@ -369,6 +369,12 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
                   </div>
                 );
               })}
+            </div>
+
+            {/* Indicador sutil de carrossel no mobile */}
+            <div className="flex sm:hidden items-center justify-center gap-1.5 text-[11px] font-semibold text-[#8C987F] -mt-2">
+              <span>Deslize para ver todos os benefícios</span>
+              <ArrowRight className="h-3 w-3" />
             </div>
           </div>
         </RevealOnScroll>
@@ -440,14 +446,14 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
                   PASSO 1: ESCOLHA SEU PLANO DE ASSINATURA
                 </span>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-3 -mx-2 px-2 scrollbar-none md:mx-0 md:px-0 md:pb-0 md:overflow-visible md:grid md:grid-cols-3 md:gap-4">
                   {plans.map((plan) => {
                     const isSelected = selectedPlan === plan.id;
                     return (
                       <div
                         key={plan.id}
                         onClick={() => setSelectedPlan(plan.id)}
-                        className={`rounded-2xl p-5 border-2 transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
+                        className={`w-[78vw] md:w-auto shrink-0 snap-center md:shrink rounded-2xl p-5 border-2 transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
                           isSelected
                             ? 'border-[#F0B55E] bg-[#FAF8F5] shadow-md scale-[1.02]'
                             : 'border-[#EADBCC]/60 bg-white hover:border-[#2B2566]/30'
@@ -484,6 +490,12 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
                       </div>
                     );
                   })}
+                </div>
+
+                {/* Indicador sutil de carrossel no mobile */}
+                <div className="flex md:hidden items-center justify-center gap-1.5 text-[11px] font-semibold text-[#8C987F] pt-1">
+                  <span>Deslize para ver todos os planos</span>
+                  <ArrowRight className="h-3 w-3" />
                 </div>
               </div>
 

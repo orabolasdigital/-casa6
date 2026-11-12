@@ -392,10 +392,10 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             </button>
           </div>
 
-          {/* Grid com as Cartas Viradas 3D (FlipTarotCard) — 4 Atendimentos Oficiais */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-7">
+          {/* Cartas Viradas 3D: Carrossel no Mobile e Grid no Desktop */}
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 scrollbar-none sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-7">
             {individualConsultations.map((item, index) => (
-              <div key={item.id} className="w-full">
+              <div key={item.id} className="w-[82vw] sm:w-full shrink-0 snap-center sm:shrink">
                 <FlipTarotCard
                   index={index}
                   romanNumeral={item.roman}
@@ -411,6 +411,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                 />
               </div>
             ))}
+          </div>
+
+          {/* Indicador sutil de carrossel no mobile */}
+          <div className="flex sm:hidden items-center justify-center gap-1.5 text-[11px] font-semibold text-[#8C987F] -mt-1">
+            <span>Deslize para ver todas as cartas</span>
+            <ArrowRight className="h-3 w-3" />
           </div>
 
           <p className="text-[11px] text-center text-[#68638C]">
@@ -472,20 +478,21 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 transition-transform group-hover:translate-x-0.5" />
           </button>
 
-          {/* Container dos Cards com transição suave fade in / fade out */}
-          <div className="px-6 sm:px-10 md:px-12">
+          {/* Container dos Cards: Carrossel no Mobile e Grid no Desktop */}
+          <div className="px-2 sm:px-10 md:px-12">
             <div
-              className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-5 transition-all duration-700 ease-in-out transform ${
+              className={`flex overflow-x-auto snap-x snap-mandatory gap-3 pb-3 -mx-2 px-2 scrollbar-none sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-2 lg:grid-cols-4 xl:gap-5 transition-all duration-700 ease-in-out transform ${
                 isTestimonialsFading ? 'opacity-0 scale-[0.985]' : 'opacity-100 scale-100'
               }`}
             >
               {testimonialGroups[testimonialGroupIndex].map((item, idx) => (
-                <AstrologicalTestimonialCard
-                  key={item.id}
-                  testimonial={item}
-                  cardIndex={idx}
-                  groupIndex={testimonialGroupIndex}
-                />
+                <div key={item.id} className="w-[82vw] sm:w-auto shrink-0 snap-center sm:shrink">
+                  <AstrologicalTestimonialCard
+                    testimonial={item}
+                    cardIndex={idx}
+                    groupIndex={testimonialGroupIndex}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -665,10 +672,10 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             </button>
           </div>
 
-          {/* Grid com 4 Cartas Viradas 3D (FlipTarotCard) - Montar Juntos é Dourada */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Cartas Viradas 3D: Carrossel no Mobile e Grid no Desktop */}
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 scrollbar-none sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-8">
             {lectureCards.map((item, index) => (
-              <div key={item.id} className="w-full">
+              <div key={item.id} className="w-[82vw] sm:w-full shrink-0 snap-center sm:shrink">
                 <FlipTarotCard
                   index={index}
                   romanNumeral={item.roman}
@@ -684,6 +691,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                 />
               </div>
             ))}
+          </div>
+
+          {/* Indicador sutil de carrossel no mobile */}
+          <div className="flex sm:hidden items-center justify-center gap-1.5 text-[11px] font-semibold text-[#8C987F] -mt-1">
+            <span>Deslize para ver todas as palestras</span>
+            <ArrowRight className="h-3 w-3" />
           </div>
 
           <p className="text-[11px] text-center text-[#68638C]">
@@ -724,12 +737,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
 
         {/* Container Ultra-Wide de Quase Largura Total */}
         <div className="relative w-full max-w-[97vw] 2xl:max-w-[1850px] mx-auto px-2 sm:px-4 md:px-6 z-10 space-y-10">
-          {/* Grid com 3 Boxes Retangulares na Horizontal Mais Largos em Linha Única (1x3) */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 xl:gap-7 w-full">
+          {/* Leituras Astrais: Carrossel no Mobile e Grid no Desktop */}
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 scrollbar-none lg:mx-0 lg:px-0 lg:pb-0 lg:overflow-visible lg:grid lg:grid-cols-3 lg:gap-5 xl:gap-7 w-full">
             {blogPosts.slice(0, 3).map((post) => (
               <div
                 key={post.id}
-                className="relative rounded-2xl bg-white text-[#2B2566] border border-[#E2DCCF] p-5 sm:p-6 shadow-[0_4px_24px_rgba(43,37,102,0.06)] hover:border-[#F0B55E] hover:shadow-[0_12px_36px_rgba(240,181,94,0.2)] transition-all duration-300 flex flex-col sm:flex-row gap-5 items-center overflow-hidden group select-text h-full"
+                className="w-[86vw] lg:w-auto shrink-0 snap-center lg:shrink relative rounded-2xl bg-white text-[#2B2566] border border-[#E2DCCF] p-5 sm:p-6 shadow-[0_4px_24px_rgba(43,37,102,0.06)] hover:border-[#F0B55E] hover:shadow-[0_12px_36px_rgba(240,181,94,0.2)] transition-all duration-300 flex flex-col sm:flex-row gap-5 items-center overflow-hidden group select-text h-full"
               >
                 {/* Cantoneiras Astrais Douradas nos Cantos */}
                 <div className="absolute top-2.5 left-2.5 pointer-events-none opacity-40 group-hover:opacity-100 transition-opacity">
@@ -792,6 +805,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Indicador sutil de carrossel no mobile */}
+          <div className="flex lg:hidden items-center justify-center gap-1.5 text-[11px] font-semibold text-[#8C987F] -mt-4">
+            <span>Deslize para ver todas as leituras</span>
+            <ArrowRight className="h-3 w-3" />
           </div>
 
           {/* Botão Centralizado para Acessar todas as Leituras */}
