@@ -4,21 +4,15 @@
  * Visão Pública: /lojinha & /loja
  * Lojinha Oficial Casa 6 com Design Leve, Sofisticado e Formato E-commerce
  * 
- * Funcionalidades & Design:
- * - Fundo suave, luminoso e acolhedor (#FAF8F5).
- * - Sem logotipo no cabeçalho.
- * - Linha-ponto dourada do Brand Guide e tipografia editorial de alta legibilidade.
- * - 4 produtos cadastrados, organizados em 1 produto por linha (stacked horizontal cards).
- * - Produto 1: Box SEMEADURA
- *   - Tag "Esgotado".
- *   - Botão "Avise-me quando chegar" direcionando para o WhatsApp.
- *   - Carrossel / miniaturas interativas com as 9 fotos reais enviadas pelo usuário.
- *   - Lista de conteúdo da box e detalhes da Coleção Ritos do Universo.
- * - Produtos 2, 3 e 4: Box ACOLHIMENTO, Box CRESCIMENTO e Box CELEBRAÇÃO
- *   - Imagem estilizada com o fundo cósmico das cartas de tarô da Home.
- *   - Texto "Em Breve" com efeito pulsante (pulse glow) avisando que logo haverá novos produtos.
- *   - Botão "Entrar na lista de espera" via WhatsApp.
- * - Totalmente expansível para cadastrar mais produtos no futuro.
+ * Atualizações Recentes:
+ * - Slideshow automático na imagem do Box Semeadura com transição suave entre as 9 fotos.
+ * - Miniaturas clicáveis mantidas abaixo do slideshow para navegação manual.
+ * - Removida a tag "1ª Edição" da imagem do Box Semeadura (mantida apenas a tag "Esgotado").
+ * - Tag "Lote Esgotado" ao lado do preço em tom cinza suave (#8C987F / borda suave), sem vermelho agressivo.
+ * - Botão "Avise-me quando chegar" discreto e elegante, com contorno suave e tipografia roxa (#2B2566).
+ * - Tag "EM BREVE" nas outras 3 boxes mantida fixa (sem efeito de pulsação).
+ * - Removida a palavra "Previsão" do preço (exibindo apenas "R$ 147,00").
+ * - Tag "Próximo Lançamento" posicionada logo após o valor, alinhada com o mesmo padrão da tag "Lote Esgotado".
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -109,7 +103,7 @@ const STORE_PRODUCTS = [
     title: 'Box SEMEADURA',
     collectionName: 'COLEÇÃO RITOS DO UNIVERSO',
     collectionDescription: 'Feita para você despertar o seu florescer ASTRAL em uma jornada de crescimento e transformação. A Box Semeadura celebra a abertura do ano novo astrológico com itens curados para ritualizar intenções de renovação.',
-    description: 'A box semeadura é um convite para você semear novos caminhos ritualizando a chegada do ano novo astrológico. Mais do que uma curadoria de produtos, é um portal para o autoconhecimento e para sua renovação.',
+    description: 'A box semeadura é um convite para você semear novos caminhos ritualizando a chegada do ano novo astrológico. Mais do que uma curadoria de produtos, é um portal de autoconhecimento e renovação.',
     status: 'sold_out',
     statusBadge: 'Esgotado',
     price: 147,
@@ -135,7 +129,7 @@ const STORE_PRODUCTS = [
     status: 'coming_soon',
     statusBadge: 'Em Breve',
     price: 147,
-    priceFormatted: 'R$ 147,00 (Previsão)',
+    priceFormatted: 'R$ 147,00',
     romanNumeral: 'II',
     teaserText: 'Em breve disponível na Lojinha Casa 6.',
     boxItems: [
@@ -155,7 +149,7 @@ const STORE_PRODUCTS = [
     status: 'coming_soon',
     statusBadge: 'Em Breve',
     price: 147,
-    priceFormatted: 'R$ 147,00 (Previsão)',
+    priceFormatted: 'R$ 147,00',
     romanNumeral: 'III',
     teaserText: 'Em preparação para o próximo ciclo astrológico.',
     boxItems: [
@@ -175,7 +169,7 @@ const STORE_PRODUCTS = [
     status: 'coming_soon',
     statusBadge: 'Em Breve',
     price: 147,
-    priceFormatted: 'R$ 147,00 (Previsão)',
+    priceFormatted: 'R$ 147,00',
     romanNumeral: 'IV',
     teaserText: 'Edição comemorativa de final de ciclo.',
     boxItems: [
@@ -191,6 +185,15 @@ const STORE_PRODUCTS = [
 export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
   // Estado para foto ativa da galeria do Box Semeadura
   const [activeSemeaduraPhoto, setActiveSemeaduraPhoto] = useState<number>(0);
+
+  // Slideshow automático transitando entre as fotos do Box Semeadura a cada 3.5 segundos
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveSemeaduraPhoto((prev) => (prev + 1) % BOX_SEMEADURA_PHOTOS.length);
+    }, 3500);
+
+    return () => clearInterval(timer);
+  }, []);
 
   // Ação de WhatsApp para Notificação de Estoque / Lista de Espera
   const handleWhatsAppNotify = (productTitle: string, isSoldOut: boolean = false) => {
@@ -263,7 +266,7 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
             </div>
 
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FAF8F5] border border-[#EADBCC] text-[11px] font-semibold text-[#8C987F] shrink-0">
-              <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[#25D366]" />
               <span>4 Produtos Cadastrados</span>
             </div>
           </div>
@@ -275,38 +278,40 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
         <div className="space-y-8 sm:space-y-10">
           
           {/* ---------------------------------------------------------------------
-              PRODUTO 1: BOX SEMEADURA (ESGOTADO / AVISE-ME NO WHATSAPP)
+              PRODUTO 1: BOX SEMEADURA (ESGOTADO / SLIDESHOW AUTOMÁTICO)
               --------------------------------------------------------------------- */}
           <RevealOnScroll delayMs={100}>
             <div className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl lg:rounded-[32px] border border-[#EADBCC]/70 shadow-[0_16px_40px_rgba(43,37,102,0.04)] hover:shadow-[0_20px_50px_rgba(43,37,102,0.07)] transition-all duration-500 overflow-hidden p-6 sm:p-8 lg:p-10">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 items-center">
                 
-                {/* Coluna da Imagem & Galeria de Miniaturas (9 fotos) */}
+                {/* Coluna da Imagem & Galeria de Miniaturas com Slideshow Automático */}
                 <div className="lg:col-span-6 space-y-3">
-                  {/* Foto Principal com Badge Esgotado */}
+                  {/* Foto Principal com Slideshow Automático e Crossfade Suave */}
                   <div className="relative w-full aspect-4/3 rounded-2xl overflow-hidden border border-[#EADBCC]/60 bg-black/5 shadow-sm group">
-                    <img
-                      src={BOX_SEMEADURA_PHOTOS[activeSemeaduraPhoto]}
-                      alt="Box SEMEADURA — Casa 6"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-104"
-                    />
+                    {BOX_SEMEADURA_PHOTOS.map((photoUrl, pIdx) => (
+                      <img
+                        key={pIdx}
+                        src={photoUrl}
+                        alt={`Box SEMEADURA — Foto ${pIdx + 1}`}
+                        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                          activeSemeaduraPhoto === pIdx
+                            ? 'opacity-100 z-1 scale-100'
+                            : 'opacity-0 z-0 scale-102 pointer-events-none'
+                        }`}
+                      />
+                    ))}
                     
-                    {/* Tag Esgotado em Destaque */}
-                    <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-[#C2593F] text-white px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider shadow-md">
+                    {/* Tag Esgotado em Destaque (Única tag mantida em cima da imagem) */}
+                    <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 bg-[#8C987F] text-white px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider shadow-sm">
                       <span>ESGOTADO</span>
                     </div>
 
-                    {/* Tag Coleção */}
-                    <div className="absolute top-3 right-3 bg-[#2B2566]/85 backdrop-blur-xs text-[#F0B55E] px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-[#F0B55E]/30">
-                      1ª Edição
-                    </div>
-
-                    <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded-md bg-black/60 text-white text-[10px] backdrop-blur-xs">
+                    <div className="absolute bottom-2 right-2 z-10 px-2 py-0.5 rounded-md bg-black/50 text-white text-[10px] backdrop-blur-xs">
                       Foto {activeSemeaduraPhoto + 1} de {BOX_SEMEADURA_PHOTOS.length}
                     </div>
                   </div>
 
-                  {/* Grid de Miniaturas Interativas (9 fotos) */}
+                  {/* Grid de Miniaturas Clicáveis Mantidas Abaixo (9 fotos) */}
                   <div className="grid grid-cols-9 gap-1.5 sm:gap-2">
                     {BOX_SEMEADURA_PHOTOS.map((thumbUrl, tIdx) => (
                       <button
@@ -331,21 +336,23 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
                   </div>
                 </div>
 
-                {/* Coluna de Detalhes, Preço e Botão "Avise-me quando chegar" */}
+                {/* Coluna de Detalhes, Preço e Botão "Avise-me quando chegar" Suave */}
                 <div className="lg:col-span-6 space-y-4 sm:space-y-5 text-center lg:text-left flex flex-col justify-between">
                   <div className="space-y-3">
                     <div className="space-y-1">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#C2593F] block">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C987F] block">
                         COLEÇÃO RITOS DO UNIVERSO
                       </span>
                       <h2 className="font-heading text-3xl sm:text-4xl font-bold text-[#2B2566] leading-tight tracking-tight">
                         Box SEMEADURA
                       </h2>
+                      
+                      {/* Preço e Tag "Lote Esgotado" em tom cinza suave */}
                       <div className="flex items-center justify-center lg:justify-start gap-3 pt-1">
                         <span className="font-heading text-3xl font-extrabold text-[#2B2566]">
                           R$ 147,00
                         </span>
-                        <span className="text-xs text-[#C2593F] font-bold bg-[#C2593F]/10 px-2.5 py-0.5 rounded-full">
+                        <span className="text-xs text-[#8C987F] font-bold bg-[#FAF8F5] border border-[#EADBCC] px-2.5 py-0.5 rounded-full">
                           Lote Esgotado
                         </span>
                       </div>
@@ -363,22 +370,22 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
                       </p>
                       <ul className="space-y-1 text-xs text-[#534D6B]">
                         <li className="flex items-start gap-2">
-                          <CheckCircle2 className="h-3.5 w-3.5 text-[#25D366] shrink-0 mt-0.5" />
+                          <CheckCircle2 className="h-3.5 w-3.5 text-[#8C987F] shrink-0 mt-0.5" />
                           <span>3 incensos naturais de alecrim (sem carvão) + incensário de citrino</span>
                         </li>
                         <li className="flex items-start gap-2">
-                          <CheckCircle2 className="h-3.5 w-3.5 text-[#25D366] shrink-0 mt-0.5" />
+                          <CheckCircle2 className="h-3.5 w-3.5 text-[#8C987F] shrink-0 mt-0.5" />
                           <span>Kit prosperidade (pirita e citrino) + 2 mini velas laranjas + vela de sal grosso</span>
                         </li>
                         <li className="flex items-start gap-2">
-                          <CheckCircle2 className="h-3.5 w-3.5 text-[#25D366] shrink-0 mt-0.5" />
+                          <CheckCircle2 className="h-3.5 w-3.5 text-[#8C987F] shrink-0 mt-0.5" />
                           <span>Ebook exclusivo com manual ritualístico e playlist personalizada</span>
                         </li>
                       </ul>
                     </div>
                   </div>
 
-                  {/* Botão Oficial: Avise-me quando chegar */}
+                  {/* Botão Oficial: Avise-me quando chegar (Suave, sem tanto destaque, fonte roxa) */}
                   <div className="pt-4 border-t border-[#EADBCC]/60 space-y-2">
                     <div className="flex items-center justify-center lg:justify-start gap-2 text-xs text-[#8C987F]">
                       <Truck className="h-4 w-4 text-[#2B2566]" />
@@ -388,11 +395,11 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
                     <button
                       type="button"
                       onClick={() => handleWhatsAppNotify('Box SEMEADURA', true)}
-                      className="w-full py-3.5 px-6 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 whitespace-nowrap"
+                      className="w-full py-3.5 px-6 rounded-full border border-[#2B2566]/25 hover:border-[#2B2566] bg-[#FAF8F5] hover:bg-white text-[#2B2566] font-bold text-xs uppercase tracking-wider shadow-xs hover:shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 whitespace-nowrap"
                     >
-                      <Bell className="h-4 w-4 fill-white" />
+                      <Bell className="h-4 w-4 text-[#2B2566]" />
                       <span>AVISE-ME QUANDO CHEGAR</span>
-                      <ArrowRight className="h-4 w-4" />
+                      <ArrowRight className="h-4 w-4 text-[#2B2566]" />
                     </button>
                     <span className="text-[11px] text-[#8C987F] block text-center lg:text-left">
                       Receba uma notificação em primeira mão pelo WhatsApp quando abrirmos o próximo lote.
@@ -406,18 +413,18 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
 
           {/* ---------------------------------------------------------------------
               PRODUTOS 2, 3 E 4: BOXES ACOLHIMENTO, CRESCIMENTO E CELEBRAÇÃO
-              (EM BREVE / COM FUNDO DA CARTA DE TARÔ DA HOME & EFEITO PULSANTE)
+              (TAG FIXA SEM PULSAÇÃO, SEM A PALAVRA "PREVISÃO", TAG NA MESMA POSIÇÃO)
               --------------------------------------------------------------------- */}
           {STORE_PRODUCTS.slice(1).map((item, idx) => (
             <RevealOnScroll key={item.id} delayMs={140 + idx * 60}>
               <div className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl lg:rounded-[32px] border border-[#EADBCC]/70 shadow-[0_16px_40px_rgba(43,37,102,0.04)] hover:shadow-[0_20px_50px_rgba(43,37,102,0.07)] transition-all duration-500 overflow-hidden p-6 sm:p-8 lg:p-10">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 items-center">
                   
-                  {/* Coluna da Imagem: Fundo Oficial da Carta de Tarô da Página Inicial com Efeito Pulsante */}
+                  {/* Coluna da Imagem: Fundo Oficial da Carta de Tarô da Página Inicial com Tag Fixa */}
                   <div className="lg:col-span-6 flex items-center justify-center">
                     <div className="relative w-full aspect-4/3 sm:aspect-16/10 rounded-2xl overflow-hidden shadow-lg border-2 border-[#F0B55E]/40 bg-[#2B2566] text-white flex flex-col items-center justify-center p-6 text-center select-none group">
                       
-                      {/* Órbitas e Linhas Circulares Sutis do Brand Guide (idêntico ao FlipTarotCard) */}
+                      {/* Órbitas e Linhas Circulares Sutis do Brand Guide */}
                       <div className="absolute inset-0 opacity-25 pointer-events-none flex items-center justify-center">
                         <svg className="w-96 h-96" viewBox="0 0 200 200" fill="none">
                           <circle cx="100" cy="100" r="90" stroke="#F0B55E" strokeWidth="0.8" strokeDasharray="3 3" />
@@ -429,8 +436,8 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
                       {/* Borda Dupla Estilizada Clássica de Tarô */}
                       <div className="absolute inset-2.5 rounded-xl border border-[#F0B55E]/30 pointer-events-none" />
 
-                      {/* Brilho Dourado Pulsante ao Fundo */}
-                      <div className="absolute inset-0 bg-radial from-[#F0B55E]/15 via-transparent to-transparent pointer-events-none animate-pulse duration-[3000ms]" />
+                      {/* Brilho Dourado Sutil Fixo ao Fundo (sem pulsação) */}
+                      <div className="absolute inset-0 bg-radial from-[#F0B55E]/10 via-transparent to-transparent pointer-events-none" />
 
                       {/* Conteúdo Central da Carta de Tarô */}
                       <div className="relative z-10 space-y-3 flex flex-col items-center">
@@ -448,9 +455,9 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
                           />
                         </div>
 
-                        {/* Badge Pulsante "EM BREVE" com Aviso */}
+                        {/* Tag "EM BREVE" Fixa (Sem Animação de Pulsação) */}
                         <div className="space-y-1">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F0B55E] text-[#2B2566] text-xs font-extrabold uppercase tracking-widest shadow-md animate-pulse">
+                          <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#F0B55E] text-[#2B2566] text-xs font-extrabold uppercase tracking-widest shadow-sm">
                             <Sparkles className="h-3.5 w-3.5 fill-[#2B2566]" />
                             <span>EM BREVE</span>
                           </span>
@@ -469,7 +476,7 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
                     </div>
                   </div>
 
-                  {/* Coluna de Detalhes, Previsão e Botão "Entrar na Lista de Espera" */}
+                  {/* Coluna de Detalhes, Preço e Tag "Próximo Lançamento" na Mesma Posição */}
                   <div className="lg:col-span-6 space-y-4 sm:space-y-5 text-center lg:text-left flex flex-col justify-between">
                     <div className="space-y-3">
                       <div className="space-y-1">
@@ -479,8 +486,10 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
                         <h3 className="font-heading text-3xl sm:text-4xl font-bold text-[#2B2566] leading-tight tracking-tight">
                           {item.title}
                         </h3>
+                        
+                        {/* Preço (sem a palavra "Previsão") e Tag "Próximo Lançamento" na mesma linha */}
                         <div className="flex items-center justify-center lg:justify-start gap-3 pt-1">
-                          <span className="font-heading text-2xl sm:text-3xl font-extrabold text-[#2B2566]">
+                          <span className="font-heading text-3xl font-extrabold text-[#2B2566]">
                             {item.priceFormatted}
                           </span>
                           <span className="text-xs text-[#8C987F] font-bold bg-[#FAF8F5] border border-[#EADBCC] px-2.5 py-0.5 rounded-full">
