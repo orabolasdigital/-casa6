@@ -15,7 +15,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Sparkles, Star, Quote, MessageCircle, Compass, Play, Youtube, Sun, Moon } from 'lucide-react';
+import { ArrowRight, Sparkles, Star, Quote, MessageCircle, Compass, Play, Youtube, Sun, Moon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { OFFICIAL_SERVICES, OFFICIAL_TESTIMONIALS, SITE_CONFIG } from '../../config/site';
 import { FlipTarotCard } from '../../components/common/FlipTarotCard';
 import { AstrologicalTestimonialCard } from '../../components/common/AstrologicalTestimonialCard';
@@ -172,8 +172,18 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
       setTestimonialGroupIndex(nextIndex);
       setTimeout(() => {
         setIsTestimonialsFading(false);
-      }, 60);
-    }, 450);
+      }, 70);
+    }, 400);
+  };
+
+  const handlePrevTestimonials = () => {
+    const prev = (testimonialGroupIndex - 1 + testimonialGroups.length) % testimonialGroups.length;
+    changeTestimonialGroup(prev);
+  };
+
+  const handleNextTestimonials = () => {
+    const next = (testimonialGroupIndex + 1) % testimonialGroups.length;
+    changeTestimonialGroup(next);
   };
 
   // Troca automática periódica suave a cada 7 segundos (pausa ao passar o mouse para permitir leitura confortável)
@@ -449,23 +459,60 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
           </p>
         </div>
 
-        {/* Combo com 4 Depoimentos na Mesma Linha (1x4) Sem Segunda Linha */}
+        {/* Carrossel Ultra-Wide com 4 Depoimentos na Mesma Linha e Flechas Laterais */}
         <div
-          className="relative mx-auto max-w-7xl xl:max-w-[1440px] px-4 sm:px-6 lg:px-8 z-10"
+          className="relative w-full max-w-[97vw] 2xl:max-w-[1820px] mx-auto px-2 sm:px-4 md:px-6 z-10"
           onMouseEnter={() => setIsTestimonialsHovered(true)}
           onMouseLeave={() => setIsTestimonialsHovered(false)}
         >
-          <div
-            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-5 transition-opacity duration-500 ease-in-out ${
-              isTestimonialsFading ? 'opacity-0' : 'opacity-100'
-            }`}
+          {/* Flecha Lateral Esquerda */}
+          <button
+            onClick={handlePrevTestimonials}
+            aria-label="Depoimentos anteriores"
+            className="absolute left-0 sm:left-1 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white hover:bg-[#2B2566] text-[#2B2566] hover:text-[#F0B55E] border border-[#E2DCCF] shadow-[0_6px_24px_rgba(43,37,102,0.18)] transition-all duration-300 flex items-center justify-center cursor-pointer group"
           >
-            {testimonialGroups[testimonialGroupIndex].map((item, idx) => (
-              <AstrologicalTestimonialCard
-                key={item.id}
-                testimonial={item}
-                cardIndex={idx}
-                groupIndex={testimonialGroupIndex}
+            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 transition-transform group-hover:-translate-x-0.5" />
+          </button>
+
+          {/* Flecha Lateral Direita */}
+          <button
+            onClick={handleNextTestimonials}
+            aria-label="Próximos depoimentos"
+            className="absolute right-0 sm:right-1 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white hover:bg-[#2B2566] text-[#2B2566] hover:text-[#F0B55E] border border-[#E2DCCF] shadow-[0_6px_24px_rgba(43,37,102,0.18)] transition-all duration-300 flex items-center justify-center cursor-pointer group"
+          >
+            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 transition-transform group-hover:translate-x-0.5" />
+          </button>
+
+          {/* Container dos Cards com transição suave fade in / fade out */}
+          <div className="px-6 sm:px-10 md:px-12">
+            <div
+              className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-5 transition-all duration-700 ease-in-out transform ${
+                isTestimonialsFading ? 'opacity-0 scale-[0.985]' : 'opacity-100 scale-100'
+              }`}
+            >
+              {testimonialGroups[testimonialGroupIndex].map((item, idx) => (
+                <AstrologicalTestimonialCard
+                  key={item.id}
+                  testimonial={item}
+                  cardIndex={idx}
+                  groupIndex={testimonialGroupIndex}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Indicadores de Página Suaves */}
+          <div className="flex items-center justify-center gap-2 pt-8">
+            {testimonialGroups.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => changeTestimonialGroup(i)}
+                aria-label={`Grupo ${i + 1}`}
+                className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${
+                  testimonialGroupIndex === i
+                    ? 'w-7 bg-[#2B2566]'
+                    : 'w-2 bg-[#2B2566]/20 hover:bg-[#2B2566]/40'
+                }`}
               />
             ))}
           </div>
@@ -684,31 +731,28 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
           <div className="absolute top-12 right-1/4 text-[#F0B55E] opacity-35 text-xs">✦</div>
         </div>
 
-        <div className="mx-auto max-w-[1560px] space-y-12 relative z-10 px-2 sm:px-4 lg:px-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div className="space-y-2">
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#8C987F]">
-                CADERNO ASTRAL & BLOG
-              </span>
-              <h2 className="font-heading text-3xl sm:text-5xl font-bold text-[#2B2566] tracking-tight">
-                Leituras Astrais
-              </h2>
-              <p className="text-xs sm:text-sm text-[#423C7B] max-w-xl font-light">
-                Ensaios e reflexões autorais de Bianca Tofoli apresentados em artigos editoriais sobre os movimentos do céu e da vida.
-              </p>
-            </div>
-
-            <button
-              onClick={() => onNavigate('/leituras')}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#2B2566] hover:text-[#F0B55E] uppercase tracking-wider transition-colors shrink-0 cursor-pointer"
-            >
-              <span>ACESSAR TODAS AS LEITURAS</span>
-              <ArrowRight className="h-4 w-4" />
-            </button>
+        {/* Cabeçalho Centralizado idêntico ao estilo de Depoimentos de Clientes */}
+        <div className="relative mx-auto max-w-3xl px-4 space-y-3 text-center mb-12 z-10">
+          <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#8C987F] block">
+            CADERNO ASTRAL & BLOG
+          </span>
+          <h2 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-[#2B2566]">
+            Leituras Astrais
+          </h2>
+          <div className="flex items-center justify-center gap-3 py-1">
+            <span className="w-12 h-px bg-[#2B2566]/20"></span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#F0B55E]"></span>
+            <span className="w-12 h-px bg-[#2B2566]/20"></span>
           </div>
+          <p className="text-xs sm:text-sm text-[#423C7B] max-w-xl mx-auto font-light leading-relaxed">
+            Ensaios e reflexões autorais de Bianca Tofoli apresentados em artigos editoriais sobre os movimentos do céu e da vida.
+          </p>
+        </div>
 
+        {/* Container Ultra-Wide de Quase Largura Total */}
+        <div className="relative w-full max-w-[97vw] 2xl:max-w-[1850px] mx-auto px-2 sm:px-4 md:px-6 z-10 space-y-10">
           {/* Grid com 3 Boxes Retangulares na Horizontal Mais Largos em Linha Única (1x3) */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 xl:gap-8 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 xl:gap-7 w-full">
             {blogPosts.slice(0, 3).map((post) => (
               <div
                 key={post.id}
@@ -729,7 +773,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                 </div>
 
                 {/* Imagem do Texto / Artigo (Thumbnail Limpa e Sem Tag) */}
-                <div className="w-full sm:w-44 md:w-48 lg:w-40 xl:w-48 h-40 sm:h-44 xl:h-48 rounded-xl overflow-hidden shrink-0 border border-[#E2DCCF] shadow-xs relative">
+                <div className="w-full sm:w-48 md:w-52 lg:w-44 xl:w-56 h-44 sm:h-48 xl:h-52 rounded-xl overflow-hidden shrink-0 border border-[#E2DCCF] shadow-xs relative">
                   <img
                     src={post.imageUrl}
                     alt={post.title}
@@ -742,7 +786,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                 <div className="flex-1 flex flex-col justify-between space-y-2.5 w-full h-full">
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-[10.5px] text-[#8C987F] font-semibold">
-                      <span className="truncate max-w-[140px]">Por Bianca Tofoli • {post.publishedAt}</span>
+                      <span className="truncate max-w-[150px]">Por Bianca Tofoli • {post.publishedAt}</span>
                       <span className="text-[9.5px] text-[#B87314] uppercase tracking-wider font-bold shrink-0">{post.readTime}</span>
                     </div>
 
@@ -766,15 +810,26 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                   <div className="pt-2">
                     <button
                       onClick={() => onNavigate('/leituras')}
-                      className="inline-flex items-center gap-2 rounded-full bg-[#2B2566] hover:bg-[#3D206B] text-white px-5 py-2.5 text-xs font-bold uppercase tracking-wider shadow-[0_4px_14px_rgba(43,37,102,0.25)] hover:shadow-[0_6px_20px_rgba(43,37,102,0.35)] transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                      className="whitespace-nowrap inline-flex items-center gap-1.5 rounded-full bg-[#2B2566] hover:bg-[#3D206B] text-white px-5 py-2.5 text-xs font-bold uppercase tracking-wider shadow-[0_4px_14px_rgba(43,37,102,0.25)] hover:shadow-[0_6px_20px_rgba(43,37,102,0.35)] transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shrink-0"
                     >
                       <span>Leia mais</span>
-                      <ArrowRight className="h-3.5 w-3.5 text-[#F0B55E] transition-transform group-hover:translate-x-1" />
+                      <ArrowRight className="h-3.5 w-3.5 text-[#F0B55E] shrink-0" />
                     </button>
                   </div>
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Botão Centralizado para Acessar todas as Leituras */}
+          <div className="pt-6 flex justify-center">
+            <button
+              onClick={() => onNavigate('/leituras')}
+              className="inline-flex items-center gap-2 rounded-full border border-[#2B2566]/25 hover:border-[#2B2566] bg-white hover:bg-[#2B2566] text-[#2B2566] hover:text-white px-8 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer"
+            >
+              <span>Acessar todas as Leituras</span>
+              <ArrowRight className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </section>
