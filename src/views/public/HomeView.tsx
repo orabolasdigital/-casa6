@@ -648,7 +648,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
       {/* =========================================================================
           SESSÃO 6: PALESTRAS E VIVÊNCIAS (4 CARTAS DE TARÔ 3D COM MONTAR JUNTOS DOURADA)
           ========================================================================= */}
-      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 border-t border-[#E2DCCF] bg-[#F4EFE6]">
+      <section className="pt-14 sm:pt-20 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8 border-t border-[#E2DCCF] bg-[#F4EFE6]">
         <div className="mx-auto max-w-7xl space-y-12">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="space-y-2">
@@ -709,7 +709,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
           SESSÃO 7: LEITURAS ASTRAIS (BOXES RETANGULARES NA HORIZONTAL COM TEXTO & BOTÃO)
           Sem efeito de carta de tarô • Fundo claro e cantoneiras astrais refinadas
           ========================================================================= */}
-      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 border-t border-[#E2DCCF] bg-[#F4EFE6] relative overflow-hidden">
+      <section className="pt-8 sm:pt-12 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8 border-t border-[#E2DCCF] bg-[#F4EFE6] relative overflow-hidden">
         {/* Órbitas Decorativas Sutis no Fundo Claro */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] h-[850px] rounded-full border border-[#2B2566]/4"></div>
@@ -718,7 +718,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
         </div>
 
         {/* Cabeçalho Centralizado idêntico ao estilo de Depoimentos de Clientes */}
-        <div className="relative mx-auto max-w-3xl px-4 space-y-3 text-center mb-12 z-10">
+        <div className="relative mx-auto max-w-3xl px-4 space-y-3 text-center mb-8 sm:mb-10 z-10">
           <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#8C987F] block">
             CADERNO ASTRAL & BLOG
           </span>
@@ -813,14 +813,14 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             <ArrowRight className="h-3 w-3" />
           </div>
 
-          {/* Botão Centralizado para Acessar todas as Leituras */}
-          <div className="pt-6 flex justify-center">
+          {/* Botão Centralizado para Acessar todas as Leituras (Mais discreto e suave) */}
+          <div className="pt-4 flex justify-center">
             <button
               onClick={() => onNavigate('/leituras')}
-              className="inline-flex items-center gap-2 rounded-full border border-[#2B2566]/25 hover:border-[#2B2566] bg-white hover:bg-[#2B2566] text-[#2B2566] hover:text-white px-8 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-full border border-[#2B2566]/20 hover:border-[#2B2566]/50 bg-transparent hover:bg-[#2B2566]/5 text-[#423C7B] hover:text-[#2B2566] px-6 py-2.5 text-xs font-medium uppercase tracking-wider transition-all duration-300 cursor-pointer"
             >
-              <span>Acessar todas as Leituras</span>
-              <ArrowRight className="h-4 w-4" />
+              <span>Acessar todas as leituras</span>
+              <ArrowRight className="h-3.5 w-3.5 text-[#F0B55E]" />
             </button>
           </div>
         </div>
@@ -830,11 +830,11 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
           SESSÃO 8: DESTAQUES DE MÍDIA (BANNERS YOUTUBE & SPOTIFY)
           Design Sofisticado, Proporções Unificadas e Fundo Cósmico Animado
           ========================================================================= */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] border-t border-[#E2DCCF] space-y-16 lg:space-y-20 relative">
-        <div className="mx-auto max-w-7xl space-y-16 lg:space-y-20 relative z-10">
+      <section className="pt-6 sm:pt-10 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] border-t border-[#E2DCCF] space-y-12 sm:space-y-16 relative">
+        <div className="mx-auto max-w-7xl space-y-12 sm:space-y-16 relative z-10">
 
           {/* BANNER 1: YOUTUBE (FUNDO RUBI CÓSMICO, VÍDEO NA ESQUERDA, TEXTO E BOTÃO NA DIREITA) */}
-          <div className="relative pt-12 sm:pt-16 lg:pt-20">
+          <div className="relative pt-4 sm:pt-6">
             <div className="relative rounded-3xl bg-gradient-to-r from-[#7D0B17] via-[#9E121E] to-[#5C0610] border border-white/20 shadow-[0_24px_60px_rgba(125,11,23,0.25)] p-6 sm:p-8 lg:p-10 xl:p-12 min-h-[220px] sm:min-h-[230px] lg:min-h-[240px] flex flex-col justify-center overflow-visible text-white">
               
               {/* Fundo Cósmico Animado: Galáxia Espiral Rubi, Nebulosa Escura e Feixes Estelares */}
