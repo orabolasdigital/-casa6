@@ -41,9 +41,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           
           {/* =========================================================================
               COLUNA PRINCIPAL: LOGO, BIOGRAFIA, SELO E REDES SOCIAIS EM DESTAQUE
+              Centralizado no Mobile e alinhado à esquerda no Desktop
               ========================================================================= */}
-          <div className="lg:col-span-4 space-y-5">
-            <div className="flex items-center">
+          <div className="lg:col-span-4 space-y-5 flex flex-col items-center lg:items-start text-center lg:text-left">
+            <div className="flex items-center justify-center lg:justify-start">
               <img
                 src="https://static.wixstatic.com/media/02c8e0_916db28bdef7413a82fde89b9ce7f738~mv2.png"
                 alt="Casa 6 — Bianca Tofoli"
@@ -52,13 +53,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               />
             </div>
 
-            <p className="text-xs text-[#E6E3F1]/80 leading-relaxed max-w-sm font-light">
+            <p className="text-xs text-[#E6E3F1]/80 leading-relaxed max-w-sm font-light text-center lg:text-left mx-auto lg:mx-0">
               Plataforma oficial de Bianca Tofoli: enfermeira, gestora, palestrante e astróloga. Consultas individuais de Mapa Natal, Bússola Guia, comunidade Patota Astral e palestras corporativas.
             </p>
 
-            {/* Redes Sociais Oficiais em Grande Destaque e Cores Vibrantes (Apenas Ícones) */}
-            <div className="pt-1">
-              <div className="flex items-center gap-2.5">
+            {/* Redes Sociais Oficiais em Grande Destaque e Cores Vibrantes (Apenas Ícones) Centralizadas no Mobile */}
+            <div className="pt-1 flex items-center justify-center lg:justify-start w-full">
+              <div className="flex items-center justify-center lg:justify-start gap-2.5">
                 {/* Instagram Oficial */}
                 <a
                   href={SITE_CONFIG.instagramUrl}
@@ -139,9 +140,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           </div>
 
           {/* =========================================================================
-              MAPA DAS PÁGINAS (4 COLUNAS ESTRUTURADAS)
+              MAPA DAS PÁGINAS (4 COLUNAS ESTRUTURADAS) — OCULTO NO MOBILE, VISÍVEL NO DESKTOP
               ========================================================================= */}
-          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
+          <div className="hidden lg:grid lg:col-span-8 grid-cols-2 sm:grid-cols-4 gap-8">
             
             {/* Coluna 1: Atendimentos */}
             <div className="space-y-3">
