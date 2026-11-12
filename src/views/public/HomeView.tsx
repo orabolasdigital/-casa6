@@ -21,7 +21,7 @@ import { FlipTarotCard } from '../../components/common/FlipTarotCard';
 import { AstrologicalTestimonialCard } from '../../components/common/AstrologicalTestimonialCard';
 import { ServiceDetailModal } from '../../components/common/ServiceDetailModal';
 import { ServiceItem } from '../../types';
-import { syncCatalogWithFirestore, CATALOG_BLOG_POSTS, getLatestBlogPosts, BlogPostItem } from '../../services/catalogService';
+import { syncCatalogWithFirestore, CATALOG_BLOG_POSTS, getLatestBlogPosts, sortBlogPostsDesc, BlogPostItem } from '../../services/catalogService';
 
 interface HomeViewProps {
   onOpenBooking: (serviceId?: string) => void;
@@ -31,7 +31,7 @@ interface HomeViewProps {
 export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate }) => {
   const [scrollY, setScrollY] = useState(0);
   const [selectedServiceForModal, setSelectedServiceForModal] = useState<ServiceItem | null>(null);
-  const [blogPosts, setBlogPosts] = useState<BlogPostItem[]>(CATALOG_BLOG_POSTS.slice(0, 3));
+  const [blogPosts, setBlogPosts] = useState<BlogPostItem[]>(() => sortBlogPostsDesc(CATALOG_BLOG_POSTS).slice(0, 3));
 
   useEffect(() => {
     // Sincroniza coleções no Firestore e carrega dinamicamente os 3 últimos posts
@@ -748,7 +748,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
           <div className="absolute top-12 right-1/4 text-[#F0B55E] opacity-35 text-xs">✦</div>
         </div>
 
-        <div className="mx-auto max-w-7xl space-y-12 relative z-10">
+        <div className="mx-auto max-w-[1560px] space-y-12 relative z-10 px-2 sm:px-4 lg:px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="space-y-2">
               <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#8C987F]">
@@ -771,12 +771,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             </button>
           </div>
 
-          {/* Grid com 3 Boxes Retangulares na Horizontal em Linha Única (1x3) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 xl:gap-6 max-w-7xl xl:max-w-[1440px] mx-auto">
+          {/* Grid com 3 Boxes Retangulares na Horizontal Mais Largos em Linha Única (1x3) */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 xl:gap-8 w-full">
             {blogPosts.slice(0, 3).map((post) => (
               <div
                 key={post.id}
-                className="relative rounded-2xl bg-white text-[#2B2566] border border-[#E2DCCF] p-4 sm:p-5 shadow-[0_4px_20px_rgba(43,37,102,0.05)] hover:border-[#F0B55E] hover:shadow-[0_12px_32px_rgba(240,181,94,0.18)] transition-all duration-300 flex flex-col sm:flex-row gap-4 sm:gap-5 items-center overflow-hidden group select-text h-full"
+                className="relative rounded-2xl bg-white text-[#2B2566] border border-[#E2DCCF] p-5 sm:p-6 shadow-[0_4px_24px_rgba(43,37,102,0.06)] hover:border-[#F0B55E] hover:shadow-[0_12px_36px_rgba(240,181,94,0.2)] transition-all duration-300 flex flex-col sm:flex-row gap-5 items-center overflow-hidden group select-text h-full"
               >
                 {/* Cantoneiras Astrais Douradas nos Cantos */}
                 <div className="absolute top-2.5 left-2.5 pointer-events-none opacity-40 group-hover:opacity-100 transition-opacity">
@@ -792,21 +792,17 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                   </svg>
                 </div>
 
-                {/* Imagem do Texto / Artigo (Thumbnail Retangular) */}
-                <div className="w-full sm:w-36 md:w-40 lg:w-44 h-36 sm:h-44 rounded-xl overflow-hidden shrink-0 border border-[#E2DCCF] shadow-xs relative">
+                {/* Imagem do Texto / Artigo (Thumbnail Limpa e Sem Tag) */}
+                <div className="w-full sm:w-44 md:w-48 lg:w-40 xl:w-48 h-40 sm:h-44 xl:h-48 rounded-xl overflow-hidden shrink-0 border border-[#E2DCCF] shadow-xs relative">
                   <img
                     src={post.imageUrl}
                     alt={post.title}
                     className="w-full h-full object-cover protected-img transition-transform duration-500 group-hover:scale-105"
                     draggable={false}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#2B2566]/65 via-transparent to-transparent pointer-events-none" />
-                  <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-[#F0B55E] text-[#2B2566] text-[8.5px] font-black uppercase tracking-wider shadow-xs">
-                    {post.category}
-                  </span>
                 </div>
 
-                {/* Conteúdo Textual Chamativo & Botão */}
+                {/* Conteúdo Textual Chamativo & Botão Roxo */}
                 <div className="flex-1 flex flex-col justify-between space-y-2.5 w-full h-full">
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-[10.5px] text-[#8C987F] font-semibold">
@@ -831,13 +827,13 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                     </p>
                   </div>
 
-                  <div className="pt-1">
+                  <div className="pt-2">
                     <button
                       onClick={() => onNavigate('/leituras')}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-[#FAF7F2] hover:bg-[#F0B55E] text-[#2B2566] px-4 py-2 text-[11px] font-bold uppercase tracking-wider border border-[#E2DCCF] transition-all cursor-pointer group-hover:bg-[#F0B55E] shadow-xs hover:shadow-md"
+                      className="inline-flex items-center gap-2 rounded-full bg-[#2B2566] hover:bg-[#3D206B] text-white px-5 py-2.5 text-xs font-bold uppercase tracking-wider shadow-[0_4px_14px_rgba(43,37,102,0.25)] hover:shadow-[0_6px_20px_rgba(43,37,102,0.35)] transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
                     >
-                      <span>LER MATÉRIA COMPLETA</span>
-                      <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
+                      <span>Leia mais</span>
+                      <ArrowRight className="h-3.5 w-3.5 text-[#F0B55E] transition-transform group-hover:translate-x-1" />
                     </button>
                   </div>
                 </div>

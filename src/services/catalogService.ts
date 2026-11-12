@@ -450,12 +450,43 @@ export async function syncCatalogWithFirestore(): Promise<void> {
 }
 
 /**
+ * Converte strings de data em português (ex: "04 Set 2025", "18 Mar 2025") em timestamp para ordenação.
+ */
+const PT_MONTH_MAP: Record<string, number> = {
+  jan: 0, fev: 1, mar: 2, abr: 3, mai: 4, jun: 5,
+  jul: 6, ago: 7, set: 8, out: 9, nov: 10, dez: 11
+};
+
+export function parseBlogDate(dateStr: string): number {
+  if (!dateStr) return 0;
+  const isoTime = Date.parse(dateStr);
+  if (!isNaN(isoTime)) return isoTime;
+
+  const parts = dateStr.toLowerCase().replace(/de /g, '').trim().split(/\s+/);
+  if (parts.length >= 3) {
+    const day = parseInt(parts[0], 10);
+    const monthKey = parts[1].substring(0, 3);
+    const month = PT_MONTH_MAP[monthKey] ?? 0;
+    const year = parseInt(parts[2], 10);
+    return new Date(year, month, day).getTime();
+  }
+  return 0;
+}
+
+export function sortBlogPostsDesc(posts: BlogPostItem[]): BlogPostItem[] {
+  return [...posts].sort((a, b) => parseBlogDate(b.publishedAt) - parseBlogDate(a.publishedAt));
+}
+
+/**
  * Retorna os últimos artigos editoriais cadastrados (por padrão os 3 mais recentes),
+ * ordenados cronologicamente de forma decrescente e sem repetição,
  * buscando diretamente da coleção `blog_posts` no Firestore com fallback automático.
  */
 export async function getLatestBlogPosts(limitCount = 3): Promise<BlogPostItem[]> {
+  const sortedStatic = sortBlogPostsDesc(CATALOG_BLOG_POSTS);
+
   if (!isFirebaseReady || !db) {
-    return CATALOG_BLOG_POSTS.slice(0, limitCount);
+    return sortedStatic.slice(0, limitCount);
   }
 
   try {
@@ -467,13 +498,16 @@ export async function getLatestBlogPosts(limitCount = 3): Promise<BlogPostItem[]
       });
 
       if (posts.length > 0) {
-        // Ordena mantendo a ordem dos IDs conhecidos ou do Firestore
-        return posts.slice(0, limitCount);
+        // Remove duplicatas por id ou título e ordena por data decrescente
+        const unique = posts.filter(
+          (p, idx, arr) => arr.findIndex(x => x.id === p.id || x.title === p.title) === idx
+        );
+        return sortBlogPostsDesc(unique).slice(0, limitCount);
       }
     }
   } catch (err) {
     console.warn('[Catalog] Aviso ao buscar blog_posts no Firestore:', err);
   }
 
-  return CATALOG_BLOG_POSTS.slice(0, limitCount);
+  return sortedStatic.slice(0, limitCount);
 }
