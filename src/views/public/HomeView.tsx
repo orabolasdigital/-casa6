@@ -476,51 +476,82 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
       </section>
 
       {/* =========================================================================
-          SESSÃO 5: BANNERS PROMOCIONAIS OFICIAIS (PATOTA ASTRAL & BÚSSOLA GUIA)
-          Logos pulando para fora do box • Sem valores • Título grande, texto e botão
+          SESSÃO 5: BANNERS PROMOCIONAIS OFICIAIS (PATOTA ASTRAL & GUIA BÚSSOLA)
+          Fiel ao design de referência: cores exatas, mesma proporção de box,
+          mesma distância do logo 3D e elementos celestes sutis nos cantos
           ========================================================================= */}
-      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] space-y-16 lg:space-y-24">
-        <div className="mx-auto max-w-7xl space-y-16 lg:space-y-24">
+      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] space-y-16 lg:space-y-24 relative overflow-hidden">
+        {/* Elementos Soltos Celestiais nos Cantos em Branco (Órbitas, Linhas Circulares e Pontilhadas com Animação Suave) */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Canto Superior Esquerdo */}
+          <div className="absolute top-4 left-6 w-48 sm:w-64 h-48 sm:h-64 rounded-full border border-dashed border-[#8C987F]/25 animate-celestial-orbit-slow" />
+          <div className="absolute top-12 left-14 w-32 sm:w-40 h-32 sm:h-40 rounded-full border border-dotted border-[#2B2566]/15 animate-celestial-orbit-reverse" />
+          <div className="absolute top-10 left-32 text-[#F0B55E] opacity-35 text-xs">✦</div>
 
-          {/* BANNER 1: PATOTA ASTRAL (VERDE FLORESTA DO PROJETO COM LOGO PULANDO PARA FORA) */}
+          {/* Canto Superior Direito */}
+          <div className="absolute top-8 right-8 w-56 sm:w-72 h-56 sm:h-72 rounded-full border border-[#F0B55E]/20 animate-celestial-orbit-slow" />
+          <div className="absolute top-16 right-16 w-36 sm:w-48 h-36 sm:h-48 rounded-full border border-dashed border-[#2B2566]/15 animate-celestial-orbit-reverse" />
+          <div className="absolute top-24 right-36 text-[#8C987F] opacity-35 text-xs">★</div>
+
+          {/* Margem Central Entre os Banners */}
+          <div className="absolute top-1/2 left-4 w-36 h-36 rounded-full border border-dotted border-[#B87314]/20 animate-celestial-orbit-reverse" />
+          <div className="absolute top-1/2 right-6 w-44 h-44 rounded-full border border-dashed border-[#8C987F]/25 animate-celestial-orbit-slow" />
+
+          {/* Canto Inferior Esquerdo */}
+          <div className="absolute bottom-6 left-8 w-48 sm:w-60 h-48 sm:h-60 rounded-full border border-[#2B2566]/15 animate-celestial-orbit-reverse" />
+          <div className="absolute bottom-12 left-16 w-32 sm:w-40 h-32 sm:h-40 rounded-full border border-dashed border-[#F0B55E]/25 animate-celestial-orbit-slow" />
+
+          {/* Canto Inferior Direito */}
+          <div className="absolute bottom-8 right-6 w-44 sm:w-56 h-44 sm:h-56 rounded-full border border-dashed border-[#8C987F]/25 animate-celestial-orbit-slow" />
+          <div className="absolute bottom-16 right-14 w-28 sm:w-36 h-28 sm:h-36 rounded-full border border-dotted border-[#2B2566]/20 animate-celestial-orbit-reverse" />
+        </div>
+
+        <div className="mx-auto max-w-7xl space-y-16 lg:space-y-24 relative z-10">
+
+          {/* BANNER 1: PATOTA ASTRAL (VERDE MUSGO EXATO, LOGO NA ESQUERDA, BOTÃO DOURADO À DIREITA) */}
           <div className="relative pt-12 sm:pt-16 lg:pt-20">
-            <div className="relative rounded-3xl bg-[#0E3D23] border border-[#25D366]/40 shadow-2xl p-6 sm:p-10 lg:p-14 overflow-visible">
-              {/* Animação Astrológica de Fundo: Órbitas Girando e Estrelas Cintilantes */}
+            {/* Linhas circulares discretas no canto do box */}
+            <div className="absolute -top-6 -right-6 w-40 h-40 rounded-full border border-dashed border-[#8C987F]/30 pointer-events-none animate-celestial-orbit-slow hidden md:block" />
+
+            <div className="relative rounded-3xl bg-[#516443] border border-[#647C53]/60 shadow-[0_20px_50px_rgba(43,37,102,0.12)] p-6 sm:p-8 lg:p-10 overflow-visible text-white">
+              {/* Animação Astrológica de Fundo: Órbitas Girando e Ondulações Circulares */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
-                <div className="absolute -right-24 -top-24 w-[480px] h-[480px] rounded-full border border-[#4ADE80]/15 animate-celestial-orbit-slow" />
-                <div className="absolute right-10 -bottom-28 w-[380px] h-[380px] rounded-full border border-dashed border-[#F0B55E]/15 animate-celestial-orbit-reverse" />
-                <div className="absolute top-10 right-1/4 text-[#4ADE80] opacity-40 text-xs animate-pulse">✦</div>
-                <div className="absolute bottom-12 right-1/3 text-[#F0B55E] opacity-35 text-xs animate-pulse">★</div>
+                <div className="absolute -left-12 -top-12 w-80 h-80 rounded-full border border-white/10" />
+                <div className="absolute -left-20 -top-20 w-[420px] h-[420px] rounded-full border border-dashed border-white/10 animate-celestial-orbit-slow" />
+                <div className="absolute -right-20 -bottom-20 w-[360px] h-[360px] rounded-full border border-dashed border-[#F0B55E]/15 animate-celestial-orbit-reverse" />
+                <div className="absolute top-8 right-1/4 text-white/40 text-xs animate-pulse">✦</div>
               </div>
 
-              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                {/* Logo Oficial 3D Grande Pulando Para Fora do Box */}
-                <div className="lg:col-span-5 flex justify-center lg:justify-start">
-                  <div className="-mt-20 sm:-mt-28 lg:-mt-36 -mb-4 lg:-mb-8 sm:-ml-4 lg:-ml-8 shrink-0">
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+                {/* Logo Oficial 3D Grande Pulando Para Fora do Box na Esquerda */}
+                <div className="lg:col-span-4 flex justify-center lg:justify-start">
+                  <div className="-mt-16 sm:-mt-24 lg:-mt-32 -mb-4 lg:-mb-6 sm:-ml-4 shrink-0">
                     <img
                       src="https://static.wixstatic.com/media/02c8e0_e5132493b4a14c0498c5df95ee68c593~mv2.png"
-                      alt="Patota Astral — Bianca Tofoli"
-                      className="w-64 sm:w-80 lg:w-[400px] h-auto object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.5)] transition-transform duration-500 hover:scale-105"
+                      alt="Patota Astral"
+                      className="w-56 sm:w-72 lg:w-80 h-auto object-contain filter drop-shadow-[0_16px_32px_rgba(0,0,0,0.35)] transition-transform duration-500 hover:scale-105"
                       draggable={false}
                     />
                   </div>
                 </div>
 
-                {/* Conteúdo: Título Grande, Texto e Botão Logo Abaixo (Sem Valor) */}
-                <div className="lg:col-span-7 space-y-4 text-white text-center lg:text-left">
-                  <h3 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.08]">
-                    Astrologia <span className="font-highlight italic text-[#4ADE80] font-normal block sm:inline">Diária por</span> Assinatura
+                {/* Conteúdo: Título Exato, Texto Exato e Botão Dourado */}
+                <div className="lg:col-span-8 flex flex-col justify-center space-y-4 text-white text-center lg:text-left">
+                  <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-white leading-[1.12]">
+                    Astrologia diária <span className="block font-normal"><span className="font-highlight italic text-white/95 font-normal">por</span> Assinatura</span>
                   </h3>
-                  <p className="text-sm sm:text-base text-[#DCFCE7]/90 leading-relaxed font-light max-w-2xl mx-auto lg:mx-0">
-                    Conecte-se com a energia de cada lua nova e cheia, antecipe desafios e potencialize oportunidades. Apenas R$ 1,50 por dia para ter a sabedoria cósmica guiando suas semanas com acolhimento e trocas reais.
-                  </p>
-                  <div className="pt-2">
+
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
+                    <p className="text-xs sm:text-[13px] md:text-sm text-white/90 leading-relaxed font-light max-w-lg text-center lg:text-left">
+                      Conecte-se com a energia do dia, antecipe-se aos desafios e potencialize suas oportunidades com a Patota Astral!
+                    </p>
+
                     <button
                       onClick={() => onNavigate('/patota')}
-                      className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] text-[#072B15] px-8 py-4 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-[#E0A353] hover:bg-[#c99041] text-[#2B2566] px-6 py-3 text-xs font-bold uppercase tracking-wider shadow-md transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shrink-0"
                     >
                       <span>FAZER PARTE DA PATOTA</span>
-                      <ArrowRight className="h-4 w-4" />
+                      <ArrowRight className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </div>
@@ -528,46 +559,54 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
             </div>
           </div>
 
-          {/* BANNER 2: BÚSSOLA GUIA (TOM AMARELO DOURADO DO PROJETO COM LOGO PULANDO PARA FORA) */}
+          {/* BANNER 2: GUIA BÚSSOLA (TOM PÊSSEGO/ÂMBAR EXATO, TEXTO NA ESQUERDA, LOGO NA DIREITA) */}
           <div className="relative pt-12 sm:pt-16 lg:pt-20">
-            <div className="relative rounded-3xl bg-gradient-to-r from-[#D98E20] via-[#EFA63E] to-[#F5CA75] border border-white/60 shadow-2xl p-6 sm:p-10 lg:p-14 overflow-visible text-[#2B2566]">
+            {/* Linhas circulares discretas no canto do box */}
+            <div className="absolute -top-6 -left-6 w-40 h-40 rounded-full border border-dashed border-[#B87314]/25 pointer-events-none animate-celestial-orbit-slow hidden md:block" />
+
+            <div className="relative rounded-3xl bg-gradient-to-r from-[#FEDEA8] via-[#FDCF8A] to-[#FCA84E] border border-white/70 shadow-[0_20px_50px_rgba(43,37,102,0.12)] p-6 sm:p-8 lg:p-10 overflow-visible text-[#2B2566]">
               {/* Animação Astrológica de Fundo: Órbitas Girando e Cintilações */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
-                <div className="absolute -left-20 -bottom-20 w-[460px] h-[460px] rounded-full border border-white/20 animate-celestial-orbit-slow" />
-                <div className="absolute -right-16 -top-20 w-[400px] h-[400px] rounded-full border border-dashed border-[#2B2566]/15 animate-celestial-orbit-reverse" />
-                <div className="absolute top-12 left-1/3 text-[#2B2566] opacity-30 text-xs animate-pulse">✦</div>
+                <div className="absolute -left-10 -bottom-10 w-60 h-60 rounded-full border border-[#2B2566]/10 animate-celestial-orbit-slow" />
+                <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full border border-dashed border-white/30 animate-celestial-orbit-reverse" />
+                <div className="absolute top-10 left-1/3 text-[#2B2566] opacity-25 text-xs animate-pulse">✦</div>
                 <div className="absolute bottom-10 right-1/4 text-white opacity-40 text-xs animate-pulse">★</div>
               </div>
 
-              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                {/* Logo Oficial 3D Grande Pulando Para Fora do Box */}
-                <div className="lg:col-span-5 flex justify-center lg:justify-start">
-                  <div className="-mt-20 sm:-mt-28 lg:-mt-36 -mb-4 lg:-mb-8 sm:-ml-4 lg:-ml-8 shrink-0">
-                    <img
-                      src="https://static.wixstatic.com/media/02c8e0_688edec712d4401984a6e1cf8afeb93e~mv2.png"
-                      alt="Bússola Guia — Casa 6"
-                      className="w-64 sm:w-80 lg:w-[400px] h-auto object-contain filter drop-shadow-[0_20px_35px_rgba(43,37,102,0.35)] transition-transform duration-500 hover:scale-105"
-                      draggable={false}
-                    />
+              {/* Rabicho de balão sutil apontando para a esquerda atrás do logo */}
+              <div className="absolute right-44 lg:right-60 top-1/2 -translate-y-1/2 w-8 h-8 bg-gradient-to-br from-[#FDCF8A] to-[#FCA84E] rotate-45 pointer-events-none hidden lg:block opacity-60" />
+
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+                {/* Conteúdo na Esquerda: Título Solicitado, Texto e Botão Roxo */}
+                <div className="lg:col-span-8 flex flex-col justify-center space-y-4 text-[#2B2566] text-center lg:text-left order-2 lg:order-1">
+                  <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#2B2566] leading-[1.1]">
+                    Seu guia mensal na <span className="block font-bold">palma da sua Mão</span>
+                  </h3>
+
+                  <p className="text-xs sm:text-[13px] md:text-sm text-[#2B2566]/90 leading-relaxed font-normal max-w-xl">
+                    Mapa individual completo. Entregue mensalmente para você planejar trabalho, relações e rotina com clareza estratégica.
+                  </p>
+
+                  <div className="pt-1">
+                    <button
+                      onClick={() => onNavigate('/bussola')}
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-[#2B2566] hover:bg-[#1E1B4B] text-white px-6 py-3 text-xs font-bold uppercase tracking-wider shadow-md transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                    >
+                      <span>CONTRATAR BÚSSOLA GUIA</span>
+                      <ArrowRight className="h-3.5 w-3.5 text-[#F0B55E]" />
+                    </button>
                   </div>
                 </div>
 
-                {/* Conteúdo: Título Solicitado, Texto e Botão Logo Abaixo (Sem Valor) */}
-                <div className="lg:col-span-7 space-y-4 text-[#2B2566] text-center lg:text-left">
-                  <h3 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#2B2566] leading-[1.08]">
-                    Seu mapa mensal de navegação <span className="font-highlight italic text-[#753D00] font-normal block sm:inline">na palma da sua mão.</span>
-                  </h3>
-                  <p className="text-sm sm:text-base text-[#2B2566]/90 leading-relaxed font-normal max-w-2xl mx-auto lg:mx-0">
-                    Mapeamento individual completo gerado a partir do seu nascimento. Entregue mensalmente em PDF pelo WhatsApp e na sua Área de Membros para você planejar trabalho, relações e rotina com clareza estratégica.
-                  </p>
-                  <div className="pt-2">
-                    <button
-                      onClick={() => onNavigate('/bussola')}
-                      className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[#2B2566] hover:bg-[#1b1463] text-white px-8 py-4 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
-                    >
-                      <span>CONTRATAR BÚSSOLA GUIA</span>
-                      <ArrowRight className="h-4 w-4 text-[#F0B55E]" />
-                    </button>
+                {/* Logo Oficial Bússola Guia 3D na Direita */}
+                <div className="lg:col-span-4 flex justify-center lg:justify-end order-1 lg:order-2">
+                  <div className="-mt-16 sm:-mt-24 lg:-mt-32 -mb-4 lg:-mb-6 sm:-mr-4 shrink-0">
+                    <img
+                      src="https://static.wixstatic.com/media/02c8e0_688edec712d4401984a6e1cf8afeb93e~mv2.png"
+                      alt="Guia Bússola"
+                      className="w-56 sm:w-72 lg:w-80 h-auto object-contain filter drop-shadow-[0_16px_32px_rgba(43,37,102,0.3)] transition-transform duration-500 hover:scale-105"
+                      draggable={false}
+                    />
                   </div>
                 </div>
               </div>
