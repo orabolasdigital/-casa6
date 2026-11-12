@@ -314,66 +314,22 @@ export const CATALOG_LOJINHA: LojinhaProduct[] = [
 ];
 
 // 5. Catálogo Oficial do Blog (6 Artigos Originais do Wix com SEO & GEO)
+// Ordenados cronologicamente do mais recente para o mais antigo:
 export const CATALOG_BLOG_POSTS: BlogPostItem[] = [
   {
-    id: 'o-significado-da-eclipse',
-    slug: 'o-significado-da-eclipse',
-    title: 'O Significado do Eclipse',
-    excerpt: 'Os eclipses são momentos poderosos de mudança e revelação. Eles acontecem quando o Sol, a Lua e a Terra se alinham, intensificando energias e trazendo transformações profundas a serem observadas.',
-    fullContent: `O Significado do Eclipse\n\nPor Bianca Tofoli • 25 de Fevereiro de 2025\n\nEclipses: Portais de Transformação e Autoconhecimento\n\n"Tudo que acontece perto de eclipses ou entre eclipses deve ser considerado a nível de autoconhecimento."\n\nOs eclipses são momentos poderosos de mudança e revelação. Eles acontecem quando o Sol, a Lua e a Terra se alinham, intensificando energias e trazendo transformações profundas a serem observadas.\n\n☀ Eclipse Solar: Acontece sempre na Lua Nova, quando a Lua cobre o Sol. Marca inícios e oportunidades inesperadas. É um chamado para novos caminhos, mas pode trazer reviravoltas que nos tiram da zona de conforto. Excelente para redefinir metas e se reconectar com sua essência.\n\n🌕 Eclipse Lunar: Ocorre sempre na Lua Cheia, quando a Terra projeta sua sombra sobre a Lua. Traz encerramentos, finalizações de ciclos, verdades reveladas e forte impacto emocional. É um período de libertação, ideal para deixar para trás o que já não faz sentido.\n\nO que aprender com os eclipses?\n1. Autoconhecimento: Eles mostram o que precisa ser visto, mesmo que desconfortável.\n2. Desapego: Ensinam a soltar padrões e relações que não contribuem para seu crescimento.\n3. Alinhamento com seu destino: Muitas vezes, algo inesperado acontece, abrindo portas para novas possibilidades.\n\nOs eclipses aceleram mudanças. Em vez de resistir, observe o que a vida está tentando lhe mostrar e confie no processo!\n\nBoa reflexão!\nBjus, Bi Tofoli`,
-    publishedAt: '25 Fev 2025',
+    id: 'eclipses-setembro-2025-peixes-virgem',
+    slug: 'eclipse-lunar-em-peixes-e-solar-em-virgem-o-que-podemos-esperar-do-mes-de-setembro-2025',
+    title: 'Eclipse Lunar em Peixes e Solar em Virgem: O que esperar de Setembro/2025',
+    excerpt: 'O mês de setembro de 2025 será marcado pelo Eclipse Lunar em Peixes (dia 7) e pelo Eclipse Solar em Virgem (dia 21), trazendo a união entre a sensibilidade intuitiva e o planejamento prático.',
+    fullContent: `Eclipse Lunar em Peixes e Solar em Virgem: O que podemos esperar do mês de Setembro/2025\n\nPor Bianca Tofoli • 04 de Setembro de 2025\n\nO mês de setembro de 2025 será marcado por dois eventos astrológicos de grande impacto: um Eclipse Lunar em Peixes, no dia 7, e um Eclipse Solar em Virgem, no dia 21. Muito além de um espetáculo no céu, esses eclipses trazem reflexões profundas sobre como organizamos a vida.\n\nO Eclipse Lunar em Peixes convida a um mergulho emocional e espiritual. Ajuda a reconhecer feridas, praticar o perdão e deixar ir o que já não faz sentido.\n\nO Eclipse Solar em Virgem, duas semanas depois, pede ação, rotina e método. A transformação acontece nos detalhes do dia a dia e nos cuidados com o corpo físico.\n\nOs dois fenômenos se complementam: viver com consciência significa unir o sonho de Peixes à realização concreta de Virgem.\n\nComo aproveitar:\n• Faça uma pausa para ouvir sua intuição.\n• Ajuste sua rotina de sono e exames de saúde.\n• Crie metas claras e duradouras.\n• Pratique empatia consigo e com os outros.\n\nBjus, Bi Tofoli`,
+    publishedAt: '04 Set 2025',
     authorName: 'Bianca Tofoli',
-    imageUrl: 'https://static.wixstatic.com/media/2feeec_5ba1606844d64da09a6379c7d46a5d36~mv2_d_5455_4286_s_4_2.jpg/v1/fill/w_2000,h_1571,al_c,q_90,usm_0.66_1.00_0.01/2feeec_5ba1606844d64da09a6379c7d46a5d36~mv2_d_5455_4286_s_4_2.jpg',
-    category: 'ECLIPSE',
-    readTime: '3 min de leitura',
-    seoKeywords: ['eclipse', 'eclipse solar', 'eclipse lunar', 'autoconhecimento', 'astrologia', 'casa 6', 'bianca tofoli'],
-    geoCoverage: 'São Paulo, Brasil',
-    originalUrl: 'https://www.acasa6.com/post/o-significado-da-eclipse'
-  },
-  {
-    id: 'mercurio-influencia-no-que-fazer-ou-nao-fazer',
-    slug: 'mercurio-influencia-no-que-fazer-ou-nao-fazer',
-    title: 'Mercúrio Retrógrado: O que fazer e evitar nesse período?',
-    excerpt: 'Na visão do autoconhecimento podemos e devemos enxergar este trânsito astrológico sem grandes polêmicas e receios, usando o período a nosso favor.',
-    fullContent: `Mercúrio Retrógrado: O que fazer e evitar nesse período?\n\nPor Bianca Tofoli • 26 de Fevereiro de 2025\n\nNa visão do autoconhecimento podemos e devemos enxergar este trânsito astrológico sem grandes polêmicas e receios:\n\nDe 15/03/2025 a 07/04/2025, teremos o primeiro MR do ano, que começará sua retrogradação no signo de Áries e retornará até Peixes, trazendo desafios e oportunidades.\n\n"Nenhum trânsito astrológico causa algo em nós, mas sim faz uma correspondência com o nosso cotidiano."\n\nO que fazer:\n• Revisar contratos e planos: Antes de assinar algo importante, releia com atenção.\n• Resgatar projetos antigos: Ótimo momento para dar continuidade ao que foi deixado de lado.\n• Refletir antes de agir: Em Áries, há impulsividade; em Peixes, confusão. Pense antes de grandes decisões.\n• Analisar sua forma de se comunicar: Excelente momento de reflexão e conexão espiritual.\n• Olhar no seu mapa natal onde você tem do grau 9° de Áries até 26° de Peixes.\n\nO que evitar:\n• Comprar eletrônicos ou iniciar projetos tecnológicos sem cautela.\n• Conversas impulsivas e discussões desnecessárias.\n• Viagens sem planejamento prévio de documentos e horários.\n• Evite prometer mais do que pode cumprir!\n\nUse esse tempo para ajustar rotas e evitar arrependimentos!\n\nBjus, Bi Tofoli`,
-    publishedAt: '26 Fev 2025',
-    authorName: 'Bianca Tofoli',
-    imageUrl: 'https://static.wixstatic.com/media/2feeec_5413fbe5a80947fdb71f2bdc55b60b00~mv2_d_7200_4800_s_4_2.jpg/v1/fill/w_2000,h_1333,al_c,q_90,usm_0.66_1.00_0.01/2feeec_5413fbe5a80947fdb71f2bdc55b60b00~mv2_d_7200_4800_s_4_2.jpg',
-    category: 'TRÂNSITOS',
-    readTime: '4 min de leitura',
-    seoKeywords: ['mercurio retrogrado', 'aries', 'peixes', 'comunicacao', 'rotina', 'astrologia', 'casa 6'],
-    geoCoverage: 'São Paulo, Brasil',
-    originalUrl: 'https://www.acasa6.com/post/merc%C3%BArio-influencia-no-que-fazer-ou-n%C3%A3o-fazer'
-  },
-  {
-    id: 'eclipse-lunar-em-virgem-lua-de-sangue',
-    slug: 'o-significado-da-eclipse-1',
-    title: 'Eclipse Lunar em Virgem: A Lua de Sangue que Revela e Cura!',
-    excerpt: 'No dia 14 de março de 2025, o céu traz a Lua de Sangue em Virgem. Um chamado para revisar rotinas, hábitos de saúde, produtividade e o equilíbrio entre trabalho e bem-estar.',
-    fullContent: `Eclipse Lunar em Virgem: A Lua de Sangue que Revela e Cura!\n\nPor Bianca Tofoli • 12 de Março de 2025\n\nPrepare-se para o Grande Despertar do Dia 14 de Março!\n\nO Eclipse Lunar Total em Virgem, conhecido como Lua de Sangue, ocorre quando a Terra se alinha perfeitamente entre o Sol e a Lua. Astrologicamente, eclipses lunares representam momentos de encerramento, clareza e transformação. Quando acontece no signo detalhista de Virgem, ele nos convida a revisar rotinas, hábitos de saúde e o equilíbrio com o bem-estar.\n\nO que observar e como se preparar?\n1. Olhe para o seu mapa natal: Descubra onde está o signo de Virgem (e Peixes, Gêmeos ou Sagitário).\n2. Prepare um ritual de limpeza e renovação: Anote hábitos que deseja deixar para trás e ressignifique-os.\n3. Práticas recomendadas: Meditação, respiração consciente e banho de ervas purificadoras (alecrim da Caixa Semeadura).\n\nOrganize seu espaço físico e desapegue do que não serve mais.\n\nBjus, Bi Tofoli`,
-    publishedAt: '12 Mar 2025',
-    authorName: 'Bianca Tofoli',
-    imageUrl: 'https://static.wixstatic.com/media/4e25e6_df45a33a5c7b4046b0d73fe2ef60078e~mv2.png/v1/fill/w_1300,h_735,al_c,q_90/4e25e6_df45a33a5c7b4046b0d73fe2ef60078e~mv2.png',
+    imageUrl: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1200&auto=format&fit=crop',
     category: 'ECLIPSE',
     readTime: '5 min de leitura',
-    seoKeywords: ['eclipse lunar virgem', 'lua de sangue', 'saude', 'rotina', 'cura', 'astrologia', 'casa 6'],
+    seoKeywords: ['eclipse peixes', 'eclipse virgem', 'setembro 2025', 'espiritualidade', 'organizacao', 'casa 6'],
     geoCoverage: 'São Paulo, Brasil',
-    originalUrl: 'https://www.acasa6.com/post/o-significado-da-eclipse-1'
-  },
-  {
-    id: 'ano-novo-astrologico-2025',
-    slug: 'o-significado-da-eclipse-1-1',
-    title: 'Ano Novo Astrológico: O que é isso e por que este recomeço será diferente?',
-    excerpt: 'O Ano Novo Astrológico marca o início de um novo ciclo zodiacal quando o Sol entra no signo de Áries. Em 2025, essa transição acontece às 6h02 do dia 20 de março.',
-    fullContent: `Ano Novo Astrológico: O que é isso e por que este recomeço será diferente?\n\nPor Bianca Tofoli • 18 de Março de 2025\n\n"Este é o chamado deste novo ciclo: Avançar com coragem, sim. Mas sem deixar para trás aquilo que é essencial."\n\nO Ano Novo Astrológico marca o início do zodíaco no momento em que o Sol ingressa em Áries. Em 2025, acontece às 6h02 de 20 de março.\n\nDiferente do calendário gregoriano, o Ano Novo Astrológico está alinhado aos ciclos celestes vivos. A entrada do Sol em Áries simboliza renovação pura. Em 2025, acontece com Vênus e Mercúrio retrógrados, exigindo avançar com reflexão e alinhamento aos próprios valores.\n\nPrincipais influências do ciclo:\n1. Júpiter entrando em Câncer: acolhimento, expansão e conexão íntima.\n2. Nodo Norte em Peixes: resgate da espiritualidade e da sensibilidade.\n3. Saturno e Netuno: reavaliação de estruturas e reconexão com o essencial.\n4. Urano em Gêmeos: revolução na comunicação e diálogos conscientes.\n\nA Caixa Semeadura da Casa 6 foi desenhada exatamente para apoiar essa passagem.\n\nBjus, Bi Tofoli`,
-    publishedAt: '18 Mar 2025',
-    authorName: 'Bianca Tofoli',
-    imageUrl: 'https://static.wixstatic.com/media/4e25e6_ce08add5cc744fef98db54df079d83ea~mv2.webp/v1/fill/w_774,h_484,al_c,q_85/4e25e6_ce08add5cc744fef98db54df079d83ea~mv2.webp',
-    category: 'CICLOS',
-    readTime: '6 min de leitura',
-    seoKeywords: ['ano novo astrologico', 'sol em aries', 'renovacao', 'jupiter em cancer', 'caixa semeadura'],
-    geoCoverage: 'São Paulo, Brasil',
-    originalUrl: 'https://www.acasa6.com/post/o-significado-da-eclipse-1-1'
+    originalUrl: 'https://www.acasa6.com/post/eclipse-lunar-em-peixes-e-solar-em-virgem-o-que-podemos-esperar-do-m%C3%AAs-de-setembro-2025'
   },
   {
     id: 'mercurio-retrogrado-em-leao',
@@ -391,19 +347,64 @@ export const CATALOG_BLOG_POSTS: BlogPostItem[] = [
     originalUrl: 'https://www.acasa6.com/post/merc%C3%BArio-retr%C3%B3grado-o-que-significa-ele-em-le%C3%A3o'
   },
   {
-    id: 'eclipses-setembro-2025-peixes-virgem',
-    slug: 'eclipse-lunar-em-peixes-e-solar-em-virgem-o-que-podemos-esperar-do-mes-de-setembro-2025',
-    title: 'Eclipse Lunar em Peixes e Solar em Virgem: O que esperar de Setembro/2025',
-    excerpt: 'O mês de setembro de 2025 será marcado pelo Eclipse Lunar em Peixes (dia 7) e pelo Eclipse Solar em Virgem (dia 21), trazendo a união entre a sensibilidade intuitiva e o planejamento prático.',
-    fullContent: `Eclipse Lunar em Peixes e Solar em Virgem: O que podemos esperar do mês de Setembro/2025\n\nPor Bianca Tofoli • 04 de Setembro de 2025\n\nO mês de setembro de 2025 será marcado por dois eventos astrológicos de grande impacto: um Eclipse Lunar em Peixes, no dia 7, e um Eclipse Solar em Virgem, no dia 21. Muito além de um espetáculo no céu, esses eclipses trazem reflexões profundas sobre como organizamos a vida.\n\nO Eclipse Lunar em Peixes convida a um mergulho emocional e espiritual. Ajuda a reconhecer feridas, praticar o perdão e deixar ir o que já não faz sentido.\n\nO Eclipse Solar em Virgem, duas semanas depois, pede ação, rotina e método. A transformação acontece nos detalhes do dia a dia e nos cuidados com o corpo físico.\n\nOs dois fenômenos se complementam: viver com consciência significa unir o sonho de Peixes à realização concreta de Virgem.\n\nComo aproveitar:\n• Faça uma pausa para ouvir sua intuição.\n• Ajuste sua rotina de sono e exames de saúde.\n• Crie metas claras e duradouras.\n• Pratique empatia consigo e com os outros.\n\nBjus, Bi Tofoli`,
-    publishedAt: '04 Set 2025',
+    id: 'ano-novo-astrologico-2025',
+    slug: 'o-significado-da-eclipse-1-1',
+    title: 'Ano Novo Astrológico: O que é isso e por que este recomeço será diferente?',
+    excerpt: 'O Ano Novo Astrológico marca o início de um novo ciclo zodiacal quando o Sol entra no signo de Áries. Em 2025, essa transição acontece às 6h02 do dia 20 de março.',
+    fullContent: `Ano Novo Astrológico: O que é isso e por que este recomeço será diferente?\n\nPor Bianca Tofoli • 18 de Março de 2025\n\n"Este é o chamado deste novo ciclo: Avançar com coragem, sim. Mas sem deixar para trás aquilo que é essencial."\n\nO Ano Novo Astrológico marca o início do zodíaco no momento em que o Sol ingressa em Áries. Em 2025, acontece às 6h02 de 20 de março.\n\nDiferente do calendário gregoriano, o Ano Novo Astrológico está alinhado aos ciclos celestes vivos. A entrada do Sol em Áries simboliza renovação pura. Em 2025, acontece com Vênus e Mercúrio retrógrados, exigindo avançar com reflexão e alinhamento aos próprios valores.\n\nPrincipais influências do ciclo:\n1. Júpiter entrando em Câncer: acolhimento, expansão e conexão íntima.\n2. Nodo Norte em Peixes: resgate da espiritualidade e da sensibilidade.\n3. Saturno e Netuno: reavaliação de estruturas e reconexão com o essencial.\n4. Urano em Gêmeos: revolução na comunicação e diálogos conscientes.\n\nA Caixa Semeadura da Casa 6 foi desenhada exatamente para apoiar essa passagem.\n\nBjus, Bi Tofoli`,
+    publishedAt: '18 Mar 2025',
     authorName: 'Bianca Tofoli',
-    imageUrl: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1200&auto=format&fit=crop',
+    imageUrl: 'https://static.wixstatic.com/media/4e25e6_ce08add5cc744fef98db54df079d83ea~mv2.webp/v1/fill/w_774,h_484,al_c,q_85/4e25e6_ce08add5cc744fef98db54df079d83ea~mv2.webp',
+    category: 'CICLOS',
+    readTime: '6 min de leitura',
+    seoKeywords: ['ano novo astrologico', 'sol em aries', 'renovacao', 'jupiter em cancer', 'caixa semeadura'],
+    geoCoverage: 'São Paulo, Brasil',
+    originalUrl: 'https://www.acasa6.com/post/o-significado-da-eclipse-1-1'
+  },
+  {
+    id: 'eclipse-lunar-em-virgem-lua-de-sangue',
+    slug: 'o-significado-da-eclipse-1',
+    title: 'Eclipse Lunar em Virgem: A Lua de Sangue que Revela e Cura!',
+    excerpt: 'No dia 14 de março de 2025, o céu traz a Lua de Sangue em Virgem. Um chamado para revisar rotinas, hábitos de saúde, produtividade e o equilíbrio entre trabalho e bem-estar.',
+    fullContent: `Eclipse Lunar em Virgem: A Lua de Sangue que Revela e Cura!\n\nPor Bianca Tofoli • 12 de Março de 2025\n\nPrepare-se para o Grande Despertar do Dia 14 de Março!\n\nO Eclipse Lunar Total em Virgem, conhecido como Lua de Sangue, ocorre quando a Terra se alinha perfeitamente entre o Sol e a Lua. Astrologicamente, eclipses lunares representam momentos de encerramento, clareza e transformação. Quando acontece no signo detalhista de Virgem, ele nos convida a revisar rotinas, hábitos de saúde e o equilíbrio com o bem-estar.\n\nO que observar e como se preparar?\n1. Olhe para o seu mapa natal: Descubra onde está o signo de Virgem (e Peixes, Gêmeos ou Sagitário).\n2. Prepare um ritual de limpeza e renovação: Anote hábitos que deseja deixar para trás e ressignifique-os.\n3. Práticas recomendadas: Meditação, respiração consciente e banho de ervas purificadoras (alecrim da Caixa Semeadura).\n\nOrganize seu espaço físico e desapegue do que não serve mais.\n\nBjus, Bi Tofoli`,
+    publishedAt: '12 Mar 2025',
+    authorName: 'Bianca Tofoli',
+    imageUrl: 'https://static.wixstatic.com/media/4e25e6_df45a33a5c7b4046b0d73fe2ef60078e~mv2.png/v1/fill/w_1300,h_735,al_c,q_90/4e25e6_df45a33a5c7b4046b0d73fe2ef60078e~mv2.png',
     category: 'ECLIPSE',
     readTime: '5 min de leitura',
-    seoKeywords: ['eclipse peixes', 'eclipse virgem', 'setembro 2025', 'espiritualidade', 'organizacao', 'casa 6'],
+    seoKeywords: ['eclipse lunar virgem', 'lua de sangue', 'saude', 'rotina', 'cura', 'astrologia', 'casa 6'],
     geoCoverage: 'São Paulo, Brasil',
-    originalUrl: 'https://www.acasa6.com/post/eclipse-lunar-em-peixes-e-solar-em-virgem-o-que-podemos-esperar-do-m%C3%AAs-de-setembro-2025'
+    originalUrl: 'https://www.acasa6.com/post/o-significado-da-eclipse-1'
+  },
+  {
+    id: 'mercurio-influencia-no-que-fazer-ou-nao-fazer',
+    slug: 'mercurio-influencia-no-que-fazer-ou-nao-fazer',
+    title: 'Mercúrio Retrógrado: O que fazer e evitar nesse período?',
+    excerpt: 'Na visão do autoconhecimento podemos e devemos enxergar este trânsito astrológico sem grandes polêmicas e receios, usando o período a nosso favor.',
+    fullContent: `Mercúrio Retrógrado: O que fazer e evitar nesse período?\n\nPor Bianca Tofoli • 26 de Fevereiro de 2025\n\nNa visão do autoconhecimento podemos e devemos enxergar este trânsito astrológico sem grandes polêmicas e receios:\n\nDe 15/03/2025 a 07/04/2025, teremos o primeiro MR do ano, que começará sua retrogradação no signo de Áries e retornará até Peixes, trazendo desafios e oportunidades.\n\n"Nenhum trânsito astrológico causa algo em nós, mas sim faz uma correspondência com o nosso cotidiano."\n\nO que fazer:\n• Revisar contratos e planos: Antes de assinar algo importante, releia com atenção.\n• Resgatar projetos antigos: Ótimo momento para dar continuidade ao que foi deixado de lado.\n• Refletir antes de agir: Em Áries, há impulsividade; em Peixes, confusão. Pense antes de grandes decisões.\n• Analisar sua forma de se comunicar: Excelente momento de reflexão e conexão espiritual.\n• Olhar no seu mapa natal onde você tem do grau 9° de Áries até 26° de Peixes.\n\nO que evitar:\n• Comprar eletrônicos ou iniciar projetos tecnológicos sem cautela.\n• Conversas impulsivas e discussões desnecessárias.\n• Viagens sem planejamento prévio de documentos e horários.\n• Evite prometer mais do que pode cumprir!\n\nUse esse tempo para ajustar rotas e evitar arrependimentos!\n\nBjus, Bi Tofoli`,
+    publishedAt: '26 Fev 2025',
+    authorName: 'Bianca Tofoli',
+    imageUrl: 'https://static.wixstatic.com/media/2feeec_5413fbe5a80947fdb71f2bdc55b60b00~mv2_d_7200_4800_s_4_2.jpg/v1/fill/w_2000,h_1333,al_c,q_90,usm_0.66_1.00_0.01/2feeec_5413fbe5a80947fdb71f2bdc55b60b00~mv2_d_7200_4800_s_4_2.jpg',
+    category: 'TRÂNSITOS',
+    readTime: '4 min de leitura',
+    seoKeywords: ['mercurio retrogrado', 'aries', 'peixes', 'comunicacao', 'rotina', 'astrologia', 'casa 6'],
+    geoCoverage: 'São Paulo, Brasil',
+    originalUrl: 'https://www.acasa6.com/post/merc%C3%BArio-influencia-no-que-fazer-ou-n%C3%A3o-fazer'
+  },
+  {
+    id: 'o-significado-da-eclipse',
+    slug: 'o-significado-da-eclipse',
+    title: 'O Significado do Eclipse',
+    excerpt: 'Os eclipses são momentos poderosos de mudança e revelação. Eles acontecem quando o Sol, a Lua e a Terra se alinham, intensificando energias e trazendo transformações profundas a serem observadas.',
+    fullContent: `O Significado do Eclipse\n\nPor Bianca Tofoli • 25 de Fevereiro de 2025\n\nEclipses: Portais de Transformação e Autoconhecimento\n\n"Tudo que acontece perto de eclipses ou entre eclipses deve ser considerado a nível de autoconhecimento."\n\nOs eclipses são momentos poderosos de mudança e revelação. Eles acontecem quando o Sol, a Lua e a Terra se alinham, intensificando energias e trazendo transformações profundas a serem observadas.\n\n☀ Eclipse Solar: Acontece sempre na Lua Nova, quando a Lua cobre o Sol. Marca inícios e oportunidades inesperadas. É um chamado para novos caminhos, mas pode trazer reviravoltas que nos tiram da zona de conforto. Excelente para redefinir metas e se reconectar com sua essência.\n\n🌕 Eclipse Lunar: Ocorre sempre na Lua Cheia, quando a Terra projeta sua sombra sobre a Lua. Traz encerramentos, finalizações de ciclos, verdades reveladas e forte impacto emocional. É um período de libertação, ideal para deixar para trás o que já não faz sentido.\n\nO que aprender com os eclipses?\n1. Autoconhecimento: Eles mostram o que precisa ser visto, mesmo que desconfortável.\n2. Desapego: Ensinam a soltar padrões e relações que não contribuem para seu crescimento.\n3. Alinhamento com seu destino: Muitas vezes, algo inesperado acontece, abrindo portas para novas possibilidades.\n\nOs eclipses aceleram mudanças. Em vez de resistir, observe o que a vida está tentando lhe mostrar e confie no processo!\n\nBoa reflexão!\nBjus, Bi Tofoli`,
+    publishedAt: '25 Fev 2025',
+    authorName: 'Bianca Tofoli',
+    imageUrl: 'https://static.wixstatic.com/media/2feeec_5ba1606844d64da09a6379c7d46a5d36~mv2_d_5455_4286_s_4_2.jpg/v1/fill/w_2000,h_1571,al_c,q_90,usm_0.66_1.00_0.01/2feeec_5ba1606844d64da09a6379c7d46a5d36~mv2_d_5455_4286_s_4_2.jpg',
+    category: 'ECLIPSE',
+    readTime: '3 min de leitura',
+    seoKeywords: ['eclipse', 'eclipse solar', 'eclipse lunar', 'autoconhecimento', 'astrologia', 'casa 6', 'bianca tofoli'],
+    geoCoverage: 'São Paulo, Brasil',
+    originalUrl: 'https://www.acasa6.com/post/o-significado-da-eclipse'
   }
 ];
 

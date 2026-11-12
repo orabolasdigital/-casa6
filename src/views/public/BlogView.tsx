@@ -27,7 +27,7 @@ import {
   Check,
   BookOpen
 } from 'lucide-react';
-import { CATALOG_BLOG_POSTS, BlogPostItem } from '../../services/catalogService';
+import { CATALOG_BLOG_POSTS, BlogPostItem, sortBlogPostsDesc } from '../../services/catalogService';
 
 interface BlogViewProps {
   onNavigate?: (path: string) => void;
@@ -97,8 +97,10 @@ export const BlogView: React.FC<BlogViewProps> = ({
   };
 
   const activeSlug = getSlugFromPath(currentPath);
+  const sortedPosts = sortBlogPostsDesc(CATALOG_BLOG_POSTS);
+
   const activePost = activeSlug
-    ? CATALOG_BLOG_POSTS.find(
+    ? sortedPosts.find(
         (post) => post.slug === activeSlug || post.id === activeSlug
       )
     : null;
@@ -328,7 +330,7 @@ export const BlogView: React.FC<BlogViewProps> = ({
               </h3>
 
               <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-3 -mx-4 px-4 scrollbar-none sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-2 sm:gap-4">
-                {CATALOG_BLOG_POSTS.filter((p) => p.id !== activePost.id)
+                {sortedPosts.filter((p) => p.id !== activePost.id)
                   .slice(0, 2)
                   .map((otherPost) => (
                     <div
@@ -390,7 +392,7 @@ export const BlogView: React.FC<BlogViewProps> = ({
 
           {/* Lista Oficial dos Artigos em Boxes Horizontais: Carrossel no Mobile e Empilhados no Desktop */}
           <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-6 -mx-4 px-4 scrollbar-none sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:block sm:space-y-8">
-            {CATALOG_BLOG_POSTS.map((post, idx) => (
+            {sortedPosts.map((post, idx) => (
               <RevealOnScroll
                 key={post.id}
                 delayMs={100 + idx * 50}
