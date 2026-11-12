@@ -34,7 +34,7 @@ export const SITE_CONFIG: SiteConfiguration = {
  */
 export const BRAND_ASSETS = {
   // Foto Bianca (usar no botão WhatsApp, e onde estiver falando de Bianca)
-  biancaPhoto: 'https://static.wixstatic.com/media/02c8e0_54a33eeb476d45c49b7f4953c34177fc~mv2.jpeg',
+  biancaPhoto: 'https://static.wixstatic.com/media/02c8e0_eebda8070c014b7e9e29291edb53c2c7~mv2.jpg',
   biancaPhotoLocal: '/assets/brand/bianca-perfil.jpg',
 
   // Logo horizontal branco (uso em fundos escuros: header, footer, etc.)

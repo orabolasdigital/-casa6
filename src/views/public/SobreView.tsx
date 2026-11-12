@@ -156,10 +156,10 @@ export const SobreView: React.FC<SobreViewProps> = ({ onOpenBooking }) => {
                   {/* 5. Moldura Circular Principal da Foto com Enquadramento Oficial */}
                   <div className="relative w-full h-full rounded-full overflow-hidden shadow-xl ring-1 ring-[#F0B55E]/25">
                     <img
-                      src="https://static.wixstatic.com/media/02c8e0_dd0430bc5bee4a5c93824bc5d867d23a~mv2.jpeg"
+                      src="https://static.wixstatic.com/media/02c8e0_eebda8070c014b7e9e29291edb53c2c7~mv2.jpg"
                       alt="Bianca Tofoli — Fundadora da Casa 6"
                       className="w-full h-full object-cover protected-img"
-                      style={{ objectPosition: '50% 20%' }}
+                      style={{ objectPosition: '50% 15%' }}
                       draggable={false}
                     />
                   </div>

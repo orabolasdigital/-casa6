@@ -394,10 +394,10 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
               <div className="relative shrink-0">
                 <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-[#F0B55E] p-1 shadow-md bg-white ring-1 ring-[#F0B55E]/25">
                   <img
-                    src="https://static.wixstatic.com/media/02c8e0_54a33eeb476d45c49b7f4953c34177fc~mv2.jpeg"
+                    src="https://static.wixstatic.com/media/02c8e0_eebda8070c014b7e9e29291edb53c2c7~mv2.jpg"
                     alt="Bianca Tofoli — Fundadora da Casa 6"
                     className="w-full h-full object-cover rounded-full"
-                    style={{ objectPosition: '50% 8%' }}
+                    style={{ objectPosition: '50% 15%' }}
                   />
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-xs">

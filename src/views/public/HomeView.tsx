@@ -296,10 +296,10 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                 {/* 5. Moldura Circular Principal da Foto Sem Borda Branca e Estática */}
                 <div className="relative w-full h-full rounded-full overflow-hidden shadow-xl ring-1 ring-[#F0B55E]/25">
                   <img
-                    src="https://static.wixstatic.com/media/02c8e0_54a33eeb476d45c49b7f4953c34177fc~mv2.jpeg"
+                    src="https://static.wixstatic.com/media/02c8e0_eebda8070c014b7e9e29291edb53c2c7~mv2.jpg"
                     alt="Bianca Tofoli — Fundadora da Casa 6"
                     className="w-full h-full object-cover protected-img"
-                    style={{ objectPosition: '50% 8%' }}
+                    style={{ objectPosition: '50% 15%' }}
                     draggable={false}
                   />
                 </div>
