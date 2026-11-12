@@ -3,25 +3,96 @@
  * Casa 6 — Bianca Tofoli
  * Visão Pública: /patota & /patota-astral
  * Comunidade Recorrente Patota Astral no WhatsApp com Bianca Tofoli
+ * 
+ * Funcionalidades & Design:
+ * - Fundo suave, luminoso e acolhedor (#FAF8F5).
+ * - Sem logotipo no topo, substituído pelo banner editorial com o logo oficial da Patota Astral 3D.
+ * - Banner com frase de impacto da astrologia diária por assinatura.
+ * - Seção "O que é a Patota Astral?" com o texto original da Bianca.
+ * - Sem a seção de depoimentos.
+ * - Conteúdo exclusivo da Patota em cards elegantes e bem formatados.
+ * - Box dedicado falando sobre a Bianca Tofoli (quem faz as previsões diárias).
+ * - Seção de Inscrição e Assinatura com destaque da tag "R$ 1,50 por dia" (Plano Anual, Semestral e Trimestral) e formulário seguro.
+ * - FAQ completa com todas as 8 perguntas e respostas do site antigo em acordeão leve e bonito.
+ * - Integração com Mercado Pago Checkout Modal.
  */
 
-import React, { useState } from 'react';
-import { MessageCircle, CheckCircle2, ShieldCheck, ChevronDown, ChevronUp, Star, Sparkles, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  MessageCircle,
+  CheckCircle2,
+  ShieldCheck,
+  ChevronDown,
+  ChevronUp,
+  Star,
+  Sparkles,
+  ArrowRight,
+  Clock,
+  Calendar,
+  Lock,
+  Heart,
+  Globe,
+  HelpCircle,
+  Check
+} from 'lucide-react';
 import { BirthData } from '../../types';
 import { MercadoPagoCheckoutModal } from '../../components/common/MercadoPagoCheckoutModal';
 import { trackAnalyticsEvent } from '../../services/analytics';
-import {
-  sanitizeName,
-  formatWhatsAppNumber,
-  lookupCRMContactByEmail
-} from '../../services/formValidation';
+import { lookupCRMContactByEmail } from '../../services/formValidation';
 
 interface PatotaAstralViewProps {
   onOpenBooking?: (serviceId?: string) => void;
 }
 
+/**
+ * Componente utilitário para animação suave de subida ao rolar a página (como nuvens)
+ */
+const RevealOnScroll: React.FC<{
+  children: React.ReactNode;
+  delayMs?: number;
+  className?: string;
+}> = ({ children, delayMs = 0, className = '' }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const domRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    const current = domRef.current;
+    if (current) observer.observe(current);
+
+    return () => {
+      if (current) observer.unobserve(current);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={domRef}
+      style={{ transitionDelay: `${delayMs}ms` }}
+      className={`transition-all duration-1000 ease-out transform ${
+        isVisible
+          ? 'opacity-100 translate-y-0 scale-100'
+          : 'opacity-0 translate-y-10 scale-[0.99]'
+      } ${className}`}
+    >
+      {children}
+    </div>
+  );
+};
+
 export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
-  const [selectedPlan, setSelectedPlan] = useState<'trimestral' | 'semestral' | 'anual'>('trimestral');
+  const [selectedPlan, setSelectedPlan] = useState<'anual' | 'semestral' | 'trimestral'>('anual');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -38,51 +109,106 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
+  // Planos com o Anual em destaque (R$ 1,50 por dia)
   const plans = [
     {
-      id: 'trimestral',
-      name: 'Plano Trimestral',
-      price: 53.0,
-      priceFormatted: 'R$ 53,00',
-      periodText: 'por mês (renovação automática trimestral)',
-      badge: 'Mais Flexível'
+      id: 'anual',
+      name: 'Plano Anual',
+      price: 43.0,
+      priceFormatted: 'R$ 43,00',
+      periodText: 'por mês (renovação anual)',
+      badge: 'R$ 1,50 por dia • Melhor Valor',
+      highlight: true
     },
     {
       id: 'semestral',
       name: 'Plano Semestral',
       price: 51.0,
       priceFormatted: 'R$ 51,00',
-      periodText: 'por mês (renovação automática semestral)',
-      badge: 'Popular'
+      periodText: 'por mês (renovação semestral)',
+      badge: 'Mais Popular',
+      highlight: false
     },
     {
-      id: 'anual',
-      name: 'Plano Anual',
-      price: 43.0,
-      priceFormatted: 'R$ 43,00',
-      periodText: 'por mês (renovação automática anual)',
-      badge: 'Melhor Valor — R$ 1,50/dia'
+      id: 'trimestral',
+      name: 'Plano Trimestral',
+      price: 53.0,
+      priceFormatted: 'R$ 53,00',
+      periodText: 'por mês (renovação trimestral)',
+      badge: 'Mais Flexível',
+      highlight: false
     }
   ] as const;
 
   const currentPlan = plans.find((p) => p.id === selectedPlan) || plans[0];
 
+  // Benefícios exclusivos da Patota
+  const benefits = [
+    {
+      icon: MessageCircle,
+      title: 'Previsões Diárias no WhatsApp',
+      desc: 'Áudios matinais com os trânsitos da Lua, aspectos do céu e orientações práticas para seu dia.'
+    },
+    {
+      icon: Calendar,
+      title: 'Encontros Online Mensais',
+      desc: 'Sessões ao vivo no Google Meet com a Bianca para discutir os ciclos do mês, com gravações salvas.'
+    },
+    {
+      icon: Sparkles,
+      title: 'Materiais Exclusivos em PDF',
+      desc: 'Rituais de lunação, guias astrológicos e tabelas práticas disponíveis para download.'
+    },
+    {
+      icon: HelpCircle,
+      title: 'Espaço para Perguntas',
+      desc: 'Tire suas dúvidas diretamente nos encontros e entenda como as energias celestes se manifestam.'
+    },
+    {
+      icon: Star,
+      title: 'Sorteios & Descontos',
+      desc: 'Condições especiais em consultas individuais, na Lojinha e em futuros workshops da Casa 6.'
+    },
+    {
+      icon: Heart,
+      title: 'Comunidade Acolhedora VIP',
+      desc: 'Um ambiente seguro, sem julgamentos, com pessoas que compartilham da mesma busca por evolução.'
+    }
+  ];
+
+  // 8 Perguntas e Respostas do Site Antigo
   const faqs = [
     {
-      q: 'Como funciona a assinatura da Patota Astral?',
-      a: 'É uma assinatura recorrente no WhatsApp com previsões diárias, encontros mensais e materiais exclusivos. Você pode escolher entre os planos trimestral, semestral ou anual com renovação automática.'
+      q: 'PRECISO ENTENDER MUITO SOBRE ASTROLOGIA PARA PARTICIPAR?',
+      a: 'Não! O objetivo da Patota Astral com Bianca Tofoli é justamente traduzir o simbolismo dos astros em orientações práticas, lúcidas e simples para o seu dia a dia. Você não precisa ter nenhum conhecimento prévio para aproveitar 100% do conteúdo.'
     },
     {
-      q: 'Preciso entender de astrologia para participar?',
-      a: 'Não! O propósito da Patota Astral com Bianca Tofoli é justamente descomplicar a astrologia, traduzindo o simbolismo dos céus em passos práticos para a sua vida pessoal e profissional.'
+      q: 'A PATOTA ASTRAL É UM GRUPO NO WHATSAPP?',
+      a: 'Sim! Todo o conteúdo diário, áudios com os trânsitos da Lua e links dos encontros são enviados diretamente em um grupo exclusivo no WhatsApp, garantindo facilidade e rapidez para ouvir na sua rotina.'
     },
     {
-      q: 'Os encontros ao vivo ficam gravados?',
-      a: 'Sim! Se você não puder assistir no horário marcado, todos os encontros ficam salvos na sua Área de Membros para assistir quando puder.'
+      q: 'QUANDO E COMO SERÃO OS ENCONTROS AO VIVO?',
+      a: 'Os encontros acontecem mensalmente de forma online (via Google Meet ou Zoom), com datas e horários avisados com antecedência no grupo. É um momento de troca sincera, aprofundamento e espaço para perguntas.'
     },
     {
-      q: 'Como e quando posso cancelar?',
-      a: 'A assinatura é recorrente. Para cancelar basta entrar em contato com nosso time pelo WhatsApp ou suporte.'
+      q: 'E SE EU NÃO PUDER ASSISTIR AO VIVO?',
+      a: 'Sem problemas! Todos os encontros são gravados na íntegra e disponibilizados na sua Área de Membros exclusiva no site da Casa 6. Você poderá assistir quando e quantas vezes quiser.'
+    },
+    {
+      q: 'O QUE ACONTECE DEPOIS QUE EU FAÇO A MINHA ASSINATURA?',
+      a: 'Assim que o pagamento for aprovado pelo Mercado Pago, você receberá um e-mail de boas-vindas com o link de acesso imediato ao grupo VIP do WhatsApp e instruções para criar sua senha da Área de Membros.'
+    },
+    {
+      q: 'QUAL PLANO DE ASSINATURA É MAIS VANTAJOSO PARA MIM?',
+      a: 'O Plano Anual é o mais vantajoso, pois oferece a maior economia — saindo por apenas cerca de R$ 1,50 por dia (menos que um cafézinho) — e garante sua presença contínua em todos os 12 encontros e lunações do ano.'
+    },
+    {
+      q: 'TENHO UMA DÚVIDA OU PRECISO DE AJUDA COM MINHA ASSINATURA. O QUE FAÇO?',
+      a: 'Nossa equipe e a própria Bianca estão à disposição no WhatsApp oficial da Casa 6 para responder dúvidas sobre planos, formas de pagamento ou acesso à comunidade.'
+    },
+    {
+      q: 'ESTOU MORANDO FORA DO PAÍS. POSSO PARTICIPAR?',
+      a: 'Sim, com certeza! A Patota Astral recebe membros do mundo todo. Como todo o ecossistema é digital (WhatsApp e Área de Membros), você só precisa de conexão com a internet para participar.'
     }
   ];
 
@@ -91,7 +217,7 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
     setErrorMessage('');
 
     if (!firstName || !lastName || !email || !whatsapp) {
-      setErrorMessage('Por favor, preencha todos os campos obrigatórios para o cadastro.');
+      setErrorMessage('Por favor, preencha nome, sobrenome, e-mail e WhatsApp para a liberação da assinatura.');
       return;
     }
 
@@ -113,346 +239,444 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
     }
   };
 
-  const birthData: BirthData = {
-    birthDay,
-    birthMonth,
-    birthYear,
-    birthHour,
-    birthMinute,
-    city,
-    state
+  const scrollToCheckout = () => {
+    const el = document.getElementById('secao-assinatura-patota');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
-    <div className="bg-[#F4EFE6] text-[#2B2566] min-h-screen py-12 sm:py-20 px-4 sm:px-6 lg:px-8 space-y-16">
+    <div className="bg-[#FAF8F5] text-[#2B2566] min-h-screen py-10 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 font-sans overflow-hidden relative">
       
-      {/* Hero Patota Astral */}
-      <div className="max-w-4xl mx-auto text-center space-y-5">
-        <div className="flex justify-center pb-2">
-          <img
-            src="https://static.wixstatic.com/media/02c8e0_e5132493b4a14c0498c5df95ee68c593~mv2.png"
-            alt="Patota Astral — Casa 6"
-            className="h-28 sm:h-36 w-auto object-contain transition-transform hover:scale-105"
-          />
-        </div>
-        <div className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-1.5 text-xs font-black text-[#072B15] shadow-md">
-          <MessageCircle className="h-4 w-4 text-[#072B15]" />
-          <span>COMUNIDADE OFICIAL VIP NO WHATSAPP</span>
-        </div>
-        <h1 className="font-heading text-4xl sm:text-6xl font-extrabold text-[#2B2566] tracking-tight">
-          Patota Astral
-        </h1>
-        <p className="font-heading text-lg sm:text-2xl text-[#166437] max-w-2xl mx-auto font-medium">
-          Acompanhe os movimentos astrológicos com Bianca Tofoli
-        </p>
+      {/* Elementos Cósmicos Decorativos Efémeros ao Fundo */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+        <div className="absolute top-20 right-[-80px] w-96 h-96 rounded-full border border-[#F0B55E]/15 opacity-40 animate-celestial-orbit-slow" />
+        <div className="absolute top-1/2 left-[-100px] w-[500px] h-[500px] rounded-full border border-[#8C987F]/10 opacity-50 animate-celestial-orbit-reverse" />
+        <div className="absolute top-36 left-12 text-[#F0B55E]/40 text-xs animate-pulse">✦</div>
+        <div className="absolute bottom-48 right-1/4 text-[#8C987F]/30 text-[10px]">★</div>
       </div>
 
-      {/* Seção 1: O que é a Patota Astral? */}
-      <div className="max-w-4xl mx-auto bg-[#FCFAF7] rounded-sm border border-[#DAD2C4] p-6 sm:p-10 shadow-md space-y-4 font-sans">
-        <h2 className="font-heading text-2xl sm:text-3xl font-bold text-[#1b1463]">
-          O que é a Patota Astral?
-        </h2>
-        <p className="text-xs sm:text-sm text-[#423C7B] leading-relaxed">
-          A Patota Astral é um grupo VIP no WhatsApp, criado por mim, Bianca Tofoli, para oferecer previsões astrológicas diárias e aprofundamento em astrologia de uma forma prática e acessível. Esse grupo é perfeito para quem deseja estar sempre alinhada com as energias do dia e fazer escolhas mais conscientes para sua rotina, trabalho, relações e projetos pessoais.
-        </p>
-        <p className="text-xs sm:text-sm text-[#423C7B] leading-relaxed">
-          Diariamente, compartilho insights astrológicos sobre os trânsitos planetários e suas influências, ajudando você a se planejar e utilizar esse conhecimento para tomar decisões mais assertivas.
-        </p>
-        <p className="text-xs sm:text-sm text-[#423C7B] leading-relaxed">
-          Além disso, a cada mês, temos encontros exclusivos ao vivo, onde aprofundamos ensinamentos astrológicos, respondemos dúvidas e trocamos experiências. Também lanço enquetes, promoções e sorteios exclusivos para os participantes, tornando essa experiência ainda mais especial.
-        </p>
-      </div>
-
-      {/* Seção 2: Conteúdo Exclusivo da Patota Astral */}
-      <div className="max-w-4xl mx-auto space-y-6 font-sans">
-        <div className="text-center space-y-2">
-          <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#8C987F]">
-            BENEFÍCIOS EXCLUSIVOS
-          </span>
-          <h2 className="font-heading text-2xl sm:text-3xl font-bold text-[#1b1463]">
-            Conteúdo Exclusivo da Patota Astral
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-          <div className="bg-[#FCFAF7] p-5 rounded-sm border border-[#DAD2C4] shadow-xs space-y-2">
-            <Sparkles className="h-5 w-5 text-[#fab03b]" />
-            <h3 className="font-bold text-sm text-[#1b1463]">Previsões Diárias</h3>
-            <p className="text-xs text-[#534D6B] leading-relaxed">
-              Entenda como as energias do dia impactam suas decisões.
-            </p>
-          </div>
-
-          <div className="bg-[#FCFAF7] p-5 rounded-sm border border-[#DAD2C4] shadow-xs space-y-2">
-            <MessageCircle className="h-5 w-5 text-[#25D366]" />
-            <h3 className="font-bold text-sm text-[#1b1463]">Encontros Online</h3>
-            <p className="text-xs text-[#534D6B] leading-relaxed">
-              Momento exclusivo para tirar dúvidas e aprender mais sobre astrologia.
-            </p>
-          </div>
-
-          <div className="bg-[#FCFAF7] p-5 rounded-sm border border-[#DAD2C4] shadow-xs space-y-2">
-            <Star className="h-5 w-5 text-[#fab03b]" />
-            <h3 className="font-bold text-sm text-[#1b1463]">Materiais Exclusivos</h3>
-            <p className="text-xs text-[#534D6B] leading-relaxed">
-              Compartilho insights e pesquisas astrológicas para ampliar seu conhecimento.
-            </p>
-          </div>
-
-          <div className="bg-[#FCFAF7] p-5 rounded-sm border border-[#DAD2C4] shadow-xs space-y-2">
-            <ShieldCheck className="h-5 w-5 text-[#6a62b8]" />
-            <h3 className="font-bold text-sm text-[#1b1463]">Interação Personalizada</h3>
-            <p className="text-xs text-[#534D6B] leading-relaxed">
-              Participe de enquetes e tenha influência na criação de novos produtos e serviços.
-            </p>
-          </div>
-
-          <div className="bg-[#FCFAF7] p-5 rounded-sm border border-[#DAD2C4] shadow-xs space-y-2">
-            <Sparkles className="h-5 w-5 text-[#fab03b]" />
-            <h3 className="font-bold text-sm text-[#1b1463]">Sorteios e Promoções</h3>
-            <p className="text-xs text-[#534D6B] leading-relaxed">
-              Participe de sorteios de produtos e serviços exclusivos.
-            </p>
-          </div>
-
-          <div className="bg-[#FCFAF7] p-5 rounded-sm border border-[#DAD2C4] shadow-xs space-y-2">
-            <CheckCircle2 className="h-5 w-5 text-[#25D366]" />
-            <h3 className="font-bold text-sm text-[#1b1463]">Comunidade VIP</h3>
-            <p className="text-xs text-[#534D6B] leading-relaxed">
-              Troque experiências com outras pessoas interessadas em astrologia e autoconhecimento.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Seção 3: Inscrição e Assinatura com Seletor dos 3 Planos */}
-      <div className="max-w-4xl mx-auto bg-[#FCFAF7] rounded-sm border-2 border-[#25D366] shadow-xl p-6 sm:p-10 space-y-8 font-sans">
+      <div className="mx-auto max-w-5xl space-y-12 sm:space-y-16 lg:space-y-20 relative z-10">
         
-        <div className="text-center space-y-2">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#166437] block">
-            R$ 1,50 por dia!
-          </span>
-          <h2 className="font-heading text-2xl sm:text-3xl font-bold text-[#1b1463]">
-            Inscrição e Assinatura
-          </h2>
-          <p className="font-heading text-lg font-bold text-[#1b1463]">
-            &gt;&gt;&gt; R$ 46,00 por mês / anual &lt;&lt;&lt;
-          </p>
-          <p className="text-xs text-[#534D6B]">
-            A assinatura é recorrente, para cancelar basta entrar em contato com nosso time.
-          </p>
-        </div>
-
-        {/* Escolha entre os Planos Trimestral, Semestral ou Anual */}
-        <div className="space-y-3">
-          <p className="text-xs font-bold uppercase tracking-wider text-[#1b1463] text-center">
-            Passo 1: Escolha o melhor plano para seu momento:
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {plans.map((p) => {
-              const isSelected = selectedPlan === p.id;
-              return (
-                <div
-                  key={p.id}
-                  onClick={() => setSelectedPlan(p.id)}
-                  className={`p-5 rounded-sm border-2 transition-all cursor-pointer flex flex-col justify-between text-center relative ${
-                    isSelected
-                      ? 'border-[#25D366] bg-[#25D366]/10 shadow-md'
-                      : 'border-[#DAD2C4] bg-white hover:border-[#25D366]/50'
-                  }`}
-                >
-                  {p.badge && (
-                    <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-[#1b1463] text-[#F0B55E] text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                      {p.badge}
-                    </span>
-                  )}
-                  <div className="space-y-1 pt-2">
-                    <h3 className="font-bold text-sm text-[#1b1463]">{p.name}</h3>
-                    <div className="font-heading text-2xl font-extrabold text-[#1b1463]">
-                      {p.priceFormatted}
-                    </div>
-                    <p className="text-[11px] text-[#534D6B]">{p.periodText}</p>
-                  </div>
-                  <div className="pt-3">
-                    <span className={`inline-block text-[11px] font-bold px-3 py-1 rounded-sm ${isSelected ? 'bg-[#25D366] text-white' : 'bg-gray-100 text-gray-600'}`}>
-                      {isSelected ? '✓ Selecionado' : 'Selecionar'}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Formulário de Identificação */}
-        <form onSubmit={handleSubmit} className="space-y-6 pt-4 border-t border-[#DAD2C4]">
-          <div className="space-y-1">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#1b1463]">
-              Passo 2: Preencha todos os seus dados para liberação do acesso:
-            </p>
-          </div>
-
-          {errorMessage && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-sm">
-              {errorMessage}
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-[#1b1463] mb-1">Nome *</label>
-              <input
-                type="text"
-                required
-                maxLength={15}
-                autoComplete="given-name"
-                placeholder="Seu primeiro nome"
-                value={firstName}
-                onChange={(e) => setFirstName(sanitizeName(e.target.value).slice(0, 15))}
-                className="w-full text-xs rounded-sm border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-[#1b1463] focus:border-[#25D366] focus:outline-none"
+        {/* =========================================================================
+            1. BANNER COM LOGO & FRASE DE IMPACTO (ASTROLOGIA DIÁRIA POR ASSINATURA)
+            ========================================================================= */}
+        <RevealOnScroll delayMs={50}>
+          <div className="max-w-4xl mx-auto text-center space-y-5">
+            {/* Logo 3D Oficial da Patota Astral */}
+            <div className="flex justify-center pb-1">
+              <img
+                src="https://static.wixstatic.com/media/02c8e0_e5132493b4a14c0498c5df95ee68c593~mv2.png"
+                alt="Patota Astral — Casa 6"
+                className="h-28 sm:h-36 w-auto object-contain transition-transform duration-500 hover:scale-105 filter drop-shadow-[0_12px_28px_rgba(43,37,102,0.1)]"
+                draggable={false}
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-[#1b1463] mb-1">Sobrenome *</label>
-              <input
-                type="text"
-                required
-                maxLength={15}
-                autoComplete="family-name"
-                placeholder="Seu sobrenome"
-                value={lastName}
-                onChange={(e) => setLastName(sanitizeName(e.target.value).slice(0, 15))}
-                className="w-full text-xs rounded-sm border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-[#1b1463] focus:border-[#25D366] focus:outline-none"
-              />
+            <div className="inline-flex items-center gap-2 rounded-full bg-[#25D366]/15 border border-[#25D366]/30 px-4 py-1.5 text-xs font-bold text-[#14532D]">
+              <MessageCircle className="h-4 w-4 text-[#25D366]" />
+              <span>COMUNIDADE VIP OFICIAL NO WHATSAPP</span>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-[#1b1463] mb-1">E-mail *</label>
-              <input
-                type="email"
-                required
-                autoComplete="email"
-                placeholder="seuemail@exemplo.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onBlur={handleEmailBlur}
-                className="w-full text-xs rounded-sm border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-[#1b1463] focus:border-[#25D366] focus:outline-none"
-              />
-            </div>
+            <div className="space-y-2">
+              <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-[#2B2566] tracking-tight">
+                Astrologia Diária por Assinatura
+              </h1>
 
-            <div>
-              <label className="block text-xs font-bold text-[#1b1463] mb-1">WhatsApp *</label>
-              <input
-                type="tel"
-                required
-                autoComplete="tel"
-                placeholder="Ex: 11 99999-9999"
-                value={whatsapp}
-                onChange={(e) => setWhatsapp(formatWhatsAppNumber(e.target.value))}
-                className="w-full text-xs rounded-sm border border-[#DAD2C4] bg-white px-3.5 py-2.5 text-[#1b1463] focus:border-[#25D366] focus:outline-none"
-              />
+              {/* Linha-Ponto do Brand Guide */}
+              <div className="flex items-center justify-center gap-3 py-1">
+                <span className="w-12 h-px bg-[#2B2566]/20" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#F0B55E]" />
+                <span className="w-20 h-px bg-[#2B2566]/20" />
+              </div>
+
+              <p className="font-heading text-lg sm:text-2xl text-[#8C987F] max-w-3xl mx-auto font-medium leading-relaxed">
+                "Conecte-se com as energias do céu e viva sua rotina com mais consciência, clareza e harmonia. Seja parte da nossa Patota Astral!"
+              </p>
             </div>
           </div>
+        </RevealOnScroll>
 
-          {/* Dados Opcionais de Certidão para Trânsitos */}
-          <div className="pt-2 space-y-2">
-            <span className="text-[11px] font-bold text-[#8C987F] uppercase tracking-wider block">
-              Dados Astrais (Opcional para cálculo dos seus trânsitos)
-            </span>
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-              <input
-                type="text"
-                placeholder="Dia"
-                maxLength={2}
-                value={birthDay}
-                onChange={(e) => setBirthDay(e.target.value.replace(/\D/g, ''))}
-                className="w-full text-xs rounded-sm border border-[#DAD2C4] bg-white px-2.5 py-2 text-[#1b1463]"
-              />
-              <input
-                type="text"
-                placeholder="Mês"
-                maxLength={2}
-                value={birthMonth}
-                onChange={(e) => setBirthMonth(e.target.value.replace(/\D/g, ''))}
-                className="w-full text-xs rounded-sm border border-[#DAD2C4] bg-white px-2.5 py-2 text-[#1b1463]"
-              />
-              <input
-                type="text"
-                placeholder="Ano"
-                maxLength={4}
-                value={birthYear}
-                onChange={(e) => setBirthYear(e.target.value.replace(/\D/g, ''))}
-                className="w-full text-xs rounded-sm border border-[#DAD2C4] bg-white px-2.5 py-2 text-[#1b1463]"
-              />
-              <input
-                type="text"
-                placeholder="Hora"
-                maxLength={2}
-                value={birthHour}
-                onChange={(e) => setBirthHour(e.target.value.replace(/\D/g, ''))}
-                className="w-full text-xs rounded-sm border border-[#DAD2C4] bg-white px-2.5 py-2 text-[#1b1463]"
-              />
-              <input
-                type="text"
-                placeholder="Min"
-                maxLength={2}
-                value={birthMinute}
-                onChange={(e) => setBirthMinute(e.target.value.replace(/\D/g, ''))}
-                className="w-full text-xs rounded-sm border border-[#DAD2C4] bg-white px-2.5 py-2 text-[#1b1463]"
-              />
+        {/* =========================================================================
+            2. O QUE É A PATOTA ASTRAL? (TEXTO ORIGINAL EM BOX LEVE E SOFISTICADO)
+            ========================================================================= */}
+        <RevealOnScroll delayMs={100}>
+          <div className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl border border-[#EADBCC]/70 p-6 sm:p-10 lg:p-12 shadow-[0_16px_40px_rgba(43,37,102,0.04)] space-y-5 text-center sm:text-left">
+            <div className="space-y-1 text-center sm:text-left">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#F0B55E] block">
+                CONHEÇA A COMUNIDADE
+              </span>
+              <h2 className="font-heading text-2xl sm:text-3xl font-bold text-[#2B2566]">
+                O que é a Patota Astral?
+              </h2>
             </div>
-          </div>
 
-          {/* Passos e Botão de Ação */}
-          <div className="space-y-3 pt-3">
-            <div className="bg-white p-3.5 rounded-sm border border-[#DAD2C4] text-xs text-[#534D6B] space-y-1">
-              <p className="font-bold text-[#1b1463]">Como funciona a sua entrada:</p>
-              <p>1. Escolha o plano e preencha seus dados.</p>
-              <p>2. Efetue o pagamento seguro com renovação automática.</p>
-              <p>3. Receba na hora o link para entrar no grupo VIP da Patota Astral.</p>
-              <p className="text-[11px] text-[#8C987F] pt-1">
-                *caso não receba o e-mail em 24h entre em contato pelo WhatsApp que confirmaremos sua compra e adicionaremos ao grupo Assinantes/VIP.
+            <div className="space-y-3.5 text-xs sm:text-sm md:text-[15px] text-[#423C7B] leading-relaxed font-normal">
+              <p>
+                A <strong>Patota Astral</strong> é um grupo VIP no WhatsApp, criado por mim, <strong>Bianca Tofoli</strong>, para pessoas que desejam navegar pela vida com mais leveza, integrando a astrologia à sua rotina diária. Esse grupo é perfeito para quem deseja entender melhor o clima do céu, como as energias do dia influenciam nosso humor, decisões, relacionamentos, trabalho e crescimento pessoal.
+              </p>
+              <p>
+                Você receberá diariamente insights astrológicos sobre os trânsitos planetários e a lua do dia, além de orientações práticas sobre como usar essas energias a seu favor para decisões mais assertivas.
+              </p>
+              <p>
+                Além disso, a cada mês, você poderá participar de um <strong>encontro ao vivo comigo</strong>, onde exploraremos temas específicos do momento e seus significados. Teremos espaço para perguntas, orientações e conversas sinceras sobre os aprendizados trazidos pelos astros no mês específico.
               </p>
             </div>
 
-            <button
-              type="submit"
-              className="w-full flex items-center justify-center gap-3 rounded-sm bg-[#25D366] hover:bg-[#20ba5a] text-white py-4 px-8 text-sm font-extrabold uppercase tracking-wider shadow-lg transition-all cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
-            >
-              <ShieldCheck className="h-5 w-5" />
-              <span>ASSINAR PATOTA ASTRAL ({currentPlan.priceFormatted})</span>
-              <ArrowRight className="h-5 w-5" />
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* FAQ Accordion da Patota */}
-      <div className="max-w-3xl mx-auto space-y-4 font-sans">
-        <h3 className="font-heading text-2xl font-bold text-center text-[#1b1463]">
-          Perguntas Frequentes
-        </h3>
-
-        <div className="space-y-3">
-          {faqs.map((faq, idx) => (
-            <div key={idx} className="bg-[#FCFAF7] rounded-sm border border-[#DAD2C4] overflow-hidden">
+            <div className="pt-3 border-t border-[#EADBCC]/50 flex justify-center sm:justify-start">
               <button
                 type="button"
-                onClick={() => setOpenFaqIndex(openFaqIndex === idx ? null : idx)}
-                className="w-full p-4 sm:p-5 flex items-center justify-between text-left text-xs sm:text-sm font-bold text-[#1b1463] hover:text-[#6a62b8] transition-colors cursor-pointer"
+                onClick={scrollToCheckout}
+                className="px-6 py-3 rounded-full bg-[#F0B55E] hover:bg-[#e0a64d] text-[#2B2566] font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer active:scale-98"
               >
-                <span>{faq.q}</span>
-                {openFaqIndex === idx ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                <span>QUERO PARTICIPAR DA PATOTA</span>
+                <ArrowRight className="h-4 w-4" />
               </button>
-              {openFaqIndex === idx && (
-                <div className="px-5 pb-5 pt-1 text-xs text-[#372B69] leading-relaxed border-t border-[#DAD2C4]/40">
-                  {faq.a}
-                </div>
-              )}
             </div>
-          ))}
-        </div>
+          </div>
+        </RevealOnScroll>
+
+        {/* =========================================================================
+            3. CONTEÚDO EXCLUSIVO DA PATOTA (GRID DE BENEFÍCIOS SOFISTICADO)
+            ========================================================================= */}
+        <RevealOnScroll delayMs={140}>
+          <div className="space-y-6">
+            <div className="text-center space-y-1">
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#8C987F] block">
+                BENEFÍCIOS EXCLUSIVOS
+              </span>
+              <h2 className="font-heading text-2xl sm:text-3xl font-bold text-[#2B2566]">
+                Conteúdo Exclusivo da Patota Astral
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+              {benefits.map((item, bIdx) => {
+                const IconComponent = item.icon;
+                return (
+                  <div
+                    key={bIdx}
+                    className="bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-5 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-2.5 flex flex-col justify-between"
+                  >
+                    <div className="space-y-2">
+                      <div className="w-10 h-10 rounded-xl bg-[#F0B55E]/15 flex items-center justify-center text-[#2B2566]">
+                        <IconComponent className="h-5 w-5 text-[#F0B55E]" />
+                      </div>
+                      <h3 className="font-heading text-base font-bold text-[#2B2566]">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-[#534D6B] leading-relaxed">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </RevealOnScroll>
+
+        {/* =========================================================================
+            4. BOX COMPACTO SOBRE A BIANCA TOFOLI (QUEM FARÁ AS PREVISÕES)
+            ========================================================================= */}
+        <RevealOnScroll delayMs={160}>
+          <div className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl border border-[#EADBCC]/70 p-6 sm:p-8 shadow-[0_12px_32px_rgba(43,37,102,0.03)]">
+            <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left">
+              
+              {/* Foto da Bianca com Moldura Redonda Elegante */}
+              <div className="relative shrink-0">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-[#F0B55E] p-1 shadow-md bg-white">
+                  <img
+                    src="https://static.wixstatic.com/media/02c8e0_dd0430bc5bee4a5c93824bc5d867d23a~mv2.jpeg"
+                    alt="Bianca Tofoli"
+                    className="w-full h-full object-cover rounded-full"
+                    style={{ objectPosition: '50% 12%' }}
+                  />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-xs">
+                  <Check className="h-3.5 w-3.5 stroke-[3]" />
+                </div>
+              </div>
+
+              {/* Texto de Apresentação */}
+              <div className="space-y-1.5 flex-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C987F] block">
+                  SUA GUIA NOS CÉUS DIÁRIOS
+                </span>
+                <h3 className="font-heading text-xl sm:text-2xl font-bold text-[#2B2566]">
+                  Bianca Tofoli
+                </h3>
+                <p className="text-xs sm:text-sm text-[#423C7B] leading-relaxed">
+                  Enfermeira formada pela UNESP - Botucatu, com mais de 10 anos de experiência em gestão de saúde e liderança de equipes. Em 2021, fez sua transição de carreira para a astrologia, trazendo consigo o propósito de cuidar de pessoas com um olhar lúcido, sensível e acolhedor.
+                </p>
+              </div>
+
+            </div>
+          </div>
+        </RevealOnScroll>
+
+        {/* =========================================================================
+            5. SEÇÃO DE INSCRIÇÃO E ASSINATURA COM DESTAQUE "R$ 1,50 POR DIA"
+            ========================================================================= */}
+        <RevealOnScroll delayMs={180}>
+          <div id="secao-assinatura-patota" className="space-y-6">
+            
+            {/* Tag em Grande Destaque: R$ 1,50 por dia */}
+            <div className="bg-gradient-to-r from-[#2B2566] via-[#382D78] to-[#2B2566] text-white rounded-3xl p-6 sm:p-8 text-center space-y-2 shadow-xl border border-[#F0B55E]/30 relative overflow-hidden">
+              <div className="absolute top-0 right-1/4 w-60 h-60 bg-[#F0B55E]/10 rounded-full blur-2xl pointer-events-none" />
+              
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#25D366]/20 border border-[#25D366]/40 text-[#25D366] text-xs font-bold uppercase tracking-wider">
+                <MessageCircle className="h-3.5 w-3.5 fill-[#25D366]" />
+                <span>ASSINATURA VIP NO WHATSAPP</span>
+              </div>
+
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#F0B55E] tracking-tight">
+                Apenas R$ 1,50 por dia!
+              </h2>
+
+              <p className="text-xs sm:text-sm text-[#DAD2C4] max-w-xl mx-auto font-normal">
+                Menos que um cafézinho para ter a orientação astrológica diária da Bianca Tofoli guiando sua rotina, suas decisões e suas relações.
+              </p>
+            </div>
+
+            {/* Container do Formulário de Assinatura */}
+            <div className="bg-white/95 backdrop-blur-xs rounded-[28px] sm:rounded-3xl border border-[#EADBCC]/70 p-6 sm:p-10 shadow-[0_16px_40px_rgba(43,37,102,0.04)] space-y-8">
+              
+              {/* Passo 1: Escolha do Plano */}
+              <div className="space-y-3">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C987F] block">
+                  PASSO 1: ESCOLHA SEU PLANO DE ASSINATURA
+                </span>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {plans.map((plan) => {
+                    const isSelected = selectedPlan === plan.id;
+                    return (
+                      <div
+                        key={plan.id}
+                        onClick={() => setSelectedPlan(plan.id)}
+                        className={`rounded-2xl p-5 border-2 transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
+                          isSelected
+                            ? 'border-[#F0B55E] bg-[#FAF8F5] shadow-md scale-[1.02]'
+                            : 'border-[#EADBCC]/60 bg-white hover:border-[#2B2566]/30'
+                        }`}
+                      >
+                        <div className="space-y-1">
+                          <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full inline-block ${
+                            plan.highlight ? 'bg-[#F0B55E] text-[#2B2566]' : 'bg-[#FAF8F5] text-[#8C987F] border border-[#EADBCC]'
+                          }`}>
+                            {plan.badge}
+                          </span>
+                          <h3 className="font-heading text-lg font-bold text-[#2B2566]">
+                            {plan.name}
+                          </h3>
+                        </div>
+
+                        <div>
+                          <span className="font-heading text-2xl sm:text-3xl font-extrabold text-[#2B2566]">
+                            {plan.priceFormatted}
+                          </span>
+                          <span className="text-[11px] text-[#534D6B] block">
+                            {plan.periodText}
+                          </span>
+                        </div>
+
+                        <div className="pt-2 border-t border-[#EADBCC]/50">
+                          <span className={`text-xs font-bold flex items-center gap-1.5 ${
+                            isSelected ? 'text-[#25D366]' : 'text-[#8C987F]'
+                          }`}>
+                            <CheckCircle2 className="h-4 w-4" />
+                            <span>{isSelected ? 'Plano Selecionado' : 'Selecionar'}</span>
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Passo 2: Formulário de Dados */}
+              <form onSubmit={handleSubmit} className="space-y-5 pt-4 border-t border-[#EADBCC]/60">
+                <div className="space-y-1">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C987F] block">
+                    PASSO 2: SEUS DADOS PARA ACESSO À COMUNIDADE
+                  </span>
+                  <p className="text-xs text-[#534D6B]">
+                    Preencha com atenção. O WhatsApp cadastrado será adicionado ao grupo VIP.
+                  </p>
+                </div>
+
+                {errorMessage && (
+                  <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium">
+                    {errorMessage}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-[#2B2566]">Nome *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Seu primeiro nome"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-[#DAD2C4] bg-[#FAF8F5] text-xs text-[#2B2566] focus:outline-none focus:border-[#F0B55E] focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-[#2B2566]">Sobrenome *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Seu sobrenome"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-[#DAD2C4] bg-[#FAF8F5] text-xs text-[#2B2566] focus:outline-none focus:border-[#F0B55E] focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-[#2B2566]">E-mail *</label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="seuemail@exemplo.com"
+                      value={email}
+                      onBlur={handleEmailBlur}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-[#DAD2C4] bg-[#FAF8F5] text-xs text-[#2B2566] focus:outline-none focus:border-[#F0B55E] focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-[#2B2566]">WhatsApp (com DDD) *</label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="(11) 99999-9999"
+                      value={whatsapp}
+                      onChange={(e) => setWhatsapp(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-[#DAD2C4] bg-[#FAF8F5] text-xs text-[#2B2566] focus:outline-none focus:border-[#F0B55E] focus:bg-white"
+                    />
+                  </div>
+                </div>
+
+                {/* Dados de Nascimento Opcionais */}
+                <div className="pt-2 border-t border-[#EADBCC]/40 space-y-2">
+                  <span className="text-[11px] font-bold text-[#8C987F] uppercase tracking-wider block">
+                    DADOS DE NASCIMENTO (OPCIONAL — PARA PERSONALIZAÇÃO DOS TRÂNSITOS)
+                  </span>
+
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                    <input
+                      type="text"
+                      placeholder="Dia (DD)"
+                      value={birthDay}
+                      onChange={(e) => setBirthDay(e.target.value)}
+                      className="px-3 py-2 rounded-lg border border-[#DAD2C4] bg-[#FAF8F5] text-xs text-center"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Mês (MM)"
+                      value={birthMonth}
+                      onChange={(e) => setBirthMonth(e.target.value)}
+                      className="px-3 py-2 rounded-lg border border-[#DAD2C4] bg-[#FAF8F5] text-xs text-center"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Ano (AAAA)"
+                      value={birthYear}
+                      onChange={(e) => setBirthYear(e.target.value)}
+                      className="px-3 py-2 rounded-lg border border-[#DAD2C4] bg-[#FAF8F5] text-xs text-center"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Hora (HH:MM)"
+                      value={birthHour ? `${birthHour}:${birthMinute}` : ''}
+                      onChange={(e) => {
+                        const parts = e.target.value.split(':');
+                        setBirthHour(parts[0] || '');
+                        setBirthMinute(parts[1] || '');
+                      }}
+                      className="px-3 py-2 rounded-lg border border-[#DAD2C4] bg-[#FAF8F5] text-xs text-center col-span-3 sm:col-span-2"
+                    />
+                  </div>
+                </div>
+
+                {/* Botão de Finalização da Assinatura */}
+                <div className="pt-4 space-y-3">
+                  <button
+                    type="submit"
+                    className="w-full py-4 px-6 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold text-sm uppercase tracking-wider shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                  >
+                    <MessageCircle className="h-5 w-5 fill-white" />
+                    <span>ASSINAR PATOTA ASTRAL ({currentPlan.priceFormatted})</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+
+                  <div className="flex items-center justify-center gap-2 text-xs text-[#8C987F]">
+                    <ShieldCheck className="h-4 w-4 text-[#25D366]" />
+                    <span>Pagamento Seguro via Mercado Pago Oficial. Cancele quando quiser.</span>
+                  </div>
+                </div>
+
+              </form>
+
+            </div>
+
+          </div>
+        </RevealOnScroll>
+
+        {/* =========================================================================
+            6. PERGUNTAS E RESPOSTAS (FAQ COMPLETA COM TODAS AS 8 PERGUNTAS DO SITE ANTIGO)
+            ========================================================================= */}
+        <RevealOnScroll delayMs={200}>
+          <div className="space-y-6">
+            <div className="text-center space-y-1">
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#8C987F] block">
+                TIRE SUAS DÚVIDAS
+              </span>
+              <h2 className="font-heading text-2xl sm:text-3xl font-bold text-[#2B2566]">
+                Perguntas Frequentes sobre a Patota Astral
+              </h2>
+            </div>
+
+            <div className="space-y-3">
+              {faqs.map((faq, idx) => {
+                const isOpen = openFaqIndex === idx;
+                return (
+                  <div
+                    key={idx}
+                    className="rounded-2xl bg-white/95 backdrop-blur-xs border border-[#EADBCC]/70 overflow-hidden shadow-xs transition-all"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                      className="w-full p-5 text-left flex items-center justify-between gap-4 font-heading text-xs sm:text-sm font-bold text-[#2B2566] hover:text-[#F0B55E] transition-colors cursor-pointer"
+                    >
+                      <span>{faq.q}</span>
+                      {isOpen ? (
+                        <ChevronUp className="h-4 w-4 text-[#F0B55E] shrink-0" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-[#8C987F] shrink-0" />
+                      )}
+                    </button>
+
+                    {isOpen && (
+                      <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-[#423C7B] leading-relaxed border-t border-[#EADBCC]/40 font-normal">
+                        {faq.a}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </RevealOnScroll>
+
       </div>
 
       {/* Modal de Checkout Mercado Pago */}
@@ -460,19 +684,29 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
         isOpen={checkoutOpen}
         onClose={() => setCheckoutOpen(false)}
         serviceType="patota"
-        itemTitle={`Assinatura Patota Astral — ${currentPlan.name} (Renovação Automática)`}
+        itemTitle={`Patota Astral — ${currentPlan.name}`}
         amount={currentPlan.price}
         customerData={{
           firstName,
           lastName,
           email,
           whatsapp,
-          birthData
+          birthData: {
+            birthDay,
+            birthMonth,
+            birthYear,
+            birthHour,
+            birthMinute,
+            city,
+            state
+          }
         }}
-        onSuccess={(orderId) => {
-          trackAnalyticsEvent('checkout_complete', { orderId, service: 'patota-astral', plan: selectedPlan });
+        onSuccess={() => {
+          setCheckoutOpen(false);
+          window.location.href = '/membros';
         }}
       />
+
     </div>
   );
 };
