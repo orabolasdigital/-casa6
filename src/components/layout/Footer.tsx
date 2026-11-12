@@ -27,7 +27,7 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   return (
-    <footer className="relative w-full bg-[#2B2566] text-[#FFFFFF] border-t border-[#F0B55E]/20 font-sans overflow-hidden">
+    <footer className="relative w-full bg-[#2B2566] text-[#FFFFFF] border-t border-[#F0B55E]/20 font-sans overflow-hidden pb-16 lg:pb-0">
       {/* Elementos Decorativos Sutis Celestes de Fundo */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
         <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full border border-white/5" />

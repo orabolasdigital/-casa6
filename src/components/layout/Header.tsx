@@ -62,17 +62,6 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate, onOpenB
 
   return (
     <header className="sticky top-0 z-40 w-full bg-[#2B2566]/98 backdrop-blur-md text-[#FFFFFF] border-b border-[#F0B55E]/20 shadow-lg">
-      {/* Botão Fixo em Barra no Topo para Mobile: Falar no WhatsApp (Verde, sem ícone) */}
-      <div className="lg:hidden w-full bg-[#25D366] active:bg-[#20ba5a] text-white text-center shadow-xs transition-colors">
-        <button
-          type="button"
-          onClick={() => onOpenBooking()}
-          className="w-full py-2 px-4 text-xs font-bold uppercase tracking-wider text-white text-center flex items-center justify-center cursor-pointer select-none"
-        >
-          <span>Falar no WhatsApp</span>
-        </button>
-      </div>
-
       <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         
         {/* Logotipo Oficial Casa 6 (Horizontal Branco para Fundo Escuro) — Ao clicar vai para a página início */}
