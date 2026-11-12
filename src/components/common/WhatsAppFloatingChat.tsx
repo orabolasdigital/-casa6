@@ -1,19 +1,22 @@
 /**
  * @license
  * Casa 6 — Bianca Tofoli
- * Botão Flutuante de WhatsApp com Layout de Entrada inspirado no Modelo de Referência
+ * Botão Flutuante de WhatsApp com Janela Conversacional Direta
  * 
  * Funcionalidades:
  * - Botão fechado: Bolinha verde oficial (#25D366) apenas com o ícone do WhatsApp (sem foto e sem texto).
  * - Ao abrir: O botão fica oculto e a janela desliza de baixo para cima cobrindo a posição.
- * - Bordas menos arredondadas (rounded-xl) com acabamento refinado.
+ * - Bordas menos arredondadas (rounded-xl) com acabamento moderno.
  * - Header oficial estilo WhatsApp (#075E54) com Avatar, Nome, Status Online, Botão de Reiniciar e Fechar.
- * - Área central com fundo pontilhado e Card Branco flutuante para a pergunta ativa:
- *   - Numeração em destaque verde (ex: 1., 2., 3., 4., 5.)
- *   - Pergunta em negrito
- *   - Campo de entrada com ícone embutido no lado esquerdo (User, Phone, Mail, Compass)
- *   - Texto auxiliar/validação explicativo abaixo do campo
- *   - Histórico compacto dos passos concluídos com opção de edição rápida
+ * - Fundo sólido suave estilo WhatsApp (sem pontinhos).
+ * - Sem mensagem inicial de boas-vindas: o primeiro campo aparece logo no topo.
+ * - Fluxo conversacional progressivo: conforme o usuário preenche, as mensagens anteriores sobem como num chat real.
+ * - Sem numeração ("1.", "2.") e com frases diretas:
+ *   1. "Informe seu nome e sobrenome"
+ *   2. "Seu WhatsApp"
+ *   3. "Seu e-mail"
+ *   4. "Selecione o assunto"
+ * - Tipografia limpa e padrão (font-sans) para fácil leitura.
  * - Barra inferior com botão largo de ação (desabilitado em cinza / ativo em verde com ícone de mensagem).
  */
 
@@ -22,19 +25,16 @@ import {
   X,
   RotateCcw,
   User,
-  UserCheck,
   Phone,
   Mail,
   Compass,
   MessageSquare,
-  CheckCircle2,
-  Check
+  CheckCircle2
 } from 'lucide-react';
 import { OFFICIAL_SERVICES, SITE_CONFIG } from '../../config/site';
 import { submitLeadBooking } from '../../services/leads';
 import { trackAnalyticsEvent } from '../../services/analytics';
 import {
-  sanitizeName,
   formatWhatsAppNumber,
   lookupCRMContactByEmail
 } from '../../services/formValidation';
@@ -52,8 +52,7 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [email, setEmail] = useState('');
   const [serviceId, setServiceId] = useState(initialServiceId || OFFICIAL_SERVICES[0].id);
@@ -92,15 +91,17 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
     };
   }, []);
 
-  // Foco automático no input ao mudar de passo
+  // Rola suavemente a conversa até o final e foca o campo ativo
   useEffect(() => {
-    if (isOpen && currentStep < 4) {
+    if (isOpen) {
       setTimeout(() => {
-        inputRef.current?.focus();
         if (contentAreaRef.current) {
           contentAreaRef.current.scrollTop = contentAreaRef.current.scrollHeight;
         }
-      }, 100);
+        if (currentStep < 3) {
+          inputRef.current?.focus();
+        }
+      }, 80);
     }
   }, [isOpen, currentStep]);
 
@@ -121,8 +122,7 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
 
   const handleReset = () => {
     setCurrentStep(0);
-    setFirstName('');
-    setLastName('');
+    setFullName('');
     setWhatsapp('');
     setEmail('');
     setErrorMessage('');
@@ -130,18 +130,16 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
     setIsSubmitting(false);
   };
 
-  // Verifica se o passo atual possui entrada válida
+  // Validação dinâmica do passo ativo
   const isStepValid = (step: number): boolean => {
     switch (step) {
       case 0:
-        return firstName.trim().length >= 2;
+        return fullName.trim().length >= 3;
       case 1:
-        return lastName.trim().length >= 2;
-      case 2:
         return whatsapp.replace(/\D/g, '').length >= 10;
-      case 3:
+      case 2:
         return email.includes('@') && email.includes('.');
-      case 4:
+      case 3:
         return Boolean(serviceId);
       default:
         return true;
@@ -154,7 +152,7 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
 
     if (currentStep === 0) {
       if (!isStepValid(0)) {
-        setErrorMessage('Por favor, informe o seu nome (mínimo de 2 letras).');
+        setErrorMessage('Por favor, informe seu nome e sobrenome.');
         return;
       }
       setCurrentStep(1);
@@ -163,7 +161,7 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
 
     if (currentStep === 1) {
       if (!isStepValid(1)) {
-        setErrorMessage('Por favor, informe o seu sobrenome.');
+        setErrorMessage('Por favor, informe um WhatsApp válido com DDD.');
         return;
       }
       setCurrentStep(2);
@@ -172,24 +170,15 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
 
     if (currentStep === 2) {
       if (!isStepValid(2)) {
-        setErrorMessage('Por favor, informe um WhatsApp válido com DDD (Ex: 11 99999-9999).');
+        setErrorMessage('Por favor, digite um e-mail válido.');
         return;
       }
       setCurrentStep(3);
-      return;
-    }
-
-    if (currentStep === 3) {
-      if (!isStepValid(3)) {
-        setErrorMessage('Por favor, digite um e-mail válido (Ex: seuemail@exemplo.com).');
-        return;
-      }
-      setCurrentStep(4);
       lookupCRMContactByEmail(email.trim()).catch((err) => console.warn('[CRM Lookup]', err));
       return;
     }
 
-    if (currentStep === 4) {
+    if (currentStep === 3) {
       handleFinalSubmit();
     }
   };
@@ -219,9 +208,13 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
     setIsSubmitting(true);
 
     try {
-      if (!firstName || !lastName || !whatsapp || !email) {
+      if (!fullName.trim() || !whatsapp.trim() || !email.trim()) {
         throw new Error('Preencha os passos anteriores para continuar.');
       }
+
+      const nameParts = fullName.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
 
       const res = await submitLeadBooking(
         {
@@ -231,11 +224,11 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
           email,
           serviceId
         },
-        'WhatsApp Chat Modelo Referência'
+        'WhatsApp Chat Conversacional'
       );
 
       setIsSuccess(true);
-      setCurrentStep(5);
+      setCurrentStep(4);
       trackAnalyticsEvent('whatsapp_click', { serviceId });
 
       // Abre o WhatsApp imediatamente em nova aba
@@ -250,7 +243,7 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
   };
 
   const whatsappRedirectUrl = `https://wa.me/${SITE_CONFIG.whatsappNumberRaw}?text=${encodeURIComponent(
-    `Olá, Bianca! Meu nome é ${firstName} ${lastName}. Vim pelo site da Casa 6 e gostaria de atendimento sobre ${getServiceName(serviceId)}.`
+    `Olá, Bianca! Meu nome é ${fullName.trim()}. Vim pelo site da Casa 6 e gostaria de atendimento sobre ${getServiceName(serviceId)}.`
   )}`;
 
   return (
@@ -283,11 +276,11 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
       )}
 
       {/* =========================================================================
-          JANELA DE ATENDIMENTO ESTILO MODELO DE REFERÊNCIA (BORDAS: rounded-xl)
+          JANELA DE ATENDIMENTO CONVERSACIONAL (BORDAS: rounded-xl)
           Desliza de baixo para cima cobrindo o botão original
           ========================================================================= */}
       {isOpen && (
-        <div className="fixed bottom-4 right-3 sm:bottom-6 sm:right-6 z-50 w-[94vw] max-w-[390px] rounded-xl bg-[#FCFAF7] border border-[#c7c5b6] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] h-[580px] animate-in fade-in slide-in-from-bottom duration-300">
+        <div className="fixed bottom-4 right-3 sm:bottom-6 sm:right-6 z-50 w-[94vw] max-w-[390px] rounded-xl bg-[#FCFAF7] border border-[#c7c5b6] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] h-[580px] font-sans animate-in fade-in slide-in-from-bottom duration-300">
           
           {/* Header do WhatsApp (#075E54) com Avatar, Nome, Status e Ações */}
           <div className="bg-[#075E54] text-white p-3.5 sm:p-4 flex items-center justify-between shrink-0 shadow-md">
@@ -303,7 +296,7 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
 
               <div className="leading-tight">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-heading font-bold text-sm sm:text-base text-white tracking-wide">
+                  <span className="font-bold text-sm sm:text-base text-white tracking-wide">
                     Bianca Tofoli
                   </span>
                   <span className="inline-flex items-center justify-center h-4 w-4 rounded-full bg-[#25D366] text-[10px] text-white font-bold">✓</span>
@@ -316,12 +309,12 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
             </div>
 
             <div className="flex items-center gap-1.5">
-              {currentStep > 0 && currentStep < 5 && (
+              {currentStep > 0 && currentStep < 4 && (
                 <button
                   type="button"
                   onClick={handleReset}
                   title="Reiniciar dados"
-                  aria-label="Reiniciar formulário"
+                  aria-label="Reiniciar conversa"
                   className="p-1.5 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-colors focus:outline-none cursor-pointer"
                 >
                   <RotateCcw className="h-4 w-4" />
@@ -338,146 +331,101 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
             </div>
           </div>
 
-          {/* Área Central: Fundo Pontilhado com Card Branco de Entrada (Modelo de Referência) */}
+          {/* Área Central: Fundo Sólido Limpo (Sem Pontinhos) com Fluxo que Sobe Conforme Preenche */}
           <div
             ref={contentAreaRef}
-            className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 bg-[#e5ddd5]/35"
-            style={{
-              backgroundImage: 'radial-gradient(#1b1463 0.65px, transparent 0.65px)',
-              backgroundSize: '13px 13px'
-            }}
+            className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 bg-[#EFEAE2]"
           >
-            {/* Mensagem Inicial de Acolhimento */}
-            <div className="bg-white/90 backdrop-blur-xs rounded-lg p-2.5 px-3 border border-gray-200/60 shadow-2xs text-xs text-[#1b1463] flex items-center gap-2">
-              <span className="text-base">✨</span>
-              <p className="leading-snug">
-                Olá! Seja muito bem-vindo(a) à <strong>Casa 6</strong>. Preencha os dados para iniciar seu atendimento:
-              </p>
-            </div>
-
-            {/* Resumo dos Passos Concluídos (Chips Compactos com opção de Edição) */}
-            {currentStep > 0 && currentStep < 5 && (
-              <div className="space-y-1.5">
-                {currentStep > 0 && (
-                  <div
-                    onClick={() => setCurrentStep(0)}
-                    className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-xs text-gray-700 hover:border-[#25D366] transition-colors cursor-pointer group shadow-2xs"
-                  >
-                    <div className="flex items-center gap-2 truncate">
-                      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#25D366]/20 text-[#075E54] text-[10px] font-bold">✓</span>
-                      <span className="text-[11px] text-gray-500 font-medium">Nome:</span>
-                      <span className="text-[11px] font-bold text-gray-800 truncate">{firstName}</span>
-                    </div>
-                    <span className="text-[10px] text-gray-400 group-hover:text-[#075E54] font-medium shrink-0">Editar</span>
+            {/* HISTÓRICO CONVERSACIONAL: PASSOS JÁ PREENCHIDOS QUE SOBEM */}
+            {currentStep > 0 && (
+              <div className="space-y-3">
+                {/* Passo 0 Concluído: Nome e Sobrenome */}
+                <div className="space-y-1.5 animate-in fade-in duration-200">
+                  <div className="bg-white rounded-xl rounded-tl-none p-3 shadow-2xs border border-gray-200 text-xs sm:text-sm text-gray-800 max-w-[85%]">
+                    <p className="font-medium text-gray-800">Informe seu nome e sobrenome</p>
                   </div>
-                )}
+                  <div className="flex justify-end">
+                    <div className="bg-[#DCF8C6] rounded-xl rounded-tr-none p-2.5 px-3.5 shadow-2xs border border-[#25D366]/20 text-xs sm:text-sm text-gray-800 max-w-[85%]">
+                      <p className="font-medium">{fullName}</p>
+                      <span className="text-[9.5px] text-emerald-700/60 block text-right mt-0.5 select-none">✓✓</span>
+                    </div>
+                  </div>
+                </div>
 
+                {/* Passo 1 Concluído: WhatsApp */}
                 {currentStep > 1 && (
-                  <div
-                    onClick={() => setCurrentStep(1)}
-                    className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-xs text-gray-700 hover:border-[#25D366] transition-colors cursor-pointer group shadow-2xs"
-                  >
-                    <div className="flex items-center gap-2 truncate">
-                      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#25D366]/20 text-[#075E54] text-[10px] font-bold">✓</span>
-                      <span className="text-[11px] text-gray-500 font-medium">Sobrenome:</span>
-                      <span className="text-[11px] font-bold text-gray-800 truncate">{lastName}</span>
+                  <div className="space-y-1.5 animate-in fade-in duration-200">
+                    <div className="bg-white rounded-xl rounded-tl-none p-3 shadow-2xs border border-gray-200 text-xs sm:text-sm text-gray-800 max-w-[85%]">
+                      <p className="font-medium text-gray-800">Seu WhatsApp</p>
                     </div>
-                    <span className="text-[10px] text-gray-400 group-hover:text-[#075E54] font-medium shrink-0">Editar</span>
+                    <div className="flex justify-end">
+                      <div className="bg-[#DCF8C6] rounded-xl rounded-tr-none p-2.5 px-3.5 shadow-2xs border border-[#25D366]/20 text-xs sm:text-sm text-gray-800 max-w-[85%]">
+                        <p className="font-medium">{whatsapp}</p>
+                        <span className="text-[9.5px] text-emerald-700/60 block text-right mt-0.5 select-none">✓✓</span>
+                      </div>
+                    </div>
                   </div>
                 )}
 
+                {/* Passo 2 Concluído: E-mail */}
                 {currentStep > 2 && (
-                  <div
-                    onClick={() => setCurrentStep(2)}
-                    className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-xs text-gray-700 hover:border-[#25D366] transition-colors cursor-pointer group shadow-2xs"
-                  >
-                    <div className="flex items-center gap-2 truncate">
-                      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#25D366]/20 text-[#075E54] text-[10px] font-bold">✓</span>
-                      <span className="text-[11px] text-gray-500 font-medium">WhatsApp:</span>
-                      <span className="text-[11px] font-bold text-gray-800 truncate">{whatsapp}</span>
+                  <div className="space-y-1.5 animate-in fade-in duration-200">
+                    <div className="bg-white rounded-xl rounded-tl-none p-3 shadow-2xs border border-gray-200 text-xs sm:text-sm text-gray-800 max-w-[85%]">
+                      <p className="font-medium text-gray-800">Seu e-mail</p>
                     </div>
-                    <span className="text-[10px] text-gray-400 group-hover:text-[#075E54] font-medium shrink-0">Editar</span>
-                  </div>
-                )}
-
-                {currentStep > 3 && (
-                  <div
-                    onClick={() => setCurrentStep(3)}
-                    className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-xs text-gray-700 hover:border-[#25D366] transition-colors cursor-pointer group shadow-2xs"
-                  >
-                    <div className="flex items-center gap-2 truncate">
-                      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#25D366]/20 text-[#075E54] text-[10px] font-bold">✓</span>
-                      <span className="text-[11px] text-gray-500 font-medium">E-mail:</span>
-                      <span className="text-[11px] font-bold text-gray-800 truncate">{email}</span>
+                    <div className="flex justify-end">
+                      <div className="bg-[#DCF8C6] rounded-xl rounded-tr-none p-2.5 px-3.5 shadow-2xs border border-[#25D366]/20 text-xs sm:text-sm text-gray-800 max-w-[85%]">
+                        <p className="font-medium break-all">{email}</p>
+                        <span className="text-[9.5px] text-emerald-700/60 block text-right mt-0.5 select-none">✓✓</span>
+                      </div>
                     </div>
-                    <span className="text-[10px] text-gray-400 group-hover:text-[#075E54] font-medium shrink-0">Editar</span>
                   </div>
                 )}
               </div>
             )}
 
-            {/* CARD BRANCO PRINCIPAL DE ENTRADA (ESTILO DO MODELO DE REFERÊNCIA) */}
-            {currentStep < 5 && (
-              <div className="bg-white rounded-xl border border-gray-200/90 shadow-sm p-4 sm:p-5 space-y-3.5 animate-in fade-in duration-200">
+            {/* CARD BRANCO ATIVO: ENTRADA ATUAL DIRETA E SEM NUMERAÇÃO */}
+            {currentStep < 4 && (
+              <div className="bg-white rounded-xl border border-gray-200/90 shadow-sm p-4 sm:p-5 space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-200">
                 
-                {/* Título com Numeração Verde em Destaque */}
-                <h3 className="text-xs sm:text-sm text-gray-900 leading-snug">
-                  <span className="text-[#075E54] font-bold text-sm sm:text-base mr-1">
-                    {currentStep + 1}.
-                  </span>
-                  {currentStep === 0 && <span className="font-semibold">Olá. Informe o seu primeiro nome:</span>}
-                  {currentStep === 1 && <span className="font-semibold">Prazer, {firstName}! Informe o seu sobrenome:</span>}
-                  {currentStep === 2 && <span className="font-semibold">Perfeito! Informe o seu WhatsApp com DDD:</span>}
-                  {currentStep === 3 && <span className="font-semibold">Ótimo! Informe o seu e-mail de contato:</span>}
-                  {currentStep === 4 && <span className="font-semibold">Selecione o assunto ou serviço desejado:</span>}
+                {/* Título Direto e Sem Numeração com Fonte Comum */}
+                <h3 className="text-sm font-semibold text-gray-800 leading-snug">
+                  {currentStep === 0 && 'Informe seu nome e sobrenome'}
+                  {currentStep === 1 && 'Seu WhatsApp'}
+                  {currentStep === 2 && 'Seu e-mail'}
+                  {currentStep === 3 && 'Selecione o assunto'}
                 </h3>
 
-                {/* Formulário com Input e Ícone Embutido na Esquerda */}
+                {/* Formulário com Input e Ícone Embutido */}
                 <form onSubmit={handleNextStep} className="space-y-2">
                   <div className="relative flex items-center">
                     {/* Ícone no lado esquerdo dentro do input */}
                     <div className="absolute left-3.5 pointer-events-none text-gray-400">
                       {currentStep === 0 && <User className="h-4.5 w-4.5" />}
-                      {currentStep === 1 && <UserCheck className="h-4.5 w-4.5" />}
-                      {currentStep === 2 && <Phone className="h-4.5 w-4.5" />}
-                      {currentStep === 3 && <Mail className="h-4.5 w-4.5" />}
-                      {currentStep === 4 && <Compass className="h-4.5 w-4.5" />}
+                      {currentStep === 1 && <Phone className="h-4.5 w-4.5" />}
+                      {currentStep === 2 && <Mail className="h-4.5 w-4.5" />}
+                      {currentStep === 3 && <Compass className="h-4.5 w-4.5" />}
                     </div>
 
-                    {/* Campo de Entrada Dinâmico por Passo */}
+                    {/* Passo 0: Nome e Sobrenome Juntos */}
                     {currentStep === 0 && (
                       <input
                         ref={inputRef}
                         type="text"
                         required
                         autoFocus
-                        placeholder="Nome"
-                        value={firstName}
+                        placeholder="Nome e sobrenome"
+                        value={fullName}
                         onChange={(e) => {
-                          setFirstName(sanitizeName(e.target.value).slice(0, 25));
+                          setFullName(e.target.value.slice(0, 40));
                           setErrorMessage('');
                         }}
-                        className="w-full pl-11 pr-3.5 py-3 rounded-lg border border-gray-200 focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/20 bg-[#FCFAF7] text-xs sm:text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all shadow-2xs"
+                        className="w-full pl-11 pr-3.5 py-3 rounded-lg border border-gray-200 focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/20 bg-[#FCFAF7] text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all shadow-2xs font-sans"
                       />
                     )}
 
+                    {/* Passo 1: Seu WhatsApp */}
                     {currentStep === 1 && (
-                      <input
-                        ref={inputRef}
-                        type="text"
-                        required
-                        autoFocus
-                        placeholder="Sobrenome"
-                        value={lastName}
-                        onChange={(e) => {
-                          setLastName(sanitizeName(e.target.value).slice(0, 25));
-                          setErrorMessage('');
-                        }}
-                        className="w-full pl-11 pr-3.5 py-3 rounded-lg border border-gray-200 focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/20 bg-[#FCFAF7] text-xs sm:text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all shadow-2xs"
-                      />
-                    )}
-
-                    {currentStep === 2 && (
                       <input
                         ref={inputRef}
                         type="tel"
@@ -489,11 +437,12 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
                           setWhatsapp(formatWhatsAppNumber(e.target.value));
                           setErrorMessage('');
                         }}
-                        className="w-full pl-11 pr-3.5 py-3 rounded-lg border border-gray-200 focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/20 bg-[#FCFAF7] text-xs sm:text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all shadow-2xs"
+                        className="w-full pl-11 pr-3.5 py-3 rounded-lg border border-gray-200 focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/20 bg-[#FCFAF7] text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all shadow-2xs font-sans"
                       />
                     )}
 
-                    {currentStep === 3 && (
+                    {/* Passo 2: Seu E-mail */}
+                    {currentStep === 2 && (
                       <input
                         ref={inputRef}
                         type="email"
@@ -505,18 +454,19 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
                           setEmail(e.target.value);
                           setErrorMessage('');
                         }}
-                        className="w-full pl-11 pr-3.5 py-3 rounded-lg border border-gray-200 focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/20 bg-[#FCFAF7] text-xs sm:text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all shadow-2xs"
+                        className="w-full pl-11 pr-3.5 py-3 rounded-lg border border-gray-200 focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/20 bg-[#FCFAF7] text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all shadow-2xs font-sans"
                       />
                     )}
 
-                    {currentStep === 4 && (
+                    {/* Passo 3: Selecione o Assunto */}
+                    {currentStep === 3 && (
                       <select
                         value={serviceId}
                         onChange={(e) => {
                           setServiceId(e.target.value);
                           setErrorMessage('');
                         }}
-                        className="w-full pl-11 pr-3.5 py-3 rounded-lg border border-gray-200 focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/20 bg-[#FCFAF7] text-xs sm:text-sm text-gray-800 outline-none transition-all font-medium shadow-2xs"
+                        className="w-full pl-11 pr-3.5 py-3 rounded-lg border border-gray-200 focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/20 bg-[#FCFAF7] text-sm text-gray-800 outline-none transition-all font-sans font-medium shadow-2xs"
                       >
                         <optgroup label="Atendimentos e Consultas">
                           <option value="pronto-socorro-astrologico">Pronto Socorro Astrológico</option>
@@ -542,13 +492,12 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
                     )}
                   </div>
 
-                  {/* Texto Auxiliar / Validação abaixo do input (conforme o modelo) */}
+                  {/* Texto Auxiliar / Validação */}
                   <p className="text-[11px] text-gray-500 font-light pt-0.5">
-                    {currentStep === 0 && 'Digite seu primeiro nome (mínimo de 2 letras).'}
-                    {currentStep === 1 && 'Digite seu sobrenome para identificação.'}
-                    {currentStep === 2 && 'Digite número com DDD (mínimo de 10 dígitos).'}
-                    {currentStep === 3 && 'Usaremos apenas para contato oficial da Casa 6.'}
-                    {currentStep === 4 && 'Selecione o assunto ou serviço que deseja falar.'}
+                    {currentStep === 0 && 'Digite nome e sobrenome.'}
+                    {currentStep === 1 && 'Digite seu WhatsApp com DDD.'}
+                    {currentStep === 2 && 'Digite seu e-mail para contato.'}
+                    {currentStep === 3 && 'Escolha o assunto ou atendimento desejado.'}
                   </p>
 
                   {/* Mensagem de Erro Caso Ocorra */}
@@ -567,11 +516,11 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
                 <div className="mx-auto w-12 h-12 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-xs">
                   <CheckCircle2 className="h-7 w-7" />
                 </div>
-                <h4 className="font-heading font-bold text-sm sm:text-base text-[#075E54]">
+                <h4 className="font-bold text-sm sm:text-base text-[#075E54]">
                   Conectando com o WhatsApp...
                 </h4>
                 <p className="text-xs text-[#1b1463] leading-relaxed">
-                  Sua mensagem personalizada foi gerada com sucesso! Se a conversa não abriu automaticamente, clique abaixo:
+                  Sua mensagem foi gerada! Se a conversa não abriu automaticamente, clique abaixo:
                 </p>
                 <a
                   href={whatsappRedirectUrl}
@@ -593,8 +542,8 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
             )}
           </div>
 
-          {/* BARRA INFERIOR COM BOTÃO LARGO (CONFORME O MODELO DE REFERÊNCIA) */}
-          {currentStep < 5 && (
+          {/* BARRA INFERIOR COM BOTÃO LARGO */}
+          {currentStep < 4 && (
             <div className="p-3.5 sm:p-4 bg-[#F4F6F8] border-t border-gray-200/80 shrink-0">
               <button
                 type="button"
@@ -610,7 +559,7 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
                 <span>
                   {isSubmitting
                     ? 'Iniciando WhatsApp...'
-                    : currentStep === 4
+                    : currentStep === 3
                     ? 'Iniciar Conversa'
                     : 'Continuar'}
                 </span>
@@ -619,7 +568,7 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
           )}
 
           {/* Rodapé Informativo Discreto */}
-          <div className="bg-[#EAECEF] py-1.5 px-3 text-[10px] text-center text-gray-500 shrink-0 border-t border-gray-200/60">
+          <div className="bg-[#EAECEF] py-1.5 px-3 text-[10px] text-center text-gray-500 shrink-0 border-t border-gray-200/60 font-sans">
             Direcionado diretamente ao WhatsApp oficial da Casa 6
           </div>
         </div>
