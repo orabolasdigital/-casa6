@@ -230,7 +230,7 @@ export const LojaView: React.FC<LojaViewProps> = ({ onOpenBooking }) => {
               LOJINHA OFICIAL CASA 6 • RITUAIS & OBJETOS
             </span>
             <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-[#2B2566] tracking-tight">
-              Produtos Edição Limitada
+              Edições Limitadas
             </h1>
             
             {/* Linha-Ponto do Brand Guide */}
