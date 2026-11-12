@@ -57,17 +57,54 @@ export function getUtmParameters(): {
 }
 
 /**
+ * Regra oficial de gravação no banco de dados para Nome e Sobrenome:
+ * - Nome (firstName): Sempre a primeira palavra antes do primeiro espaço.
+ * - Sobrenome (lastName): Todo o restante do texto após o primeiro espaço.
+ */
+export function parseFirstAndLastName(
+  rawFullName?: string,
+  rawFirst?: string,
+  rawLast?: string
+): { firstName: string; lastName: string; fullName: string } {
+  const combined = (rawFullName || `${rawFirst || ''} ${rawLast || ''}`)
+    .trim()
+    .replace(/\s+/g, ' ');
+
+  if (!combined) {
+    return { firstName: '', lastName: '', fullName: '' };
+  }
+
+  const firstSpaceIndex = combined.indexOf(' ');
+  if (firstSpaceIndex === -1) {
+    return {
+      firstName: combined,
+      lastName: '',
+      fullName: combined
+    };
+  }
+
+  const firstName = combined.substring(0, firstSpaceIndex).trim();
+  const lastName = combined.substring(firstSpaceIndex + 1).trim();
+
+  return {
+    firstName,
+    lastName,
+    fullName: combined
+  };
+}
+
+/**
  * Validação dos campos do formulário global
  * Regras:
- * - Nome e Sobrenome: validação flexível de pelo menos 2 caracteres.
+ * - Nome e Sobrenome: validação flexível de pelo menos 2 caracteres no nome.
  * - WhatsApp: validação de DDD real brasileiro ou internacional.
  * - E-mail: sintaxe e formato válido.
  */
 export function validateLeadForm(input: LeadFormInput): { isValid: boolean; errors: Record<string, string> } {
   const errors: Record<string, string> = {};
 
-  const trimmedFirst = (input.firstName || '').trim();
-  if (!trimmedFirst || trimmedFirst.length < 2) {
+  const { firstName } = parseFirstAndLastName(input.fullName, input.firstName, input.lastName);
+  if (!firstName || firstName.length < 2) {
     errors.firstName = 'Informe seu nome (mínimo de 2 letras).';
   }
 
@@ -110,9 +147,14 @@ export async function submitLeadBooking(
   const now = new Date().toISOString();
   const utm = getUtmParameters();
 
-  const firstName = (input.firstName || '').trim();
-  const lastName = (input.lastName || '').trim();
-  const fullName = `${firstName} ${lastName}`.trim() || firstName;
+  // Aplicação estrita da regra de gravação no banco de dados:
+  // - Nome: sempre a primeira palavra
+  // - Sobrenome: todo o restante após o primeiro espaço
+  const { firstName, lastName, fullName } = parseFirstAndLastName(
+    input.fullName,
+    input.firstName,
+    input.lastName
+  );
 
   const newLead: Lead = {
     id: leadId,

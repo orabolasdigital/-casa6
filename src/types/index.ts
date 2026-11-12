@@ -50,8 +50,9 @@ export interface Lead {
  * Regra: Contém EXCLUSIVAMENTE estes 5 campos. Sem mensagem livre ou observações.
  */
 export interface LeadFormInput {
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
+  fullName?: string;
   whatsapp: string;
   email: string;
   serviceId: string;

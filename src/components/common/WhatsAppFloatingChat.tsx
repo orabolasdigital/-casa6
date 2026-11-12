@@ -35,7 +35,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { OFFICIAL_SERVICES, SITE_CONFIG } from '../../config/site';
-import { submitLeadBooking } from '../../services/leads';
+import { submitLeadBooking, parseFirstAndLastName } from '../../services/leads';
 import { trackAnalyticsEvent } from '../../services/analytics';
 import {
   formatWhatsAppNumber,
@@ -180,14 +180,14 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
     setIsSubmitting(true);
 
     try {
-      const nameParts = fullName.trim().split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
+      // Regra oficial: primeira palavra = Nome (firstName), restante após o espaço = Sobrenome (lastName)
+      const { firstName, lastName } = parseFirstAndLastName(fullName);
 
       const res = await submitLeadBooking(
         {
           firstName,
           lastName,
+          fullName: fullName.trim(),
           whatsapp,
           email,
           serviceId
