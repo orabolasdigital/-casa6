@@ -41,33 +41,34 @@ export function getUtmParameters(): {
 } {
   if (typeof window === 'undefined') return {};
   const params = new URLSearchParams(window.location.search);
-  return {
-    utmSource: params.get('utm_source') || undefined,
-    utmMedium: params.get('utm_medium') || undefined,
-    utmCampaign: params.get('utm_campaign') || undefined,
-    utmContent: params.get('utm_content') || undefined,
-    utmTerm: params.get('utm_term') || undefined
-  };
+  const utms: {
+    utmSource?: string;
+    utmMedium?: string;
+    utmCampaign?: string;
+    utmContent?: string;
+    utmTerm?: string;
+  } = {};
+  const s = params.get('utm_source'); if (s) utms.utmSource = s;
+  const m = params.get('utm_medium'); if (m) utms.utmMedium = m;
+  const c = params.get('utm_campaign'); if (c) utms.utmCampaign = c;
+  const ct = params.get('utm_content'); if (ct) utms.utmContent = ct;
+  const t = params.get('utm_term'); if (t) utms.utmTerm = t;
+  return utms;
 }
 
 /**
- * Validação rigorosa dos 5 campos do formulário global
+ * Validação dos campos do formulário global
  * Regras:
- * - Nome e Sobrenome: apenas letras/acentos, mín 3 e máx 15 caracteres.
- * - WhatsApp: validação de DDD real brasileiro ou internacional, sem repetições fake.
- * - E-mail: sintaxe e provedores confiáveis.
+ * - Nome e Sobrenome: validação flexível de pelo menos 2 caracteres.
+ * - WhatsApp: validação de DDD real brasileiro ou internacional.
+ * - E-mail: sintaxe e formato válido.
  */
 export function validateLeadForm(input: LeadFormInput): { isValid: boolean; errors: Record<string, string> } {
   const errors: Record<string, string> = {};
 
-  const nameVal = validateName(input.firstName, 'Nome');
-  if (!nameVal.isValid && nameVal.error) {
-    errors.firstName = nameVal.error;
-  }
-
-  const lastNameVal = validateName(input.lastName, 'Sobrenome');
-  if (!lastNameVal.isValid && lastNameVal.error) {
-    errors.lastName = lastNameVal.error;
+  const trimmedFirst = (input.firstName || '').trim();
+  if (!trimmedFirst || trimmedFirst.length < 2) {
+    errors.firstName = 'Informe seu nome (mínimo de 2 letras).';
   }
 
   const phoneVal = validateWhatsAppNumber(input.whatsapp);
@@ -104,19 +105,23 @@ export async function submitLeadBooking(
   }
 
   const matchedService = OFFICIAL_SERVICES.find((s) => s.id === input.serviceId) || OFFICIAL_SERVICES[0];
-  const serviceName = matchedService.title;
+  const serviceName = matchedService?.title || 'Atendimento Casa 6';
   const leadId = `lead_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
   const now = new Date().toISOString();
   const utm = getUtmParameters();
 
+  const firstName = (input.firstName || '').trim();
+  const lastName = (input.lastName || '').trim();
+  const fullName = `${firstName} ${lastName}`.trim() || firstName;
+
   const newLead: Lead = {
     id: leadId,
-    firstName: input.firstName.trim(),
-    lastName: input.lastName.trim(),
-    fullName: `${input.firstName.trim()} ${input.lastName.trim()}`,
+    firstName: firstName,
+    lastName: lastName,
+    fullName: fullName,
     email: input.email.trim().toLowerCase(),
     whatsapp: input.whatsapp.trim(),
-    serviceId: matchedService.id,
+    serviceId: matchedService ? matchedService.id : input.serviceId,
     serviceName: serviceName,
     sourcePage: sourcePageTitle,
     sourceUrl: typeof window !== 'undefined' ? window.location.href : '',
@@ -127,19 +132,31 @@ export async function submitLeadBooking(
     updatedAt: now
   };
 
-  // 1. Persistência de Dados (Firestore quando conectado; fallback em armazenamento local)
+  // Sanitiza para garantir que NENHUM campo com valor undefined seja enviado ao Firestore
+  const sanitizedLead: Record<string, any> = {};
+  for (const [key, val] of Object.entries(newLead)) {
+    if (val !== undefined) {
+      sanitizedLead[key] = val;
+    }
+  }
+
+  // 1. Persistência de Dados (Firestore quando conectado; fallback local)
   if (isFirebaseReady && db) {
     try {
       const docRef = doc(db, 'leads', leadId);
-      await setDoc(docRef, newLead);
+      await setDoc(docRef, sanitizedLead);
     } catch (err) {
-      handleFirestoreError(err, OperationType.CREATE, `leads/${leadId}`);
+      console.warn('[Firestore Leads Warning]', err);
     }
-  } else {
-    // Armazenamento local para permitir testes completos de CRM em Etapa 1
+  }
+
+  // Sempre armazena também em cache local para garantir continuidade
+  try {
     const existing = getLocalLeads();
-    existing.unshift(newLead);
+    existing.unshift(sanitizedLead as Lead);
     saveLocalLeads(existing);
+  } catch (storageErr) {
+    console.warn('[Local Leads Storage Warning]', storageErr);
   }
 
   // 1.1 Sincronização Automática na coleção de CRM (crm_contatos)
@@ -158,14 +175,13 @@ export async function submitLeadBooking(
 
   // 2. Disparo de Evento Analítico
   trackAnalyticsEvent('submit_booking', {
-    serviceId: matchedService.id,
-    serviceName: matchedService.title,
+    serviceId: matchedService ? matchedService.id : input.serviceId,
+    serviceName: serviceName,
     deviceCategory: newLead.deviceCategory,
     sourcePage: sourcePageTitle
   });
 
   // 3. Geração Automática da Mensagem de WhatsApp oficial da Bianca Tofoli
-  // Mensagem padronizada estrita conforme diretriz oficial da especificação (Requisito 19)
   const whatsappMessage = `Olá, Bianca! Vim pelo site e gostaria de agendar ${serviceName}.\n\nMeu nome é ${newLead.fullName}.`;
   const whatsappUrl = `https://wa.me/${SITE_CONFIG.whatsappNumberRaw}?text=${encodeURIComponent(whatsappMessage)}`;
 

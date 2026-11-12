@@ -129,11 +129,11 @@ export function validateName(value: string, fieldLabel: 'Nome' | 'Sobrenome'): {
   if (/[^a-zA-ZÀ-ÿ\s]/.test(trimmed)) {
     return { isValid: false, error: `O ${fieldLabel.toLowerCase()} deve conter apenas letras e acentos.` };
   }
-  if (trimmed.length < 3) {
-    return { isValid: false, error: `O ${fieldLabel.toLowerCase()} deve ter no mínimo 3 letras.` };
+  if (trimmed.length < 2) {
+    return { isValid: false, error: `O ${fieldLabel.toLowerCase()} deve ter no mínimo 2 letras.` };
   }
-  if (trimmed.length > 15) {
-    return { isValid: false, error: `O ${fieldLabel.toLowerCase()} deve ter no máximo 15 letras.` };
+  if (trimmed.length > 35) {
+    return { isValid: false, error: `O ${fieldLabel.toLowerCase()} deve ter no máximo 35 letras.` };
   }
   return { isValid: true };
 }
