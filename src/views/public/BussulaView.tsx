@@ -264,10 +264,17 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
             </div>
 
             <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 scrollbar-none md:mx-0 md:px-0 md:pb-0 md:overflow-visible md:grid md:grid-cols-3 md:gap-5">
+              {/* Pilar 1: No Seu WhatsApp */}
               <div className="w-[82vw] md:w-auto shrink-0 snap-center md:shrink bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-6 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-3 flex flex-col justify-between">
                 <div className="space-y-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#2B2566]/10 flex items-center justify-center text-[#2B2566]">
-                    <Smartphone className="h-5 w-5 text-[#2B2566]" />
+                  <div className="w-12 h-12 flex items-center justify-start bg-transparent">
+                    <img
+                      src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@latest/assets/Mobile%20phone/3D/mobile_phone_3d.png"
+                      alt="No Seu WhatsApp"
+                      className="w-11 h-11 object-contain filter drop-shadow-[0_4px_10px_rgba(43,37,102,0.12)] transition-transform duration-300 hover:scale-115 select-none"
+                      loading="lazy"
+                      draggable={false}
+                    />
                   </div>
                   <h3 className="font-heading text-lg font-bold text-[#2B2566]">
                     No Seu WhatsApp
@@ -278,10 +285,17 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
                 </div>
               </div>
 
+              {/* Pilar 2: Área de Membros */}
               <div className="w-[82vw] md:w-auto shrink-0 snap-center md:shrink bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-6 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-3 flex flex-col justify-between">
                 <div className="space-y-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#2B2566]/10 flex items-center justify-center text-[#2B2566]">
-                    <Lock className="h-5 w-5 text-[#2B2566]" />
+                  <div className="w-12 h-12 flex items-center justify-start bg-transparent">
+                    <img
+                      src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@latest/assets/Locked/3D/locked_3d.png"
+                      alt="Área de Membros"
+                      className="w-11 h-11 object-contain filter drop-shadow-[0_4px_10px_rgba(43,37,102,0.12)] transition-transform duration-300 hover:scale-115 select-none"
+                      loading="lazy"
+                      draggable={false}
+                    />
                   </div>
                   <h3 className="font-heading text-lg font-bold text-[#2B2566]">
                     Área de Membros
@@ -292,10 +306,17 @@ export const BussulaView: React.FC<BussulaViewProps> = () => {
                 </div>
               </div>
 
+              {/* Pilar 3: 100% Personalizado */}
               <div className="w-[82vw] md:w-auto shrink-0 snap-center md:shrink bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-6 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-3 flex flex-col justify-between">
                 <div className="space-y-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#2B2566]/10 flex items-center justify-center text-[#2B2566]">
-                    <Sparkles className="h-5 w-5 text-[#2B2566]" />
+                  <div className="w-12 h-12 flex items-center justify-start bg-transparent">
+                    <img
+                      src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@latest/assets/Compass/3D/compass_3d.png"
+                      alt="100% Personalizado"
+                      className="w-11 h-11 object-contain filter drop-shadow-[0_4px_10px_rgba(43,37,102,0.12)] transition-transform duration-300 hover:scale-115 select-none"
+                      loading="lazy"
+                      draggable={false}
+                    />
                   </div>
                   <h3 className="font-heading text-lg font-bold text-[#2B2566]">
                     100% Personalizado

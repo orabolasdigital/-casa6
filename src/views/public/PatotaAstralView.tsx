@@ -142,35 +142,35 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
 
   const currentPlan = plans.find((p) => p.id === selectedPlan) || plans[0];
 
-  // Benefícios exclusivos da Patota com ícones roxos em alto contraste
+  // Benefícios exclusivos da Patota com ícones 3D (estilo emoji) e fundo transparente
   const benefits = [
     {
-      icon: MessageCircle,
+      icon3d: 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@latest/assets/Crystal%20ball/3D/crystal_ball_3d.png',
       title: 'Previsões Diárias no WhatsApp',
       desc: 'Áudios matinais com os trânsitos da Lua, aspectos do céu e orientações práticas para seu dia.'
     },
     {
-      icon: Calendar,
+      icon3d: 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@latest/assets/Tear-off%20calendar/3D/tear-off_calendar_3d.png',
       title: 'Encontros Online Mensais',
       desc: 'Sessões ao vivo no Google Meet com a Bianca para discutir os ciclos do mês, com gravações salvas.'
     },
     {
-      icon: Sparkles,
+      icon3d: 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@latest/assets/Page%20facing%20up/3D/page_facing_up_3d.png',
       title: 'Materiais Exclusivos em PDF',
       desc: 'Rituais de lunação, guias astrológicos e tabelas práticas disponíveis para download.'
     },
     {
-      icon: HelpCircle,
+      icon3d: 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@latest/assets/Speech%20balloon/3D/speech_balloon_3d.png',
       title: 'Espaço para Perguntas',
       desc: 'Tire suas dúvidas diretamente nos encontros e entenda como as energias celestes se manifestam.'
     },
     {
-      icon: Star,
+      icon3d: 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@latest/assets/Wrapped%20gift/3D/wrapped_gift_3d.png',
       title: 'Sorteios & Descontos',
       desc: 'Condições especiais em consultas individuais, na Lojinha e em futuros workshops da Casa 6.'
     },
     {
-      icon: Heart,
+      icon3d: 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@latest/assets/Sparkling%20heart/3D/sparkling_heart_3d.png',
       title: 'Comunidade Acolhedora VIP',
       desc: 'Um ambiente seguro, sem julgamentos, com pessoas que compartilham da mesma busca por evolução.'
     }
@@ -348,27 +348,31 @@ export const PatotaAstralView: React.FC<PatotaAstralViewProps> = () => {
             </div>
 
             <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 scrollbar-none sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-5">
-              {benefits.map((item, bIdx) => {
-                const IconComponent = item.icon;
-                return (
-                  <div
-                    key={bIdx}
-                    className="w-[78vw] sm:w-auto shrink-0 snap-center sm:shrink bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-5 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-2.5 flex flex-col justify-between"
-                  >
-                    <div className="space-y-2">
-                      <div className="w-10 h-10 rounded-xl bg-[#2B2566]/10 flex items-center justify-center text-[#2B2566]">
-                        <IconComponent className="h-5 w-5 text-[#2B2566]" />
-                      </div>
-                      <h3 className="font-heading text-base font-bold text-[#2B2566]">
-                        {item.title}
-                      </h3>
-                      <p className="text-xs text-[#534D6B] leading-relaxed">
-                        {item.desc}
-                      </p>
+              {benefits.map((item, bIdx) => (
+                <div
+                  key={bIdx}
+                  className="w-[78vw] sm:w-auto shrink-0 snap-center sm:shrink bg-white/90 backdrop-blur-xs rounded-2xl border border-[#EADBCC]/60 p-5 shadow-[0_8px_24px_rgba(43,37,102,0.03)] hover:shadow-[0_12px_32px_rgba(43,37,102,0.06)] transition-all duration-300 space-y-2.5 flex flex-col justify-between"
+                >
+                  <div className="space-y-2.5">
+                    {/* Ícone 3D estilo emoji com fundo transparente */}
+                    <div className="w-12 h-12 flex items-center justify-start bg-transparent">
+                      <img
+                        src={item.icon3d}
+                        alt={item.title}
+                        className="w-11 h-11 object-contain filter drop-shadow-[0_4px_10px_rgba(43,37,102,0.12)] transition-transform duration-300 hover:scale-115 select-none"
+                        loading="lazy"
+                        draggable={false}
+                      />
                     </div>
+                    <h3 className="font-heading text-base font-bold text-[#2B2566]">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-[#534D6B] leading-relaxed">
+                      {item.desc}
+                    </p>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
 
             {/* Indicador sutil de carrossel no mobile */}
