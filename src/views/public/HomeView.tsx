@@ -307,8 +307,8 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
               </div>
             </div>
 
-            {/* Texto Editorial Compacto e Quadradinho */}
-            <div className="lg:col-span-7 space-y-5 max-w-lg pt-6 sm:pt-10 lg:pt-0">
+            {/* Texto Editorial Compacto e Elegante */}
+            <div className="lg:col-span-7 space-y-5 max-w-xl pt-6 sm:pt-10 lg:pt-0">
               <div className="space-y-2">
                 <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#8C987F] block">
                   FUNDADORA DA CASA 6 • ASTRÓLOGA • PALESTRANTE
@@ -325,31 +325,25 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                 </div>
               </div>
 
-              {/* Narrativa Sucinta em Formato Quadradinho Equilibrado */}
-              <div className="space-y-3">
-                <p className="text-base sm:text-lg font-heading text-[#2B2566] leading-snug">
-                  Na astrologia, a Casa 6 é a casa do{' '}
-                  <span className="font-highlight italic text-xl sm:text-2xl text-[#B87314] font-semibold">trabalho</span>, da{' '}
-                  <span className="font-highlight italic text-xl sm:text-2xl text-[#B87314] font-semibold">rotina</span> e do{' '}
-                  <span className="font-highlight italic text-xl sm:text-2xl text-[#B87314] font-semibold">cuidado</span> com o corpo.
+              {/* Narrativa Oficial Exata da Mini Bio */}
+              <div className="space-y-4">
+                <p className="text-sm sm:text-[15px] text-[#423C7B] leading-relaxed font-normal">
+                  Acredito que a astrologia é uma poderosa ferramenta de autoconhecimento e transformação. Meu objetivo é integrá-la ao dia a dia das pessoas, na rotina, ajudando-as a encontrar mais equilíbrio e realização em suas carreiras, relacionamentos, saúde e bem-estar. Quero que cada pessoa descubra sua própria essência e viva de forma mais consciente e alinhada com seus propósitos.
                 </p>
-                <p className="text-xs sm:text-sm text-[#423C7B] leading-relaxed font-light text-balance">
-                  É o território da Bianca: enfermeira, gestora, palestrante. A astrologia entra como origem do nome e como vocabulário de direção — casa, mapa, caminho — nunca como promessa mística. A marca fala de decisões reais: demandas e recursos na rotina, a pausa consciente antes de responder e o corpo que sustenta a trajetória com o apoio que precisa existir ao redor.
+
+                {/* Citação em Destaque com Tom Dourado/Ocre Queimado */}
+                <div className="py-1 pl-5 border-l-2 border-[#B87314] my-2">
+                  <blockquote className="font-heading text-base sm:text-lg text-[#2B2566] italic leading-snug">
+                    “Para mim, tudo tem rachaduras — mas é por elas que entra a luz, se assim permitirmos!”
+                  </blockquote>
+                </div>
+
+                <p className="text-sm sm:text-[15px] text-[#423C7B] leading-relaxed font-normal">
+                  A Casa 6 é a materialização desse propósito: um espaço onde você pode se compreender, alinhar sua energia e viver com mais autenticidade.
                 </p>
               </div>
 
-              {/* Frase em destaque serifada com tom ocre queimado para alto contraste em fundo claro */}
-              <div className="pt-1 pl-5 border-l-2 border-[#B87314]">
-                <blockquote className="font-heading text-lg sm:text-xl text-[#2B2566] leading-snug">
-                  QUANDO TUDO{' '}
-                  <span className="font-highlight italic text-[1.25em] font-semibold text-[#B87314] inline-block align-baseline ml-1">
-                    depende
-                  </span>{' '}
-                  DE VOCÊ.
-                </blockquote>
-              </div>
-
-              <div className="pt-1">
+              <div className="pt-2">
                 <button
                   onClick={() => onNavigate('/sobre')}
                   className="inline-flex items-center gap-2.5 rounded-full bg-[#F0B55E] hover:bg-[#dfa247] px-8 py-3.5 text-xs sm:text-sm font-bold text-[#2B2566] transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-md uppercase tracking-wider"
