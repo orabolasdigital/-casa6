@@ -448,3 +448,32 @@ export async function syncCatalogWithFirestore(): Promise<void> {
     console.warn('[Catalog Sync Warning]', err);
   }
 }
+
+/**
+ * Retorna os últimos artigos editoriais cadastrados (por padrão os 3 mais recentes),
+ * buscando diretamente da coleção `blog_posts` no Firestore com fallback automático.
+ */
+export async function getLatestBlogPosts(limitCount = 3): Promise<BlogPostItem[]> {
+  if (!isFirebaseReady || !db) {
+    return CATALOG_BLOG_POSTS.slice(0, limitCount);
+  }
+
+  try {
+    const snap = await getDocs(collection(db, 'blog_posts'));
+    if (!snap.empty) {
+      const posts: BlogPostItem[] = [];
+      snap.forEach(docSnap => {
+        posts.push({ id: docSnap.id, ...(docSnap.data() as BlogPostItem) });
+      });
+
+      if (posts.length > 0) {
+        // Ordena mantendo a ordem dos IDs conhecidos ou do Firestore
+        return posts.slice(0, limitCount);
+      }
+    }
+  } catch (err) {
+    console.warn('[Catalog] Aviso ao buscar blog_posts no Firestore:', err);
+  }
+
+  return CATALOG_BLOG_POSTS.slice(0, limitCount);
+}
