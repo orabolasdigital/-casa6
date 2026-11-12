@@ -854,22 +854,22 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                 <div className="absolute bottom-10 right-1/3 text-[#F0B55E]/40 text-xs animate-pulse" style={{ animationDelay: '1.8s' }}>★</div>
               </div>
 
-              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 xl:gap-8 items-center">
-                {/* Imagem do Vídeo / Podcast no YouTube Ampliada, Próxima ao Texto e Ocupando o Espaço do Box */}
-                <div className="lg:col-span-5 xl:col-span-5 flex justify-center lg:justify-start">
-                  <div className="-mt-12 sm:-mt-16 lg:-mt-20 xl:-mt-24 -mb-6 sm:-mb-8 lg:-mb-10 sm:-ml-2 lg:-ml-4 shrink-0">
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 xl:gap-10 items-center">
+                {/* Imagem do Vídeo / Podcast no YouTube Proporcional, Sem Sombra Escura Pesada e com Respiros Equilibrados */}
+                <div className="lg:col-span-5 flex justify-center lg:justify-start">
+                  <div className="-mt-10 sm:-mt-14 lg:-mt-16 xl:-mt-20 shrink-0">
                     <img
                       src="https://static.wixstatic.com/media/02c8e0_d34c417ab4f148fcaf82c0354538ae59~mv2.png"
                       alt="Canal da Bianca no YouTube — Podcast"
-                      className="w-72 sm:w-96 md:w-[420px] lg:w-[460px] xl:w-[500px] 2xl:w-[530px] h-auto object-contain filter drop-shadow-[0_18px_36px_rgba(0,0,0,0.45)] transition-transform duration-500 hover:scale-105"
+                      className="w-64 sm:w-80 md:w-[350px] lg:w-[380px] xl:w-[410px] 2xl:w-[430px] h-auto object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,0.18)] transition-transform duration-500 hover:scale-[1.02]"
                       draggable={false}
                     />
                   </div>
                 </div>
 
                 {/* Conteúdo: Título Unificado, Texto e Botão */}
-                <div className="lg:col-span-7 xl:col-span-7 flex flex-col justify-center space-y-3.5 text-white text-center lg:text-left">
-                  <h3 className="font-heading text-2xl sm:text-3xl lg:text-3xl xl:text-[38px] font-bold tracking-tight text-white leading-tight">
+                <div className="lg:col-span-7 flex flex-col justify-center space-y-3.5 text-white text-center lg:text-left">
+                  <h3 className="font-heading text-2xl sm:text-3xl lg:text-3xl xl:text-4xl font-bold tracking-tight text-white leading-tight">
                     Acompanhe o canal da Bianca no YouTube!
                   </h3>
 
