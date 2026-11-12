@@ -290,6 +290,7 @@ export const WhatsAppFloatingChat: React.FC<WhatsAppFloatingChatProps> = ({
                   src="https://static.wixstatic.com/media/02c8e0_54a33eeb476d45c49b7f4953c34177fc~mv2.jpeg"
                   alt="Bianca Tofoli"
                   className="h-full w-full object-cover"
+                  style={{ objectPosition: '50% 8%' }}
                 />
                 <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-[#25D366] border-2 border-[#075E54]" />
               </div>
