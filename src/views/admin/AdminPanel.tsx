@@ -3,85 +3,75 @@
  * Casa 6 — Bianca Tofoli
  * Painel de Controles (/painel)
  * 
+ * Arquitetura em 4 Seções Centrais (Baseada na especificação do projeto e referência visual):
+ * 1. OPERAÇÕES: Calculadora Astral (Bússola Pessoal), Agenda Atendimentos (Google Calendar Sync) & Cadastros (CRM Master).
+ * 2. SERVIÇOS: Atendimentos, Palestras, Parcerias, Patota, Bússola, Lojinha (com gestão de frete fixo/km/estado).
+ * 3. FLUXOS: Mensagens WhatsApp com variáveis, Automações de e-mail/alertas, Blog Caderno Astral, Mercado Pago, Pixels & Acessos RBAC.
+ * 4. PÁGINAS: CMS completo de 9 páginas com restauração instantânea aos padrões originais.
+ * 
  * Estrutura de Acesso e Permissões (RBAC):
  * - Suporte (Master): Não pode ser removido, alterado ou ajustado. Mestre do sistema.
  * - Bianca (Administradora): Pode inserir, excluir, alterar nomes e senhas de outros membros (inclusive Caio).
  * - Caio (Operador Básico): Acesso a todas as funções operacionais, mas não pode inserir nem excluir usuários; pode alterar apenas seu próprio nome e senha.
- * 
- * Tela de Login:
- * - Logo da Casa6 no topo que retorna à Home ao ser clicado.
- * - Título: Painel de Controle
- * - Subtítulo: Área Restrita para Administradores
- * - Campo Login: Caixa suspensa (dropdown) com os usuários cadastrados.
- * - Campo Senha: Campo com olhinho lateral para visualizar a senha.
- * - Botão: Entrar no Painel
  */
 
 import React, { useState, useEffect } from 'react';
 import {
   LayoutDashboard,
+  Calculator,
+  Calendar,
   Users,
   Compass,
-  Sparkles,
-  Calendar,
   Presentation,
-  BookOpen,
+  Handshake,
+  Sparkles,
   ShoppingBag,
   MessageSquare,
-  Settings,
-  Search,
-  LogOut,
+  Mail,
+  BookOpen,
+  CreditCard,
+  Share2,
   Shield,
-  Filter,
-  ExternalLink,
+  Layers,
+  LogOut,
   ChevronRight,
-  Database,
+  ExternalLink,
   Lock,
   Eye,
   EyeOff,
-  UserCheck,
-  UserPlus,
-  Edit2,
-  Trash2,
-  AlertCircle,
+  ArrowLeft,
+  Search,
   CheckCircle2,
-  X
+  AlertCircle
 } from 'lucide-react';
-import { SITE_CONFIG, OFFICIAL_SERVICES } from '../../config/site';
-import { Lead, LeadStatus, UserProfile, AdminUser } from '../../types';
-import { getCurrentUser, loginWithAdminAccount, logoutAdminSession, subscribeAuth } from '../../services/auth';
-import { getLeadsList, updateLeadStatus } from '../../services/leads';
-import {
-  getAdminUsersList,
-  authenticateAdminUser,
-  createAdminUser,
-  updateAdminUser,
-  deleteAdminUser
-} from '../../services/adminUsersService';
 
-type AdminTab =
-  | 'dashboard'
-  | 'leads'
-  | 'usuarios'
-  | 'atendimentos'
-  | 'patota'
-  | 'vivencias'
-  | 'palestras'
-  | 'blog'
-  | 'loja'
-  | 'depoimentos'
-  | 'configuracoes'
-  | 'seo';
+import { UserProfile, AdminUser } from '../../types';
+import { getCurrentUser, loginWithAdminAccount, logoutAdminSession, subscribeAuth } from '../../services/auth';
+import { getAdminUsersList } from '../../services/adminUsersService';
+import { CRMContactDetail, getCRMContactsList } from '../../services/crmService';
+import { AppointmentItem, getAppointmentsList } from '../../services/agendaService';
+
+// Componentes dos Módulos do Hub
+import { AdminHubGrid, SectionKey, ItemKey } from './components/AdminHubGrid';
+import { OperationsCalculator } from './modules/OperationsCalculator';
+import { OperationsAgenda } from './modules/OperationsAgenda';
+import { OperationsCRM } from './modules/OperationsCRM';
+import { ServicesManager, ServiceSubTab } from './modules/ServicesManager';
+import { FlowsManager, FlowSubTab } from './modules/FlowsManager';
+import { PagesManager, PageSlug } from './modules/PagesManager';
 
 export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigateHome }) => {
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(getCurrentUser());
-  const [currentTab, setCurrentTab] = useState<AdminTab>('dashboard');
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-  const [leadStatusFilter, setLeadStatusFilter] = useState<string>('all');
-  const [isLoadingLeads, setIsLoadingLeads] = useState(false);
 
-  // Estados dos Usuários Administradores
+  // Estados de Navegação do Hub (Nulo = Exibe o Hub Visual de Cartões)
+  const [activeSection, setActiveSection] = useState<SectionKey | null>(null);
+  const [activeItem, setActiveItem] = useState<ItemKey | null>(null);
+
+  // Dados Operacionais Carregados para Contadores & Cruzes
+  const [contacts, setContacts] = useState<CRMContactDetail[]>([]);
+  const [appointments, setAppointments] = useState<AppointmentItem[]>([]);
+
+  // Estados dos Usuários Administradores para Login
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [selectedLoginUsername, setSelectedLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -89,182 +79,74 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  // Estados de Gerenciamento da Aba de Usuários
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editingTargetUser, setEditingTargetUser] = useState<AdminUser | null>(null);
-  const [newUserNameInput, setNewUserNameInput] = useState('');
-  const [newUserPasswordInput, setNewUserPasswordInput] = useState('');
-  const [newUserRoleInput, setNewUserRoleInput] = useState<'admin' | 'operador'>('operador');
-  const [showNewUserPassword, setShowNewUserPassword] = useState(false);
+  // Carregamento inicial de dados
+  const refreshOperationalData = async () => {
+    try {
+      const [crms, apts] = await Promise.all([getCRMContactsList(), getAppointmentsList()]);
+      setContacts(crms);
+      setAppointments(apts);
+    } catch (err) {
+      console.warn('[AdminPanel] Erro ao carregar dados operacionais:', err);
+    }
+  };
 
-  const [editUserNameInput, setEditUserNameInput] = useState('');
-  const [editUserPasswordInput, setEditUserPasswordInput] = useState('');
-  const [showEditUserPassword, setShowEditUserPassword] = useState(false);
-
-  const [userFeedbackMessage, setUserFeedbackMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [isSavingUser, setIsSavingUser] = useState(false);
-
-  // Monitora autenticação
-  useEffect(() => {
-    const unsub = subscribeAuth((state) => {
-      setCurrentUser(state.user);
-    });
-    return unsub;
-  }, []);
-
-  // Carrega lista de usuários administradores da coleção
   const refreshAdminUsers = async () => {
     try {
-      const users = await getAdminUsersList();
-      setAdminUsers(users);
+      const list = await getAdminUsersList();
+      setAdminUsers(list);
+      if (list.length > 0 && !selectedLoginUsername) {
+        setSelectedLoginUsername(list[0].username);
+      }
     } catch (err) {
-      console.warn('[AdminPanel] Erro ao carregar usuários:', err);
+      console.error('[AdminPanel] Erro ao carregar usuários:', err);
     }
   };
 
   useEffect(() => {
+    const unsub = subscribeAuth((user) => {
+      setCurrentUser(user);
+    });
     refreshAdminUsers();
+    refreshOperationalData();
+    return () => unsub();
   }, []);
 
-  // Carrega leads
-  const refreshLeads = async () => {
-    setIsLoadingLeads(true);
-    try {
-      const data = await getLeadsList();
-      setLeads(data);
-      if (data.length > 0 && !selectedLead) {
-        setSelectedLead(data[0]);
-      }
-    } finally {
-      setIsLoadingLeads(false);
-    }
-  };
-
-  useEffect(() => {
-    if (currentUser) {
-      refreshLeads();
-      refreshAdminUsers();
-    }
-  }, [currentUser]);
-
-  // Submissão do Formulário de Login Simplificado
+  // Handler de Login
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError('');
-
-    if (!selectedLoginUsername) {
-      setLoginError('Por favor, selecione um usuário no campo Login.');
-      return;
-    }
-
-    if (!loginPassword) {
-      setLoginError('Por favor, digite a sua senha de acesso.');
-      return;
-    }
-
     setIsLoggingIn(true);
+
     try {
-      const authenticated = await authenticateAdminUser(selectedLoginUsername, loginPassword);
-      if (!authenticated) {
-        setLoginError('Senha incorreta para o usuário selecionado. Tente novamente.');
-        return;
+      if (!selectedLoginUsername) {
+        throw new Error('Selecione um usuário no campo Login.');
+      }
+      if (!loginPassword) {
+        throw new Error('Digite a senha para prosseguir.');
       }
 
-      loginWithAdminAccount(authenticated);
+      const authenticated = await loginWithAdminAccount(selectedLoginUsername, loginPassword);
+      setCurrentUser(authenticated);
       setLoginPassword('');
-    } catch (err) {
-      setLoginError('Ocorreu um erro ao autenticar. Tente novamente.');
+      await refreshOperationalData();
+    } catch (err: any) {
+      setLoginError(err?.message || 'Falha ao autenticar. Verifique o usuário e a senha.');
     } finally {
       setIsLoggingIn(false);
     }
   };
 
-  // Criação de Novo Usuário (Apenas Bianca ou Suporte)
-  const handleCreateUser = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!currentUser) return;
-    setUserFeedbackMessage(null);
-    setIsSavingUser(true);
-
-    try {
-      await createAdminUser(currentUser, {
-        username: newUserNameInput,
-        password: newUserPasswordInput,
-        role: newUserRoleInput
-      });
-
-      setUserFeedbackMessage({
-        type: 'success',
-        text: `Usuário "${newUserNameInput}" cadastrado com sucesso!`
-      });
-
-      setNewUserNameInput('');
-      setNewUserPasswordInput('');
-      setNewUserRoleInput('operador');
-      setIsCreateModalOpen(false);
-      await refreshAdminUsers();
-    } catch (err: any) {
-      setUserFeedbackMessage({
-        type: 'error',
-        text: err?.message || 'Erro ao cadastrar usuário.'
-      });
-    } finally {
-      setIsSavingUser(false);
-    }
+  // Handler de Seleção no Hub Visual
+  const handleSelectHubItem = (section: SectionKey, item: ItemKey) => {
+    setActiveSection(section);
+    setActiveItem(item);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Edição de Usuário (Bianca e Suporte podem editar qualquer um exceto Suporte; Caio só pode editar ele mesmo)
-  const handleUpdateUser = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!currentUser || !editingTargetUser) return;
-    setUserFeedbackMessage(null);
-    setIsSavingUser(true);
-
-    try {
-      await updateAdminUser(currentUser, editingTargetUser.id, {
-        username: editUserNameInput,
-        password: editUserPasswordInput ? editUserPasswordInput : undefined
-      });
-
-      setUserFeedbackMessage({
-        type: 'success',
-        text: `Cadastro de "${editUserNameInput}" atualizado com sucesso!`
-      });
-
-      setEditingTargetUser(null);
-      await refreshAdminUsers();
-    } catch (err: any) {
-      setUserFeedbackMessage({
-        type: 'error',
-        text: err?.message || 'Erro ao atualizar usuário.'
-      });
-    } finally {
-      setIsSavingUser(false);
-    }
-  };
-
-  // Exclusão de Usuário (Apenas Bianca e Suporte, nunca o Suporte)
-  const handleDeleteUser = async (userToDelete: AdminUser) => {
-    if (!currentUser) return;
-    const confirmDelete = window.confirm(
-      `Tem certeza que deseja excluir o acesso de "${userToDelete.username}" ao painel de controle? Esta ação não pode ser desfeita.`
-    );
-    if (!confirmDelete) return;
-
-    setUserFeedbackMessage(null);
-    try {
-      await deleteAdminUser(currentUser, userToDelete.id);
-      setUserFeedbackMessage({
-        type: 'success',
-        text: `Acesso de "${userToDelete.username}" excluído com sucesso.`
-      });
-      await refreshAdminUsers();
-    } catch (err: any) {
-      setUserFeedbackMessage({
-        type: 'error',
-        text: err?.message || 'Erro ao excluir usuário.'
-      });
-    }
+  const handleBackToHub = () => {
+    setActiveSection(null);
+    setActiveItem(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // =========================================================================
@@ -272,7 +154,7 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
   // =========================================================================
   if (!currentUser) {
     return (
-      <div className="admin-scope min-h-screen bg-[#2B2566] flex flex-col items-center justify-center p-4">
+      <div className="admin-scope min-h-screen bg-[#161438] flex flex-col items-center justify-center p-4">
         {/* Logo da Casa 6 no topo clicável para retornar à página inicial */}
         <button
           type="button"
@@ -289,49 +171,46 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
         </button>
 
         {/* Janela de Login Simplificada */}
-        <div className="w-full max-w-sm sm:max-w-md rounded-3xl bg-[#FCFAF7] p-8 sm:p-10 shadow-2xl border border-[#F0B55E]/40 space-y-6">
+        <div className="w-full max-w-sm sm:max-w-md rounded-3xl bg-[#1D1B48] p-8 sm:p-10 shadow-2xl border border-[#F0B55E]/40 space-y-6">
           <div className="text-center space-y-1">
-            <h1 className="font-heading text-2xl font-bold text-[#2B2566]">
+            <h1 className="font-heading text-2xl font-bold text-white">
               Painel de Controle
             </h1>
-            <p className="text-xs sm:text-sm text-[#68638C] font-medium">
+            <p className="text-xs sm:text-sm text-[#DAD2C4] font-medium">
               Área Restrita para Administradores
             </p>
           </div>
 
           {loginError && (
-            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold text-center animate-in fade-in">
-              {loginError}
+            <div className="p-3.5 rounded-xl bg-red-500/20 border border-red-500/40 text-red-200 text-xs flex items-center gap-2">
+              <Lock className="h-4 w-4 shrink-0" />
+              <span>{loginError}</span>
             </div>
           )}
 
-          {/* Formulário Estrito: Login (Caixa Suspensa), Senha (com Olhinho) e Botão */}
-          <form onSubmit={handleLoginSubmit} className="space-y-5">
+          <form onSubmit={handleLoginSubmit} className="space-y-4">
+            {/* Campo Login: Caixa Suspensa (Dropdown) */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-[#2B2566]">
-                Login *
+              <label className="block text-xs font-bold text-[#DAD2C4] uppercase tracking-wider">
+                Login
               </label>
               <select
                 value={selectedLoginUsername}
-                onChange={(e) => {
-                  setSelectedLoginUsername(e.target.value);
-                  setLoginError('');
-                }}
-                className="w-full rounded-xl border border-[#DAD2C4] bg-white px-4 py-3 text-xs sm:text-sm text-[#2B2566] font-medium focus:border-[#F0B55E] focus:outline-none focus:ring-2 focus:ring-[#F0B55E]/20 transition-all cursor-pointer"
-                required
+                onChange={(e) => setSelectedLoginUsername(e.target.value)}
+                className="w-full rounded-xl border border-[#372B69] bg-[#2B2566] px-4 py-3 text-xs sm:text-sm text-white font-medium focus:border-[#F0B55E] focus:outline-none transition-colors cursor-pointer"
               >
-                <option value="">Selecione o usuário...</option>
                 {adminUsers.map((user) => (
-                  <option key={user.id} value={user.username}>
-                    {user.username}
+                  <option key={user.id} value={user.username} className="bg-[#1D1B48] text-white">
+                    {user.username} {user.username.toLowerCase() === 'suporte' ? '(Mestre)' : user.role === 'admin' ? '(Administradora)' : '(Operador)'}
                   </option>
                 ))}
               </select>
             </div>
 
+            {/* Campo Senha com Olhinho Lateral */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-[#2B2566]">
-                Senha *
+              <label className="block text-xs font-bold text-[#DAD2C4] uppercase tracking-wider">
+                Senha
               </label>
               <div className="relative">
                 <input
@@ -339,24 +218,17 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
                   required
                   placeholder="Digite sua senha"
                   value={loginPassword}
-                  onChange={(e) => {
-                    setLoginPassword(e.target.value);
-                    setLoginError('');
-                  }}
-                  className="w-full rounded-xl border border-[#DAD2C4] bg-white pl-4 pr-11 py-3 text-xs sm:text-sm text-[#2B2566] focus:border-[#F0B55E] focus:outline-none focus:ring-2 focus:ring-[#F0B55E]/20 transition-all"
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  className="w-full rounded-xl border border-[#372B69] bg-[#2B2566] pl-4 pr-11 py-3 text-xs sm:text-sm text-white focus:border-[#F0B55E] focus:outline-none transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setShowLoginPassword(!showLoginPassword)}
                   title={showLoginPassword ? 'Ocultar senha' : 'Visualizar senha'}
                   aria-label={showLoginPassword ? 'Ocultar senha' : 'Visualizar senha'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#8C987F] hover:text-[#2B2566] cursor-pointer transition-colors focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#DAD2C4]/70 hover:text-[#F0B55E] cursor-pointer transition-colors focus:outline-none"
                 >
-                  {showLoginPassword ? (
-                    <EyeOff className="h-4.5 w-4.5" />
-                  ) : (
-                    <Eye className="h-4.5 w-4.5" />
-                  )}
+                  {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
@@ -364,9 +236,9 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
             <button
               type="submit"
               disabled={isLoggingIn}
-              className="w-full flex items-center justify-center gap-2 rounded-full bg-[#2B2566] hover:bg-[#1E1B4B] text-[#F0B55E] py-3.5 px-6 text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-md hover:shadow-lg cursor-pointer active:scale-98 disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#F0B55E] to-[#E5A344] hover:brightness-110 text-[#1E1B4B] py-3.5 px-6 text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-lg hover:shadow-xl cursor-pointer active:scale-98 disabled:opacity-50"
             >
-              <Shield className="h-4 w-4 text-[#F0B55E]" />
+              <Shield className="h-4 w-4 text-[#1E1B4B]" />
               <span>{isLoggingIn ? 'Entrando...' : 'Entrar no Painel'}</span>
             </button>
           </form>
@@ -376,116 +248,275 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
   }
 
   // =========================================================================
-  // PAINEL DE CONTROLE AUTENTICADO
+  // PAINEL DE CONTROLE AUTENTICADO (COSMIC CASA 6 THEME COM 4 SEÇÕES)
   // =========================================================================
-  const handleStatusChange = async (leadId: string, newStatus: LeadStatus) => {
-    await updateLeadStatus(leadId, newStatus);
-    await refreshLeads();
-    if (selectedLead && selectedLead.id === leadId) {
-      setSelectedLead((prev) => (prev ? { ...prev, status: newStatus } : null));
-    }
-  };
-
-  const filteredLeads = leads.filter((l) => {
-    if (leadStatusFilter === 'all') return true;
-    return l.status === leadStatusFilter;
-  });
-
   const isMasterUser = currentUser.role === 'master';
   const isAdminUser = currentUser.role === 'admin' || isMasterUser;
-  const isOperadorUser = currentUser.role === 'operador' || currentUser.role === 'editor';
 
   return (
-    <div className="admin-scope min-h-screen bg-[#F3EEE5] text-[#211D35] flex flex-col md:flex-row">
+    <div className="admin-scope min-h-screen bg-[#161438] text-white flex flex-col md:flex-row">
+      
       {/* SIDEBAR ADMINISTRATIVA */}
-      <aside className="w-full md:w-64 bg-[#22205A] text-[#FFFFFF] flex flex-col shrink-0 border-r border-[#372B69]">
-        {/* Topo da Sidebar com Usuário Logado */}
+      <aside className="w-full md:w-64 bg-[#1D1B48] border-r border-[#372B69] flex flex-col shrink-0">
+        
+        {/* Topo da Sidebar: Logo & Usuário Logado */}
         <div className="p-4 border-b border-[#372B69] flex items-center justify-between">
-          <div className="overflow-hidden">
-            <div className="flex items-center gap-2">
-              <img
-                src="https://static.wixstatic.com/media/02c8e0_916db28bdef7413a82fde89b9ce7f738~mv2.png"
-                alt="Casa 6"
-                className="h-6 w-auto object-contain cursor-pointer"
-                onClick={onNavigateHome}
-                title="Ir para o Início"
-              />
-              <span className="text-[9px] bg-[#2B2566] px-1.5 py-0.5 rounded text-[#F0B55E] uppercase font-bold border border-[#F0B55E]/40">
-                Painel
-              </span>
+          <div className="flex items-center gap-3">
+            <img
+              src="https://static.wixstatic.com/media/02c8e0_916db28bdef7413a82fde89b9ce7f738~mv2.png"
+              alt="Casa 6"
+              className="h-7 w-auto object-contain cursor-pointer transition-transform hover:scale-105"
+              onClick={handleBackToHub}
+              title="Ir para o Hub Geral"
+            />
+            <div>
+              <div className="text-[10px] text-[#F0B55E] font-bold uppercase tracking-wider">
+                Painel Master
+              </div>
+              <div className="text-xs font-bold text-white capitalize truncate max-w-[110px]">
+                {currentUser.displayName}
+              </div>
             </div>
-            <p className="text-[11px] text-[#DAD2C4] truncate mt-1">
-              Olá, <strong className="text-white font-bold">{currentUser.displayName}</strong>{' '}
-              <span className="text-[10px] text-[#F0B55E]">
-                ({currentUser.role === 'master' ? 'Mestre' : currentUser.role === 'admin' ? 'Admin' : 'Operador'})
-              </span>
-            </p>
           </div>
+
           <button
             onClick={() => logoutAdminSession()}
             title="Encerrar Sessão"
             aria-label="Encerrar Sessão"
-            className="p-1.5 rounded-lg hover:bg-[#372B69] text-[#DAD2C4] hover:text-[#FFFFFF] cursor-pointer transition-colors"
+            className="p-1.5 rounded-lg hover:bg-[#2B2566] text-[#DAD2C4] hover:text-[#F0B55E] cursor-pointer transition-colors"
           >
             <LogOut className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Navegação de Módulos */}
-        <nav className="p-2 space-y-1 flex-1 text-xs">
-          {[
-            { id: 'dashboard', label: 'Dashboard Geral', icon: LayoutDashboard },
-            { id: 'leads', label: 'Gestão de Leads (CRM)', icon: Users, badge: leads.length },
-            { id: 'usuarios', label: 'Acessos & Administradores', icon: Shield, badge: adminUsers.length },
-            { id: 'atendimentos', label: 'Atendimentos', icon: Compass },
-            { id: 'patota', label: 'Patota Astral', icon: Sparkles },
-            { id: 'vivencias', label: 'Vivências', icon: Calendar },
-            { id: 'palestras', label: 'Palestras', icon: Presentation },
-            { id: 'blog', label: 'Caderno Astral (Blog)', icon: BookOpen },
-            { id: 'loja', label: 'Loja & Produtos', icon: ShoppingBag },
-            { id: 'depoimentos', label: 'Depoimentos', icon: MessageSquare },
-            { id: 'configuracoes', label: 'Configurações do Site', icon: Settings },
-            { id: 'seo', label: 'SEO & Indexação', icon: Search }
-          ].map((item) => {
-            const Icon = item.icon;
-            const isActive = currentTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setCurrentTab(item.id as AdminTab);
-                  setUserFeedbackMessage(null);
-                }}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded transition-colors cursor-pointer ${
-                  isActive
-                    ? 'bg-[#FFB63F] text-[#080C35] font-bold shadow-xs'
-                    : 'text-[#FFFFFF] hover:bg-[#372B69]'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Icon className="h-4 w-4" />
-                  <span>{item.label}</span>
-                </div>
-                {item.badge !== undefined && item.badge > 0 && (
-                  <span
-                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                      isActive ? 'bg-[#080C35] text-[#FFB63F]' : 'bg-[#372B69] text-[#FFFFFF]'
-                    }`}
-                  >
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+        {/* Navegação Rápida entre Seções & Itens */}
+        <nav className="p-3 space-y-4 flex-1 text-xs overflow-y-auto">
+          
+          {/* Botão de Retorno ao Hub Geral */}
+          <button
+            onClick={handleBackToHub}
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold transition-all cursor-pointer ${
+              activeItem === null
+                ? 'bg-[#F0B55E] text-[#1E1B4B] shadow-md'
+                : 'text-white hover:bg-[#2B2566]'
+            }`}
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            <span>Hub Principal (Visão Geral)</span>
+          </button>
+
+          {/* 1. SEÇÃO OPERAÇÕES */}
+          <div className="space-y-1">
+            <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#F0B55E] flex items-center justify-between">
+              <span>Operações</span>
+              <span className="text-[9px] text-[#DAD2C4]/70">Coração</span>
+            </div>
+
+            <button
+              onClick={() => handleSelectHubItem('operacoes', 'calculadora')}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+                activeItem === 'calculadora' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Calculator className="h-3.5 w-3.5" />
+                <span>Calculadora Astral</span>
+              </div>
+            </button>
+
+            <button
+              onClick={() => handleSelectHubItem('operacoes', 'agenda')}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+                activeItem === 'agenda' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Calendar className="h-3.5 w-3.5" />
+                <span>Agenda Atendimentos</span>
+              </div>
+              {appointments.length > 0 && (
+                <span className="text-[10px] bg-[#372B69] px-1.5 py-0.2 rounded-full text-white font-mono">
+                  {appointments.length}
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => handleSelectHubItem('operacoes', 'cadastros')}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+                activeItem === 'cadastros' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Users className="h-3.5 w-3.5" />
+                <span>Cadastros (CRM)</span>
+              </div>
+              {contacts.length > 0 && (
+                <span className="text-[10px] bg-[#F0B55E] text-[#1E1B4B] px-1.5 py-0.2 rounded-full font-bold">
+                  {contacts.length}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* 2. SEÇÃO SERVIÇOS */}
+          <div className="space-y-1">
+            <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#F0B55E]">
+              Serviços & Catálogo
+            </div>
+
+            <button
+              onClick={() => handleSelectHubItem('servicos', 'serv_atendimentos')}
+              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                activeItem === 'serv_atendimentos' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
+              }`}
+            >
+              <Compass className="h-3.5 w-3.5" />
+              <span>Atendimentos</span>
+            </button>
+
+            <button
+              onClick={() => handleSelectHubItem('servicos', 'serv_palestras')}
+              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                activeItem === 'serv_palestras' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
+              }`}
+            >
+              <Presentation className="h-3.5 w-3.5" />
+              <span>Palestras (NR-1)</span>
+            </button>
+
+            <button
+              onClick={() => handleSelectHubItem('servicos', 'serv_parcerias')}
+              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                activeItem === 'serv_parcerias' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
+              }`}
+            >
+              <Handshake className="h-3.5 w-3.5" />
+              <span>Parcerias</span>
+            </button>
+
+            <button
+              onClick={() => handleSelectHubItem('servicos', 'serv_patota')}
+              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                activeItem === 'serv_patota' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
+              }`}
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>Patota (R$ 47/mês)</span>
+            </button>
+
+            <button
+              onClick={() => handleSelectHubItem('servicos', 'serv_bussola')}
+              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                activeItem === 'serv_bussola' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
+              }`}
+            >
+              <Compass className="h-3.5 w-3.5" />
+              <span>Bússolas (R$ 47)</span>
+            </button>
+
+            <button
+              onClick={() => handleSelectHubItem('servicos', 'serv_lojinha')}
+              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                activeItem === 'serv_lojinha' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
+              }`}
+            >
+              <ShoppingBag className="h-3.5 w-3.5" />
+              <span>Lojinha & Frete</span>
+            </button>
+          </div>
+
+          {/* 3. SEÇÃO FLUXOS */}
+          <div className="space-y-1">
+            <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#F0B55E]">
+              Fluxos & Conexões
+            </div>
+
+            <button
+              onClick={() => handleSelectHubItem('fluxos', 'fluxo_mensagens')}
+              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                activeItem === 'fluxo_mensagens' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
+              }`}
+            >
+              <MessageSquare className="h-3.5 w-3.5" />
+              <span>WhatsApp Templates</span>
+            </button>
+
+            <button
+              onClick={() => handleSelectHubItem('fluxos', 'fluxo_automacoes')}
+              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                activeItem === 'fluxo_automacoes' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
+              }`}
+            >
+              <Mail className="h-3.5 w-3.5" />
+              <span>Automações & E-mail</span>
+            </button>
+
+            <button
+              onClick={() => handleSelectHubItem('fluxos', 'fluxo_blog')}
+              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                activeItem === 'fluxo_blog' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
+              }`}
+            >
+              <BookOpen className="h-3.5 w-3.5" />
+              <span>Blog Caderno Astral</span>
+            </button>
+
+            <button
+              onClick={() => handleSelectHubItem('fluxos', 'fluxo_pagamento')}
+              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                activeItem === 'fluxo_pagamento' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
+              }`}
+            >
+              <CreditCard className="h-3.5 w-3.5" />
+              <span>Mercado Pago</span>
+            </button>
+
+            <button
+              onClick={() => handleSelectHubItem('fluxos', 'fluxo_vinculacoes')}
+              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                activeItem === 'fluxo_vinculacoes' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
+              }`}
+            >
+              <Share2 className="h-3.5 w-3.5" />
+              <span>Pixels & Tracking</span>
+            </button>
+
+            <button
+              onClick={() => handleSelectHubItem('fluxos', 'fluxo_acessos')}
+              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                activeItem === 'fluxo_acessos' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
+              }`}
+            >
+              <Shield className="h-3.5 w-3.5" />
+              <span>Acessos & Usuários</span>
+            </button>
+          </div>
+
+          {/* 4. SEÇÃO PÁGINAS CMS */}
+          <div className="space-y-1">
+            <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#F0B55E]">
+              Páginas CMS (9 Páginas)
+            </div>
+
+            <button
+              onClick={() => handleSelectHubItem('paginas', 'pag_inicio')}
+              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                activeSection === 'paginas' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
+              }`}
+            >
+              <Layers className="h-3.5 w-3.5" />
+              <span>Editor de Páginas</span>
+            </button>
+          </div>
         </nav>
 
         {/* Rodapé da Sidebar */}
         <div className="p-3 border-t border-[#372B69] text-[10px] text-[#DAD2C4] space-y-1">
-          <p>Painel de Controle • Casa 6</p>
+          <p>Casa 6 &bull; Plataforma Oficial</p>
           <button
             onClick={onNavigateHome}
-            className="text-[#FFB63F] hover:underline flex items-center gap-1 cursor-pointer"
+            className="text-[#F0B55E] hover:underline flex items-center gap-1 cursor-pointer"
           >
             <span>Ver Website Público</span>
             <ExternalLink className="h-3 w-3" />
@@ -494,655 +525,73 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
       </aside>
 
       {/* ÁREA DE CONTEÚDO PRINCIPAL DO PAINEL */}
-      <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-        {/* CABEÇALHO DO MÓDULO */}
-        <header className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DAD2C4] pb-4">
-          <div>
-            <h2 className="font-heading text-2xl font-bold text-[#22205A]">
-              {currentTab === 'dashboard' && 'Dashboard Operacional'}
-              {currentTab === 'leads' && 'Gestão de Leads do Funil'}
-              {currentTab === 'usuarios' && 'Acessos & Administradores do Painel'}
-              {currentTab === 'atendimentos' && 'Catálogo de Atendimentos'}
-              {currentTab === 'patota' && 'Patota Astral — Gestão Recorrente'}
-              {currentTab === 'vivencias' && 'Vivências e Imersões'}
-              {currentTab === 'palestras' && 'Palestras e Eventos'}
-              {currentTab === 'blog' && 'Caderno Astral (Editorial)'}
-              {currentTab === 'loja' && 'Loja e Publicações'}
-              {currentTab === 'depoimentos' && 'Depoimentos de Clientes'}
-              {currentTab === 'configuracoes' && 'Configurações Oficiais'}
-              {currentTab === 'seo' && 'SEO, GEO e Indexação'}
-            </h2>
-            <p className="text-xs text-[#534D6B]">
-              Ambiente restrito da Casa 6 com isolamento de PII e segurança RBAC.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#372B69]/15 text-[#372B69] px-3 py-1 text-xs font-bold border border-[#372B69]/20">
-              <Shield className="h-3.5 w-3.5 text-[#FFB63F]" />
-              <span>
-                Usuário Conectado: <strong>{currentUser.displayName}</strong> (
-                {currentUser.role === 'master' ? 'Mestre' : currentUser.role === 'admin' ? 'Administrador' : 'Operador'}
-                )
-              </span>
-            </span>
-          </div>
-        </header>
-
-        {/* FEEDBACK DE AÇÕES */}
-        {userFeedbackMessage && (
-          <div
-            className={`mb-6 p-4 rounded-xl border flex items-center justify-between gap-3 text-xs font-medium animate-in fade-in ${
-              userFeedbackMessage.type === 'success'
-                ? 'bg-green-50 border-green-200 text-green-800'
-                : 'bg-red-50 border-red-200 text-red-800'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              {userFeedbackMessage.type === 'success' ? (
-                <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
-              ) : (
-                <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
-              )}
-              <span>{userFeedbackMessage.text}</span>
-            </div>
+      <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto">
+        
+        {/* BARRA DE NAVEGAÇÃO SUPERIOR / BREADCRUMBS */}
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#372B69] pb-4">
+          <div className="flex items-center gap-2 text-xs text-[#DAD2C4]">
             <button
-              onClick={() => setUserFeedbackMessage(null)}
-              className="text-gray-400 hover:text-gray-600 cursor-pointer"
+              onClick={handleBackToHub}
+              className="text-[#F0B55E] hover:underline font-bold flex items-center gap-1 cursor-pointer"
             >
-              <X className="h-4 w-4" />
+              <span>Hub Principal</span>
             </button>
+
+            {activeItem && (
+              <>
+                <ChevronRight className="h-3.5 w-3.5 text-[#DAD2C4]/50" />
+                <span className="uppercase text-[11px] font-bold text-white tracking-wider">
+                  {activeSection} &bull; {activeItem}
+                </span>
+              </>
+            )}
           </div>
-        )}
+
+          {activeItem && (
+            <button
+              onClick={handleBackToHub}
+              className="py-1.5 px-3 rounded-lg bg-[#2B2566] hover:bg-[#372B69] text-[#F0B55E] text-xs font-bold flex items-center gap-1.5 self-start sm:self-auto transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>Voltar ao Hub</span>
+            </button>
+          )}
+        </div>
 
         {/* =========================================================================
-            ABA: ACESSOS & ADMINISTRADORES (RBAC)
+            ROTEAMENTO INTERNO DOS MÓDULOS
             ========================================================================= */}
-        {currentTab === 'usuarios' && (
-          <div className="space-y-6">
-            {/* Topo com Descrição e Botão Adicionar Usuário */}
-            <div className="rounded-xl bg-[#FCFAF7] p-6 border border-[#DAD2C4] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <h3 className="font-heading text-lg font-bold text-[#22205A] flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-[#FFB63F]" />
-                  <span>Acessos Cadastrados no Banco de Dados (Coleção: &apos;admin_users&apos;)</span>
-                </h3>
-                <p className="text-xs text-[#534D6B] max-w-2xl leading-relaxed">
-                  Gerenciamento de permissões do painel. O usuário <strong>Suporte</strong> é o mestre inalterável.
-                  A administradora <strong>Bianca</strong> possui permissão para incluir, alterar e remover outros membros.
-                  O operador <strong>Caio</strong> possui acesso operacional irrestrito e permissão para alterar seu próprio nome e senha.
-                </p>
-              </div>
-
-              {/* Botão Novo Administrador (Oculto para Caio) */}
-              {isAdminUser && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setNewUserNameInput('');
-                    setNewUserPasswordInput('');
-                    setNewUserRoleInput('operador');
-                    setIsCreateModalOpen(true);
-                  }}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#2B2566] hover:bg-[#1E1B4B] text-[#F0B55E] px-5 py-2.5 text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer shrink-0"
-                >
-                  <UserPlus className="h-4 w-4" />
-                  <span>Novo Acesso</span>
-                </button>
-              )}
-            </div>
-
-            {/* Tabela de Usuários Cadastrados */}
-            <div className="rounded-xl bg-[#FCFAF7] border border-[#DAD2C4] shadow-xs overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs text-[#211D35]">
-                  <thead className="bg-[#ECE6DA] text-[#22205A] uppercase text-[10px] tracking-wider font-bold border-b border-[#DAD2C4]">
-                    <tr>
-                      <th className="px-5 py-3.5">Nome / Login</th>
-                      <th className="px-5 py-3.5">Nível de Acesso</th>
-                      <th className="px-5 py-3.5">Status de Proteção</th>
-                      <th className="px-5 py-3.5">Data de Cadastro</th>
-                      <th className="px-5 py-3.5 text-right">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#DAD2C4]">
-                    {adminUsers.map((user) => {
-                      const isSuporte = user.isProtected || user.id === 'suporte' || user.username.toLowerCase() === 'suporte';
-                      const isSelf =
-                        currentUser.id === user.id ||
-                        currentUser.displayName.toLowerCase() === user.username.toLowerCase();
-
-                      const canEditThisUser =
-                        !isSuporte && (isAdminUser || (isOperadorUser && isSelf));
-                      const canDeleteThisUser =
-                        !isSuporte && isAdminUser && !isSelf;
-
-                      return (
-                        <tr key={user.id} className="hover:bg-white/60 transition-colors">
-                          <td className="px-5 py-4 font-bold text-[#22205A] flex items-center gap-2">
-                            <span className="h-7 w-7 rounded-full bg-[#2B2566] text-[#F0B55E] flex items-center justify-center text-xs font-extrabold uppercase">
-                              {user.username.charAt(0)}
-                            </span>
-                            <span>{user.username}</span>
-                            {isSelf && (
-                              <span className="text-[10px] bg-green-100 text-green-800 px-2 py-0.5 rounded-full font-bold">
-                                Você
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-5 py-4">
-                            {user.role === 'master' ? (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 text-purple-900 px-2.5 py-0.5 text-[11px] font-bold border border-purple-200">
-                                ✦ Mestre
-                              </span>
-                            ) : user.role === 'admin' ? (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-[#FFB63F]/20 text-[#2B2566] px-2.5 py-0.5 text-[11px] font-bold border border-[#FFB63F]/50">
-                                Administrador
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 text-blue-800 px-2.5 py-0.5 text-[11px] font-semibold border border-blue-200">
-                                Operador Básico
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-5 py-4">
-                            {isSuporte ? (
-                              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
-                                <Lock className="h-3 w-3 text-amber-600" />
-                                <span>Mestre Intocável (Protegido)</span>
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1 text-[11px] text-green-700">
-                                <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
-                                <span>Ativo no Sistema</span>
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-5 py-4 text-[#7A7394]">
-                            {new Date(user.createdAt).toLocaleDateString('pt-BR')}
-                          </td>
-                          <td className="px-5 py-4 text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              {/* Botão de Edição */}
-                              {canEditThisUser ? (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setEditingTargetUser(user);
-                                    setEditUserNameInput(user.username);
-                                    setEditUserPasswordInput('');
-                                  }}
-                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-[#DAD2C4] hover:border-[#2B2566] text-[#22205A] text-xs font-semibold cursor-pointer shadow-2xs hover:bg-[#FAF8F5] transition-all"
-                                >
-                                  <Edit2 className="h-3.5 w-3.5 text-[#2B2566]" />
-                                  <span>{isSelf ? 'Alterar Meus Dados' : 'Alterar'}</span>
-                                </button>
-                              ) : isSuporte ? (
-                                <span className="text-[11px] text-gray-400 italic">
-                                  Bloqueado contra alterações
-                                </span>
-                              ) : null}
-
-                              {/* Botão de Exclusão (Apenas Bianca ou Suporte, e nunca a própria conta ou o Suporte) */}
-                              {canDeleteThisUser && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteUser(user)}
-                                  title={`Excluir ${user.username}`}
-                                  className="p-1.5 rounded-lg bg-white border border-red-200 hover:bg-red-50 text-red-600 hover:text-red-700 cursor-pointer transition-colors shadow-2xs"
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Aviso de Regras de Segurança */}
-            <div className="rounded-xl bg-[#ECE6DA]/60 p-4 border border-[#DAD2C4] text-xs text-[#534D6B] space-y-1">
-              <p className="font-bold text-[#22205A]">Regras de Acesso e Governança Ativas:</p>
-              <p>• <strong>Suporte:</strong> Mestre protegido de fábrica. Não pode ser renomeado, alterado ou removido sob nenhuma hipótese.</p>
-              <p>• <strong>Bianca:</strong> Administradora com plenos poderes para criar, renomear, redefinir senhas e excluir operadores e administradores.</p>
-              <p>• <strong>Caio:</strong> Operador básico com acesso integral aos dados de leads, atendimentos e catálogo, restrito de alterar cadastros alheios ou cadastrar novos acessos.</p>
-            </div>
-          </div>
-        )}
-
-        {/* MODAL: NOVO ADMINISTRADOR */}
-        {isCreateModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in">
-            <div className="w-full max-w-md rounded-2xl bg-white p-6 sm:p-8 shadow-2xl border border-[#DAD2C4] space-y-5">
-              <div className="flex items-center justify-between border-b border-[#DAD2C4] pb-3">
-                <h3 className="font-heading text-lg font-bold text-[#22205A] flex items-center gap-2">
-                  <UserPlus className="h-5 w-5 text-[#FFB63F]" />
-                  <span>Cadastrar Novo Administrador</span>
-                </h3>
-                <button
-                  type="button"
-                  onClick={() => setIsCreateModalOpen(false)}
-                  className="text-gray-400 hover:text-gray-600 cursor-pointer"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              <form onSubmit={handleCreateUser} className="space-y-4">
-                <div className="space-y-1">
-                  <label className="block text-xs font-bold text-[#22205A]">
-                    Nome de Acesso (Login) *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ex: Mariana, Roberto..."
-                    value={newUserNameInput}
-                    onChange={(e) => setNewUserNameInput(e.target.value)}
-                    className="w-full rounded-xl border border-[#DAD2C4] bg-[#FAF8F5] px-3.5 py-2.5 text-xs text-[#22205A] focus:border-[#F0B55E] focus:outline-none focus:bg-white"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="block text-xs font-bold text-[#22205A]">
-                    Senha *
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showNewUserPassword ? 'text' : 'password'}
-                      required
-                      placeholder="Senha do usuário"
-                      value={newUserPasswordInput}
-                      onChange={(e) => setNewUserPasswordInput(e.target.value)}
-                      className="w-full rounded-xl border border-[#DAD2C4] bg-[#FAF8F5] pl-3.5 pr-10 py-2.5 text-xs text-[#22205A] focus:border-[#F0B55E] focus:outline-none focus:bg-white"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowNewUserPassword(!showNewUserPassword)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 cursor-pointer"
-                    >
-                      {showNewUserPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="block text-xs font-bold text-[#22205A]">
-                    Nível de Acesso (Permissões) *
-                  </label>
-                  <select
-                    value={newUserRoleInput}
-                    onChange={(e) => setNewUserRoleInput(e.target.value as 'admin' | 'operador')}
-                    className="w-full rounded-xl border border-[#DAD2C4] bg-[#FAF8F5] px-3.5 py-2.5 text-xs text-[#22205A] focus:border-[#F0B55E] focus:outline-none focus:bg-white cursor-pointer"
-                  >
-                    <option value="operador">Operador Básico (Acessa tudo, não gerencia outros usuários)</option>
-                    <option value="admin">Administrador (Pode gerenciar outros acessos)</option>
-                  </select>
-                </div>
-
-                <div className="pt-3 border-t border-[#DAD2C4] flex items-center justify-end gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsCreateModalOpen(false)}
-                    className="px-4 py-2 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-100 cursor-pointer"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSavingUser}
-                    className="px-5 py-2 rounded-full bg-[#2B2566] hover:bg-[#1E1B4B] text-[#F0B55E] text-xs font-bold uppercase tracking-wider shadow cursor-pointer disabled:opacity-50"
-                  >
-                    {isSavingUser ? 'Salvando...' : 'Salvar no Banco de Dados'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* MODAL: ALTERAR NOME E SENHA */}
-        {editingTargetUser && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in">
-            <div className="w-full max-w-md rounded-2xl bg-white p-6 sm:p-8 shadow-2xl border border-[#DAD2C4] space-y-5">
-              <div className="flex items-center justify-between border-b border-[#DAD2C4] pb-3">
-                <h3 className="font-heading text-lg font-bold text-[#22205A] flex items-center gap-2">
-                  <Edit2 className="h-5 w-5 text-[#FFB63F]" />
-                  <span>Alterar Acesso: {editingTargetUser.username}</span>
-                </h3>
-                <button
-                  type="button"
-                  onClick={() => setEditingTargetUser(null)}
-                  className="text-gray-400 hover:text-gray-600 cursor-pointer"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              <form onSubmit={handleUpdateUser} className="space-y-4">
-                <div className="space-y-1">
-                  <label className="block text-xs font-bold text-[#22205A]">
-                    Nome de Acesso (Login) *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={editUserNameInput}
-                    onChange={(e) => setEditUserNameInput(e.target.value)}
-                    className="w-full rounded-xl border border-[#DAD2C4] bg-[#FAF8F5] px-3.5 py-2.5 text-xs text-[#22205A] focus:border-[#F0B55E] focus:outline-none focus:bg-white"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="block text-xs font-bold text-[#22205A]">
-                    Nova Senha (deixe em branco para manter a atual)
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showEditUserPassword ? 'text' : 'password'}
-                      placeholder="Digite a nova senha"
-                      value={editUserPasswordInput}
-                      onChange={(e) => setEditUserPasswordInput(e.target.value)}
-                      className="w-full rounded-xl border border-[#DAD2C4] bg-[#FAF8F5] pl-3.5 pr-10 py-2.5 text-xs text-[#22205A] focus:border-[#F0B55E] focus:outline-none focus:bg-white"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowEditUserPassword(!showEditUserPassword)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 cursor-pointer"
-                    >
-                      {showEditUserPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="pt-3 border-t border-[#DAD2C4] flex items-center justify-end gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setEditingTargetUser(null)}
-                    className="px-4 py-2 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-100 cursor-pointer"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSavingUser}
-                    className="px-5 py-2 rounded-full bg-[#2B2566] hover:bg-[#1E1B4B] text-[#F0B55E] text-xs font-bold uppercase tracking-wider shadow cursor-pointer disabled:opacity-50"
-                  >
-                    {isSavingUser ? 'Atualizando...' : 'Atualizar Dados'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* =========================================================================
-            ABA: DASHBOARD
-            ========================================================================= */}
-        {currentTab === 'dashboard' && (
-          <div className="space-y-6">
-            {/* Cards de Métricas Principais */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="rounded-xl bg-[#FCFAF7] p-5 border border-[#DAD2C4] shadow-xs">
-                <span className="text-xs text-[#7A7394] font-medium">Total de Leads</span>
-                <p className="font-heading text-3xl font-bold text-[#22205A] mt-1">{leads.length}</p>
-                <span className="text-[11px] text-[#483474] font-semibold">Capturados no funil oficial</span>
-              </div>
-              <div className="rounded-xl bg-[#FCFAF7] p-5 border border-[#DAD2C4] shadow-xs">
-                <span className="text-xs text-[#7A7394] font-medium">Leads Novos (Aguardando)</span>
-                <p className="font-heading text-3xl font-bold text-[#6F4D84] mt-1">
-                  {leads.filter((l) => l.status === 'new').length}
-                </p>
-                <span className="text-[11px] text-[#7A7394]">Prontos para contato no WhatsApp</span>
-              </div>
-              <div className="rounded-xl bg-[#FCFAF7] p-5 border border-[#DAD2C4] shadow-xs">
-                <span className="text-xs text-[#7A7394] font-medium">Consultas Agendadas</span>
-                <p className="font-heading text-3xl font-bold text-[#22205A] mt-1">
-                  {leads.filter((l) => l.status === 'scheduled').length}
-                </p>
-                <span className="text-[11px] text-[#372B69]">Status em andamento</span>
-              </div>
-              <div className="rounded-xl bg-[#FCFAF7] p-5 border border-[#DAD2C4] shadow-xs">
-                <span className="text-xs text-[#7A7394] font-medium">Acessos Cadastrados</span>
-                <p className="font-heading text-3xl font-bold text-[#22205A] mt-1">
-                  {adminUsers.length}
-                </p>
-                <span className="text-[11px] text-[#7A7394]">Suporte, Bianca, Caio</span>
-              </div>
-            </div>
-
-            {/* Status de Congelamento da Etapa 1 */}
-            <div className="rounded-xl bg-[#FCFAF7] p-6 border border-[#DAD2C4] shadow-xs space-y-4">
-              <h3 className="font-heading text-lg font-bold text-[#22205A] flex items-center gap-2">
-                <Database className="h-5 w-5 text-[#FFB63F]" />
-                <span>Status de Fundação Técnica da Etapa 1 (Transparência Absoluta)</span>
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                <div className="rounded-lg bg-[#F3EEE5] p-4 border border-[#DAD2C4] space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-[#22205A]">Arquitetura de Leads & Funil</span>
-                    <span className="rounded bg-[#372B69]/15 text-[#372B69] px-2 py-0.5 font-bold">REAL / TESTADO</span>
-                  </div>
-                  <p className="text-[#534D6B]">
-                    Validação em 5 campos obrigatórios, captura de UTMs, redirecionamento WhatsApp automático formatado.
-                  </p>
-                </div>
-
-                <div className="rounded-lg bg-[#F3EEE5] p-4 border border-[#DAD2C4] space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-[#22205A]">Autenticação & RBAC de Usuários</span>
-                    <span className="rounded bg-green-100 text-green-800 px-2 py-0.5 font-bold">REAL / PERSISTIDO</span>
-                  </div>
-                  <p className="text-[#534D6B]">
-                    Coleção &apos;admin_users&apos; ativa com perfis Suporte (Mestre), Bianca (Admin) e Caio (Operador).
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* =========================================================================
-            ABA: LEADS DO FUNIL
-            ========================================================================= */}
-        {currentTab === 'leads' && (
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-[#7A7394]" />
-                <span className="text-xs font-semibold text-[#534D6B]">Filtrar por Status:</span>
-                <select
-                  value={leadStatusFilter}
-                  onChange={(e) => setLeadStatusFilter(e.target.value)}
-                  className="rounded-lg border border-[#DAD2C4] bg-[#FCFAF7] px-3 py-1.5 text-xs text-[#22205A] focus:outline-none"
-                >
-                  <option value="all">Todos ({leads.length})</option>
-                  <option value="new">Novos</option>
-                  <option value="contacted">Em Contato</option>
-                  <option value="scheduled">Agendados</option>
-                  <option value="completed">Concluídos</option>
-                  <option value="lost">Perdidos</option>
-                </select>
-              </div>
-
-              <button
-                onClick={refreshLeads}
-                disabled={isLoadingLeads}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[#DAD2C4] bg-[#FCFAF7] px-3 py-1.5 text-xs font-semibold text-[#22205A] hover:bg-[#DAD2C4] transition-colors"
-              >
-                <span>{isLoadingLeads ? 'Atualizando...' : 'Atualizar Lista'}</span>
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Tabela de Leads */}
-              <div className="lg:col-span-8 rounded-xl bg-[#FCFAF7] border border-[#DAD2C4] shadow-xs overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs text-[#211D35]">
-                    <thead className="bg-[#ECE6DA] text-[#22205A] uppercase text-[10px] tracking-wider font-bold border-b border-[#DAD2C4]">
-                      <tr>
-                        <th className="px-4 py-3">Nome Completo</th>
-                        <th className="px-4 py-3">Serviço de Interesse</th>
-                        <th className="px-4 py-3">Status</th>
-                        <th className="px-4 py-3">Data</th>
-                        <th className="px-4 py-3 text-right">Ação</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#DAD2C4]">
-                      {filteredLeads.length === 0 ? (
-                        <tr>
-                          <td colSpan={5} className="px-4 py-8 text-center text-xs text-[#7A7394]">
-                            Nenhum lead encontrado neste filtro.
-                          </td>
-                        </tr>
-                      ) : (
-                        filteredLeads.map((lead) => {
-                          const isSelected = selectedLead?.id === lead.id;
-                          return (
-                            <tr
-                              key={lead.id}
-                              onClick={() => setSelectedLead(lead)}
-                              className={`cursor-pointer transition-colors ${
-                                isSelected ? 'bg-[#FFB63F]/20 font-semibold' : 'hover:bg-white/60'
-                              }`}
-                            >
-                              <td className="px-4 py-3 text-[#22205A] font-bold">
-                                {lead.fullName}
-                              </td>
-                              <td className="px-4 py-3 truncate max-w-[160px]">
-                                {lead.serviceName || lead.serviceId}
-                              </td>
-                              <td className="px-4 py-3">
-                                <span className="rounded px-2 py-0.5 text-[10px] font-bold uppercase bg-[#DAD2C4] text-[#22205A]">
-                                  {lead.status}
-                                </span>
-                              </td>
-                              <td className="px-4 py-3 text-[#7A7394]">
-                                {new Date(lead.createdAt).toLocaleDateString('pt-BR')}
-                              </td>
-                              <td className="px-4 py-3 text-right">
-                                <ChevronRight className="inline-block h-4 w-4 text-[#7A7394]" />
-                              </td>
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* Detalhes do Lead Selecionado */}
-              <div className="lg:col-span-4 rounded-xl bg-[#FCFAF7] border border-[#DAD2C4] p-5 shadow-xs space-y-4">
-                <h3 className="font-heading text-sm font-bold text-[#22205A] border-b border-[#DAD2C4] pb-2">
-                  Ficha do Lead Selecionado
-                </h3>
-                {selectedLead ? (
-                  <div className="space-y-3 text-xs">
-                    <div>
-                      <span className="text-[#7A7394] block text-[10px] uppercase font-bold">Nome:</span>
-                      <p className="font-bold text-[#22205A] text-sm">{selectedLead.fullName}</p>
-                    </div>
-
-                    <div>
-                      <span className="text-[#7A7394] block text-[10px] uppercase font-bold">E-mail:</span>
-                      <a href={`mailto:${selectedLead.email}`} className="text-[#2B2566] hover:underline font-medium">
-                        {selectedLead.email}
-                      </a>
-                    </div>
-
-                    <div>
-                      <span className="text-[#7A7394] block text-[10px] uppercase font-bold">WhatsApp:</span>
-                      <a
-                        href={`https://wa.me/${selectedLead.whatsapp.replace(/\D/g, '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-green-700 font-bold hover:underline"
-                      >
-                        {selectedLead.whatsapp} ↗
-                      </a>
-                    </div>
-
-                    <div className="border-t border-[#DAD2C4] pt-2 space-y-1 text-[11px] text-[#534D6B]">
-                      <p>
-                        <strong className="text-[#22205A]">Serviço: </strong>
-                        {selectedLead.serviceName || selectedLead.serviceId}
-                      </p>
-                      <p>
-                        <strong className="text-[#22205A]">Dispositivo: </strong>
-                        {selectedLead.deviceCategory}
-                      </p>
-                      <p>
-                        <strong className="text-[#22205A]">Página de Origem: </strong>
-                        {selectedLead.sourcePage}
-                      </p>
-                      {selectedLead.utmSource && (
-                        <p>
-                          <strong className="text-[#22205A]">UTM Source: </strong>
-                          {selectedLead.utmSource}
-                        </p>
-                      )}
-                      <p>
-                        <strong className="text-[#22205A]">Data do Pedido: </strong>
-                        {new Date(selectedLead.createdAt).toLocaleString('pt-BR')}
-                      </p>
-                    </div>
-
-                    <div className="border-t border-[#DAD2C4] pt-3 space-y-2">
-                      <label className="block font-semibold text-[#22205A]">
-                        Atualizar Status Operacional:
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {(['new', 'contacted', 'scheduled', 'completed', 'lost'] as LeadStatus[]).map((st) => (
-                          <button
-                            key={st}
-                            onClick={() => handleStatusChange(selectedLead.id, st)}
-                            className={`px-2 py-1.5 rounded text-[11px] font-semibold transition-colors border cursor-pointer ${
-                              selectedLead.status === st
-                                ? 'bg-[#22205A] text-[#FFFFFF] border-[#22205A]'
-                                : 'bg-[#F3EEE5] text-[#534D6B] border-[#DAD2C4] hover:bg-[#DAD2C4]'
-                            }`}
-                          >
-                            {st}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-center text-xs text-[#7A7394] py-8">
-                    Selecione um lead na tabela ao lado para visualizar os detalhes completos.
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* DEMAIS MÓDULOS ARQUITETURAIS PREPARADOS */}
-        {['atendimentos', 'patota', 'vivencias', 'palestras', 'blog', 'loja', 'depoimentos', 'configuracoes', 'seo'].includes(currentTab) && (
-          <div className="rounded-xl bg-[#FCFAF7] p-8 border border-[#DAD2C4] shadow-xs space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="rounded bg-[#483474]/15 text-[#483474] px-2.5 py-1 text-xs font-bold uppercase border border-[#483474]/20">
-                Módulo Arquitetado (Etapa 1 — Preparado)
-              </span>
-            </div>
-            <h3 className="font-heading text-xl font-bold text-[#22205A]">
-              Módulo: {currentTab.toUpperCase()}
-            </h3>
-            <p className="text-xs sm:text-sm text-[#534D6B] leading-relaxed max-w-2xl">
-              A fundação de dados, schemas no Firestore blueprint, regras de segurança e modelos TypeScript para o módulo{' '}
-              <strong>{currentTab}</strong> já foram formalmente criados e integrados ao painel.
-            </p>
-            <div className="rounded-lg bg-[#F3EEE5] p-4 border border-[#DAD2C4] text-xs text-[#534D6B] space-y-1">
-              <p>• Coleção correspondente no Firestore: <strong>/{currentTab}</strong></p>
-              <p>• Permissão: <strong>Acessível por todos os operadores ({currentUser.displayName})</strong></p>
-            </div>
-          </div>
+        {activeItem === null ? (
+          // VISÃO 1: HUB VISUAL COMPLETO COM AS 4 SEÇÕES E CARTÕES
+          <AdminHubGrid
+            onSelectItem={handleSelectHubItem}
+            crmCount={contacts.length}
+            agendaCount={appointments.length}
+          />
+        ) : activeItem === 'calculadora' ? (
+          // OPERAÇÕES: CALCULADORA ASTRAL
+          <OperationsCalculator />
+        ) : activeItem === 'agenda' ? (
+          // OPERAÇÕES: AGENDA ATENDIMENTOS
+          <OperationsAgenda />
+        ) : activeItem === 'cadastros' ? (
+          // OPERAÇÕES: CADASTROS (CRM)
+          <OperationsCRM />
+        ) : activeItem.startsWith('serv_') ? (
+          // SERVIÇOS: GERENCIADOR DE CATÁLOGO & FRETE
+          <ServicesManager initialSubTab={activeItem as ServiceSubTab} />
+        ) : activeItem.startsWith('fluxo_') ? (
+          // FLUXOS: WHATSAPP, AUTOMAÇÕES, BLOG, MERCADO PAGO, PIXELS, ACESSOS
+          <FlowsManager initialSubTab={activeItem as FlowSubTab} currentUser={currentUser} />
+        ) : activeItem.startsWith('pag_') ? (
+          // PÁGINAS: CMS DE 9 PÁGINAS COM RESTAURAÇÃO
+          <PagesManager initialSlug={activeItem as PageSlug} />
+        ) : (
+          <AdminHubGrid
+            onSelectItem={handleSelectHubItem}
+            crmCount={contacts.length}
+            agendaCount={appointments.length}
+          />
         )}
       </main>
     </div>
