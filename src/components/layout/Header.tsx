@@ -30,11 +30,12 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate, onOpenB
   }, [mobileMenuOpen]);
 
   // Ordem oficial exata em caixa alta conforme instrução:
-  // SOBRE -> ATENDIMENTOS -> ENCONTROS -> BÚSSOLA (com tag NEW) -> PATOTA -> LEITURAS -> LOJINHA
+  // SOBRE -> ATENDIMENTOS -> PALESTRAS -> PARCERIAS -> BÚSSOLA (com tag NEW) -> PATOTA -> LEITURAS -> LOJINHA
   const navLinks = [
     { label: 'SOBRE', path: '/sobre' },
     { label: 'ATENDIMENTOS', path: '/atendimentos' },
-    { label: 'ENCONTROS', path: '/encontros' },
+    { label: 'PALESTRAS', path: '/palestras' },
+    { label: 'PARCERIAS', path: '/parcerias' },
     { label: 'BÚSSOLA', path: '/bussola', hasNewBadge: true },
     { label: 'PATOTA', path: '/patota' },
     { label: 'LEITURAS', path: '/leituras' },
@@ -50,7 +51,8 @@ export const Header: React.FC<HeaderProps> = ({ currentPath, onNavigate, onOpenB
     if (path === '/inicio') return currentPath === '/inicio' || currentPath === '/';
     if (path === '/sobre') return currentPath === '/sobre';
     if (path === '/atendimentos') return currentPath === '/atendimentos' || currentPath.startsWith('/atendimentos/');
-    if (path === '/encontros') return currentPath === '/encontros' || currentPath === '/palestras';
+    if (path === '/palestras' || path === '/encontros') return currentPath === '/palestras' || currentPath === '/encontros';
+    if (path === '/parcerias') return currentPath === '/parcerias' || currentPath === '/Parcerias';
     if (path === '/bussola') return currentPath === '/bussola' || currentPath === '/bussula-guia';
     if (path === '/patota') return currentPath === '/patota' || currentPath === '/patota-astral';
     if (path === '/leituras') return currentPath === '/leituras' || currentPath === '/blog' || currentPath.startsWith('/leituras/') || currentPath.startsWith('/blog/');

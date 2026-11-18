@@ -83,13 +83,23 @@ export const APP_ROUTES: Record<string, RouteMeta> = {
   },
   palestras: {
     path: '/palestras',
-    title: 'Palestras & Workshops | Bianca Tofoli — Casa 6',
-    description: 'WAAP, RESPIRAR (a) CALMA, Autoconhecimento e temas personalizados para eventos corporativos e coletivos.',
+    title: 'Palestras Corporativas & Workshops | Bianca Tofoli — Casa 6',
+    description: 'Palestras e workshops corporativos com foco em saúde mental, inteligência emocional e conformidade com a NR-1. Experiências conduzidas por Bianca Tofoli.',
     canonicalUrl: 'https://casa6.com.br/palestras',
-    section: 'Palestras',
+    section: 'Corporativo',
     isAdmin: false,
     showInNav: true,
     navLabel: 'palestras'
+  },
+  parcerias: {
+    path: '/parcerias',
+    title: 'Parcerias & Permutas Estratégicas | Casa 6 — Bianca Tofoli',
+    description: 'Conecte sua marca a um público consciente e engajado. Oportunidades de publicidade, permuta, divulgação e co-criação com Bianca Tofoli.',
+    canonicalUrl: 'https://casa6.com.br/parcerias',
+    section: 'Comercial',
+    isAdmin: false,
+    showInNav: true,
+    navLabel: 'parcerias'
   },
   leituras: {
     path: '/leituras',

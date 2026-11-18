@@ -111,6 +111,31 @@ export interface LectureItem {
   format: 'presencial' | 'online' | 'corporativo';
 }
 
+export interface PalestraItem {
+  id: string;
+  empresa: string;
+  logoUrl?: string;
+  fotos: string[];
+  duracao: string;
+  descricao: string;
+  conteudo: string[];
+  tags: string[];
+  destaque?: boolean;
+  createdAt?: string;
+}
+
+export interface ParceriaItem {
+  id: string;
+  empresa: string;
+  logoUrl?: string;
+  fotos: string[];
+  tipo: 'Publicidade' | 'Permuta' | 'Divulgação' | 'Personalizado';
+  descricao: string;
+  oQueOferece: string;
+  destaque?: boolean;
+  createdAt?: string;
+}
+
 export interface BlogPost {
   id: string;
   slug: string;

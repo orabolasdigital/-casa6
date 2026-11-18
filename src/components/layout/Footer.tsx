@@ -193,50 +193,50 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               </ul>
             </div>
 
-            {/* Coluna 2: Encontros */}
+            {/* Coluna 2: Corporativo & Parcerias */}
             <div className="space-y-3">
               <h3 className="font-bold text-xs uppercase tracking-wider text-[#F0B55E] border-b border-[#F0B55E]/20 pb-2">
-                Encontros
+                Corporativo
               </h3>
               <ul className="space-y-2.5 text-xs text-[#E6E3F1]/85">
                 <li>
                   <button
                     type="button"
-                    onClick={() => onNavigate('/encontros')}
+                    onClick={() => onNavigate('/palestras')}
                     className="hover:text-[#F0B55E] transition-colors text-left uppercase tracking-wide cursor-pointer flex items-center gap-1.5 group"
                   >
                     <span className="text-[#F0B55E]/50 group-hover:text-[#F0B55E] text-[10px] transition-colors">✦</span>
-                    <span>WAAP</span>
+                    <span>Palestras & Workshops</span>
                   </button>
                 </li>
                 <li>
                   <button
                     type="button"
-                    onClick={() => onNavigate('/encontros')}
+                    onClick={() => onNavigate('/palestras')}
                     className="hover:text-[#F0B55E] transition-colors text-left uppercase tracking-wide cursor-pointer flex items-center gap-1.5 group"
                   >
                     <span className="text-[#F0B55E]/50 group-hover:text-[#F0B55E] text-[10px] transition-colors">✦</span>
-                    <span>Respirar e (A)calmar</span>
+                    <span>Conformidade NR-1</span>
                   </button>
                 </li>
                 <li>
                   <button
                     type="button"
-                    onClick={() => onNavigate('/encontros')}
+                    onClick={() => onNavigate('/parcerias')}
                     className="hover:text-[#F0B55E] transition-colors text-left uppercase tracking-wide cursor-pointer flex items-center gap-1.5 group"
                   >
                     <span className="text-[#F0B55E]/50 group-hover:text-[#F0B55E] text-[10px] transition-colors">✦</span>
-                    <span>Autoconhecimento</span>
+                    <span>Parcerias Comerciais</span>
                   </button>
                 </li>
                 <li>
                   <button
                     type="button"
-                    onClick={() => onNavigate('/encontros')}
+                    onClick={() => onNavigate('/parcerias')}
                     className="hover:text-[#F0B55E] transition-colors text-left uppercase tracking-wide cursor-pointer flex items-center gap-1.5 group"
                   >
                     <span className="text-[#F0B55E]/50 group-hover:text-[#F0B55E] text-[10px] transition-colors">✦</span>
-                    <span>Vamos Montar</span>
+                    <span>Permutas & Co-branding</span>
                   </button>
                 </li>
               </ul>

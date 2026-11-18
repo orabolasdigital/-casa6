@@ -24,6 +24,7 @@ import { AtendimentosView } from './views/public/AtendimentosView';
 import { PatotaAstralView } from './views/public/PatotaAstralView';
 import { VivenciasView } from './views/public/VivenciasView';
 import { PalestrasView } from './views/public/PalestrasView';
+import { ParceriasView } from './views/public/ParceriasView';
 import { BlogView } from './views/public/BlogView';
 import { LojaView } from './views/public/LojaView';
 import { LegalView } from './views/public/LegalViews';
@@ -97,6 +98,7 @@ export default function App() {
     if (currentPath === '/vivencias') return APP_ROUTES.vivencias;
     if (currentPath.startsWith('/vivencias/')) return APP_ROUTES.vivenciaDetalhe;
     if (currentPath === '/palestras' || currentPath === '/encontros') return APP_ROUTES.palestras;
+    if (currentPath === '/parcerias' || currentPath === '/Parcerias') return APP_ROUTES.parcerias;
     if (currentPath === '/leituras' || currentPath === '/blog') return APP_ROUTES.leituras;
     if (currentPath.startsWith('/leituras/') || currentPath.startsWith('/blog/')) return APP_ROUTES.blogDetalhe;
     if (currentPath === '/lojinha' || currentPath === '/loja') return APP_ROUTES.lojinha;
@@ -146,6 +148,8 @@ export default function App() {
           <VivenciasView onOpenBooking={() => handleOpenBooking()} />
         ) : currentPath === '/palestras' || currentPath === '/encontros' ? (
           <PalestrasView onOpenBooking={() => handleOpenBooking()} />
+        ) : currentPath === '/parcerias' || currentPath === '/Parcerias' ? (
+          <ParceriasView onOpenBooking={() => handleOpenBooking()} />
         ) : currentPath === '/leituras' || currentPath === '/blog' || currentPath.startsWith('/leituras/') || currentPath.startsWith('/blog/') ? (
           <BlogView
             onNavigate={navigateTo}
