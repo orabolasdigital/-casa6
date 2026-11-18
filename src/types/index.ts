@@ -6,13 +6,23 @@
 
 export type TechnicalStatus = 'REAL' | 'CONFIGURADO' | 'TESTADO' | 'PREPARADO' | 'MOCK' | 'PENDENTE';
 
-export type UserRole = 'admin' | 'editor';
+export type UserRole = 'master' | 'admin' | 'operador' | 'editor';
 
 export interface UserProfile {
   id: string;
   email: string;
   displayName: string;
   role: UserRole;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminUser {
+  id: string;
+  username: string;
+  password: string;
+  role: 'master' | 'admin' | 'operador';
+  isProtected?: boolean;
   createdAt: string;
   updatedAt: string;
 }

@@ -5,7 +5,7 @@
  */
 
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut as fbSignOut } from 'firebase/auth';
-import { UserProfile, UserRole } from '../types';
+import { UserProfile, UserRole, AdminUser } from '../types';
 import { auth, isFirebaseReady } from './firebase';
 
 const LOCAL_STORAGE_AUTH_KEY = 'casa6_admin_session';
@@ -166,6 +166,34 @@ export function loginDevSession(role: UserRole = 'admin', email = 'bianca@casa6.
 
   notifySubscribers();
   return devUser;
+}
+
+/**
+ * Autenticação Oficial por Usuário do Painel (Suporte, Bianca, Caio)
+ */
+export function loginWithAdminAccount(adminUser: AdminUser): UserProfile {
+  const user: UserProfile = {
+    id: adminUser.id,
+    email: `${adminUser.username.toLowerCase()}@casa6.com.br`,
+    displayName: adminUser.username,
+    role: adminUser.role,
+    createdAt: adminUser.createdAt,
+    updatedAt: adminUser.updatedAt
+  };
+
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(LOCAL_STORAGE_AUTH_KEY, JSON.stringify(user));
+  }
+
+  currentState = {
+    isAuthenticated: true,
+    user,
+    isLoading: false,
+    isFirebaseActive: isFirebaseReady
+  };
+
+  notifySubscribers();
+  return user;
 }
 
 /**
