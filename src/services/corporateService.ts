@@ -226,3 +226,119 @@ export async function getParceriasPortfolio(): Promise<ParceriaItem[]> {
 
   return INITIAL_PARCERIAS;
 }
+
+export async function savePalestraItem(item: Partial<PalestraItem>): Promise<PalestraItem> {
+  const currentList = await getPalestrasPortfolio();
+  const id = item.id || `palestra_${Date.now()}`;
+  const fullItem: PalestraItem = {
+    id,
+    empresa: item.empresa || 'Nova Empresa',
+    logoUrl: item.logoUrl || 'https://static.wixstatic.com/media/02c8e0_9faeeab290534345a6aaa65fddb10d0f~mv2.png',
+    fotos: item.fotos && item.fotos.length > 0 ? item.fotos : ['https://static.wixstatic.com/media/02c8e0_fe08bedd21184bf390fb985cae10f64f~mv2.jpeg'],
+    duracao: item.duracao || '1h30',
+    descricao: item.descricao || 'Descrição da palestra corporativa.',
+    conteudo: item.conteudo || ['Tópico 1', 'Tópico 2'],
+    tags: item.tags || ['Bem-Estar', 'NR-1'],
+    destaque: item.destaque ?? true,
+    createdAt: item.createdAt || new Date().toISOString()
+  };
+
+  const idx = currentList.findIndex((p) => p.id === id);
+  let updated: PalestraItem[];
+  if (idx >= 0) {
+    updated = [...currentList];
+    updated[idx] = fullItem;
+  } else {
+    updated = [fullItem, ...currentList];
+  }
+
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(LOCAL_STORAGE_PALESTRAS_KEY, JSON.stringify(updated));
+  }
+
+  if (isFirebaseReady && db) {
+    try {
+      await setDoc(doc(db, 'palestras_portfolio', id), fullItem, { merge: true });
+    } catch (err) {
+      console.warn('[CorporateService] Erro ao salvar palestra no Firestore:', err);
+    }
+  }
+
+  return fullItem;
+}
+
+export async function deletePalestraItem(id: string): Promise<void> {
+  const currentList = await getPalestrasPortfolio();
+  const filtered = currentList.filter((p) => p.id !== id);
+
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(LOCAL_STORAGE_PALESTRAS_KEY, JSON.stringify(filtered));
+  }
+
+  if (isFirebaseReady && db) {
+    try {
+      const { deleteDoc } = await import('firebase/firestore');
+      await deleteDoc(doc(db, 'palestras_portfolio', id));
+    } catch (err) {
+      console.warn('[CorporateService] Erro ao excluir palestra do Firestore:', err);
+    }
+  }
+}
+
+export async function saveParceriaItem(item: Partial<ParceriaItem>): Promise<ParceriaItem> {
+  const currentList = await getParceriasPortfolio();
+  const id = item.id || `parceria_${Date.now()}`;
+  const fullItem: ParceriaItem = {
+    id,
+    empresa: item.empresa || 'Nova Empresa / Parceiro',
+    logoUrl: item.logoUrl || 'https://static.wixstatic.com/media/02c8e0_8af738fb419e424887681c32ca6a68a4~mv2.png',
+    fotos: item.fotos && item.fotos.length > 0 ? item.fotos : ['https://static.wixstatic.com/media/02c8e0_ba9bbb820abf45ceaf08609f65cdd001~mv2.jpeg'],
+    tipo: item.tipo || 'Permuta',
+    descricao: item.descricao || 'Descrição da parceria estratégica.',
+    oQueOferece: item.oQueOferece || 'O que a parceria oferece para os clientes e comunidade Casa 6.',
+    destaque: item.destaque ?? true,
+    createdAt: item.createdAt || new Date().toISOString()
+  };
+
+  const idx = currentList.findIndex((p) => p.id === id);
+  let updated: ParceriaItem[];
+  if (idx >= 0) {
+    updated = [...currentList];
+    updated[idx] = fullItem;
+  } else {
+    updated = [fullItem, ...currentList];
+  }
+
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(LOCAL_STORAGE_PARCERIAS_KEY, JSON.stringify(updated));
+  }
+
+  if (isFirebaseReady && db) {
+    try {
+      await setDoc(doc(db, 'parcerias_portfolio', id), fullItem, { merge: true });
+    } catch (err) {
+      console.warn('[CorporateService] Erro ao salvar parceria no Firestore:', err);
+    }
+  }
+
+  return fullItem;
+}
+
+export async function deleteParceriaItem(id: string): Promise<void> {
+  const currentList = await getParceriasPortfolio();
+  const filtered = currentList.filter((p) => p.id !== id);
+
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(LOCAL_STORAGE_PARCERIAS_KEY, JSON.stringify(filtered));
+  }
+
+  if (isFirebaseReady && db) {
+    try {
+      const { deleteDoc } = await import('firebase/firestore');
+      await deleteDoc(doc(db, 'parcerias_portfolio', id));
+    } catch (err) {
+      console.warn('[CorporateService] Erro ao excluir parceria do Firestore:', err);
+    }
+  }
+}
+

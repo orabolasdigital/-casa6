@@ -3,21 +3,17 @@
  * Casa 6 — Bianca Tofoli
  * Painel de Controles (/painel)
  * 
- * Arquitetura em 4 Seções Centrais (Baseada na especificação do projeto e referência visual):
- * 1. OPERAÇÕES: Calculadora Astral (Bússola Pessoal), Agenda Atendimentos (Google Calendar Sync) & Cadastros (CRM Master).
- * 2. SERVIÇOS: Atendimentos, Palestras, Parcerias, Patota, Bússola, Lojinha (com gestão de frete fixo/km/estado).
- * 3. FLUXOS: Mensagens WhatsApp com variáveis, Automações de e-mail/alertas, Blog Caderno Astral, Mercado Pago, Pixels & Acessos RBAC.
- * 4. PÁGINAS: CMS completo de 9 páginas com restauração instantânea aos padrões originais.
+ * Navegação por Menu Lateral Suspenso (Accordion) em 4 Seções:
+ * 1. OPERAÇÕES: Calculadora, Agenda, Cadastros
+ * 2. SERVIÇOS: Atendimentos, Palestras, Parcerias, Patota, Bússola, Lojinha e frete
+ * 3. FLUXOS: Mensagens, Automações, Blog, Pagamentos, Vinculações, Usuários
+ * 4. PÁGINAS: Início, Sobre, Atendimentos, Palestras, Parcerias, Bússola, Patota, Leituras, Lojinha
  * 
- * Estrutura de Acesso e Permissões (RBAC):
- * - Suporte (Master): Não pode ser removido, alterado ou ajustado. Mestre do sistema.
- * - Bianca (Administradora): Pode inserir, excluir, alterar nomes e senhas de outros membros (inclusive Caio).
- * - Caio (Operador Básico): Acesso a todas as funções operacionais, mas não pode inserir nem excluir usuários; pode alterar apenas seu próprio nome e senha.
+ * Design: Menu lateral em roxo escuro (#1D1B48/#22205A) e Área Central Toda Clara (#F8F6F2/Branco).
  */
 
 import React, { useState, useEffect } from 'react';
 import {
-  LayoutDashboard,
   Calculator,
   Calendar,
   Users,
@@ -34,15 +30,15 @@ import {
   Shield,
   Layers,
   LogOut,
+  ChevronDown,
   ChevronRight,
   ExternalLink,
   Lock,
   Eye,
   EyeOff,
-  ArrowLeft,
-  Search,
-  CheckCircle2,
-  AlertCircle
+  Globe,
+  Settings2,
+  Workflow
 } from 'lucide-react';
 
 import { UserProfile, AdminUser } from '../../types';
@@ -51,27 +47,72 @@ import { getAdminUsersList } from '../../services/adminUsersService';
 import { CRMContactDetail, getCRMContactsList } from '../../services/crmService';
 import { AppointmentItem, getAppointmentsList } from '../../services/agendaService';
 
-// Componentes dos Módulos do Hub
-import { AdminHubGrid, SectionKey, ItemKey } from './components/AdminHubGrid';
+// Módulos
 import { OperationsCalculator } from './modules/OperationsCalculator';
 import { OperationsAgenda } from './modules/OperationsAgenda';
 import { OperationsCRM } from './modules/OperationsCRM';
 import { ServicesManager, ServiceSubTab } from './modules/ServicesManager';
 import { FlowsManager, FlowSubTab } from './modules/FlowsManager';
-import { PagesManager, PageSlug } from './modules/PagesManager';
+import { PagesManager } from './modules/PagesManager';
+
+export type AdminSectionKey = 'operacoes' | 'servicos' | 'fluxos' | 'paginas';
+
+export type AdminItemKey =
+  // Operações
+  | 'operacoes_calculadora'
+  | 'operacoes_agenda'
+  | 'operacoes_cadastros'
+  // Serviços
+  | 'servicos_atendimentos'
+  | 'servicos_palestras'
+  | 'servicos_parcerias'
+  | 'servicos_patota'
+  | 'servicos_bussola'
+  | 'servicos_lojinha'
+  // Fluxos
+  | 'fluxos_mensagens'
+  | 'fluxos_automacoes'
+  | 'fluxos_blog'
+  | 'fluxos_pagamentos'
+  | 'fluxos_vinculacoes'
+  | 'fluxos_usuarios'
+  // Páginas
+  | 'paginas_inicio'
+  | 'paginas_sobre'
+  | 'paginas_atendimentos'
+  | 'paginas_palestras'
+  | 'paginas_parcerias'
+  | 'paginas_bussola'
+  | 'paginas_patota'
+  | 'paginas_leituras'
+  | 'paginas_lojinha';
 
 export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigateHome }) => {
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(getCurrentUser());
 
-  // Estados de Navegação do Hub (Nulo = Exibe o Hub Visual de Cartões)
-  const [activeSection, setActiveSection] = useState<SectionKey | null>(null);
-  const [activeItem, setActiveItem] = useState<ItemKey | null>(null);
+  // Item ativo inicial direto na tela (Sem tela de Hub Geral)
+  const [activeItem, setActiveItem] = useState<AdminItemKey>('operacoes_cadastros');
 
-  // Dados Operacionais Carregados para Contadores & Cruzes
+  // Estado dos Menus Suspensos / Accordions da Lateral
+  const [openSections, setOpenSections] = useState<Record<AdminSectionKey, boolean>>({
+    operacoes: true,
+    servicos: true,
+    fluxos: false,
+    paginas: false
+  });
+
+  const toggleSection = (section: AdminSectionKey) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
+  // Dados Operacionais
   const [contacts, setContacts] = useState<CRMContactDetail[]>([]);
   const [appointments, setAppointments] = useState<AppointmentItem[]>([]);
 
-  // Estados dos Usuários Administradores para Login
+  // Login
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [selectedLoginUsername, setSelectedLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -79,14 +120,13 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  // Carregamento inicial de dados
   const refreshOperationalData = async () => {
     try {
       const [crms, apts] = await Promise.all([getCRMContactsList(), getAppointmentsList()]);
       setContacts(crms);
       setAppointments(apts);
     } catch (err) {
-      console.warn('[AdminPanel] Erro ao carregar dados operacionais:', err);
+      console.warn('[AdminPanel] Erro ao carregar dados:', err);
     }
   };
 
@@ -111,7 +151,6 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
     return () => unsub();
   }, []);
 
-  // Handler de Login
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError('');
@@ -136,26 +175,12 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
     }
   };
 
-  // Handler de Seleção no Hub Visual
-  const handleSelectHubItem = (section: SectionKey, item: ItemKey) => {
-    setActiveSection(section);
-    setActiveItem(item);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleBackToHub = () => {
-    setActiveSection(null);
-    setActiveItem(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   // =========================================================================
   // TELA DE LOGIN SIMPLIFICADA (ESTRITAMENTE CONFORME ESPECIFICADO)
   // =========================================================================
   if (!currentUser) {
     return (
       <div className="admin-scope min-h-screen bg-[#161438] flex flex-col items-center justify-center p-4">
-        {/* Logo da Casa 6 no topo clicável para retornar à página inicial */}
         <button
           type="button"
           onClick={onNavigateHome}
@@ -170,7 +195,6 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
           />
         </button>
 
-        {/* Janela de Login Simplificada */}
         <div className="w-full max-w-sm sm:max-w-md rounded-3xl bg-[#1D1B48] p-8 sm:p-10 shadow-2xl border border-[#F0B55E]/40 space-y-6">
           <div className="text-center space-y-1">
             <h1 className="font-heading text-2xl font-bold text-white">
@@ -189,7 +213,6 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
           )}
 
           <form onSubmit={handleLoginSubmit} className="space-y-4">
-            {/* Campo Login: Caixa Suspensa (Dropdown) */}
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-[#DAD2C4] uppercase tracking-wider">
                 Login
@@ -207,7 +230,6 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
               </select>
             </div>
 
-            {/* Campo Senha com Olhinho Lateral */}
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-[#DAD2C4] uppercase tracking-wider">
                 Senha
@@ -248,32 +270,31 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
   }
 
   // =========================================================================
-  // PAINEL DE CONTROLE AUTENTICADO (COSMIC CASA 6 THEME COM 4 SEÇÕES)
+  // PAINEL DE CONTROLE AUTENTICADO
+  // Lateral: Roxo Escuro (#1D1B48 / #22205A) com Menus Suspensos
+  // Conteúdo Central: Claro (#F8F6F2 / Branco)
   // =========================================================================
-  const isMasterUser = currentUser.role === 'master';
-  const isAdminUser = currentUser.role === 'admin' || isMasterUser;
-
   return (
-    <div className="admin-scope min-h-screen bg-[#161438] text-white flex flex-col md:flex-row">
+    <div className="admin-scope min-h-screen bg-[#F8F6F2] text-[#22205A] flex flex-col md:flex-row">
       
-      {/* SIDEBAR ADMINISTRATIVA */}
-      <aside className="w-full md:w-64 bg-[#1D1B48] border-r border-[#372B69] flex flex-col shrink-0">
+      {/* MENU LATERAL ESQUERDO (ROXO ESCURO COM MENUS SUSPENSOS) */}
+      <aside className="w-full md:w-72 bg-[#1D1B48] text-white border-r border-[#372B69] flex flex-col shrink-0">
         
-        {/* Topo da Sidebar: Logo & Usuário Logado */}
+        {/* Topo com Logo e Perfil */}
         <div className="p-4 border-b border-[#372B69] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
               src="https://static.wixstatic.com/media/02c8e0_916db28bdef7413a82fde89b9ce7f738~mv2.png"
               alt="Casa 6"
               className="h-7 w-auto object-contain cursor-pointer transition-transform hover:scale-105"
-              onClick={handleBackToHub}
-              title="Ir para o Hub Geral"
+              onClick={onNavigateHome}
+              title="Ir para o Website"
             />
             <div>
               <div className="text-[10px] text-[#F0B55E] font-bold uppercase tracking-wider">
-                Painel Master
+                Painel de Controle
               </div>
-              <div className="text-xs font-bold text-white capitalize truncate max-w-[110px]">
+              <div className="text-xs font-bold text-white capitalize truncate max-w-[120px]">
                 {currentUser.displayName}
               </div>
             </div>
@@ -289,225 +310,261 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
           </button>
         </div>
 
-        {/* Navegação Rápida entre Seções & Itens */}
-        <nav className="p-3 space-y-4 flex-1 text-xs overflow-y-auto">
+        {/* NAVEGAÇÃO POR SEÇÕES E MENUS SUSPENSOS */}
+        <nav className="p-3 space-y-3 flex-1 text-xs overflow-y-auto">
           
-          {/* Botão de Retorno ao Hub Geral */}
-          <button
-            onClick={handleBackToHub}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold transition-all cursor-pointer ${
-              activeItem === null
-                ? 'bg-[#F0B55E] text-[#1E1B4B] shadow-md'
-                : 'text-white hover:bg-[#2B2566]'
-            }`}
-          >
-            <LayoutDashboard className="h-4 w-4" />
-            <span>Hub Principal (Visão Geral)</span>
-          </button>
-
-          {/* 1. SEÇÃO OPERAÇÕES */}
-          <div className="space-y-1">
-            <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#F0B55E] flex items-center justify-between">
-              <span>Operações</span>
-              <span className="text-[9px] text-[#DAD2C4]/70">Coração</span>
-            </div>
-
+          {/* ==========================================
+              SEÇÃO 1: OPERAÇÕES (Ícone Grande & Accordion)
+              ========================================== */}
+          <div className="rounded-xl bg-[#22205A]/70 border border-[#372B69] overflow-hidden">
             <button
-              onClick={() => handleSelectHubItem('operacoes', 'calculadora')}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors cursor-pointer ${
-                activeItem === 'calculadora' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
-              }`}
+              onClick={() => toggleSection('operacoes')}
+              className="w-full flex items-center justify-between p-3.5 hover:bg-[#2B2566] transition-colors cursor-pointer text-left"
             >
-              <div className="flex items-center gap-2">
-                <Calculator className="h-3.5 w-3.5" />
-                <span>Calculadora Astral</span>
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-[#2B2566] text-[#F0B55E] border border-[#F0B55E]/30">
+                  <Calculator className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-black text-xs uppercase tracking-wider text-white">
+                    OPERAÇÕES
+                  </h3>
+                  <span className="text-[10px] text-[#DAD2C4]/70">Calculadora, Agenda & CRM</span>
+                </div>
               </div>
-            </button>
-
-            <button
-              onClick={() => handleSelectHubItem('operacoes', 'agenda')}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors cursor-pointer ${
-                activeItem === 'agenda' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <Calendar className="h-3.5 w-3.5" />
-                <span>Agenda Atendimentos</span>
-              </div>
-              {appointments.length > 0 && (
-                <span className="text-[10px] bg-[#372B69] px-1.5 py-0.2 rounded-full text-white font-mono">
-                  {appointments.length}
-                </span>
+              {openSections.operacoes ? (
+                <ChevronDown className="h-4 w-4 text-[#F0B55E]" />
+              ) : (
+                <ChevronRight className="h-4 w-4 text-[#DAD2C4]" />
               )}
             </button>
 
-            <button
-              onClick={() => handleSelectHubItem('operacoes', 'cadastros')}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors cursor-pointer ${
-                activeItem === 'cadastros' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <Users className="h-3.5 w-3.5" />
-                <span>Cadastros (CRM)</span>
+            {openSections.operacoes && (
+              <div className="px-2 pb-2 space-y-1 border-t border-[#372B69] pt-2">
+                <button
+                  onClick={() => setActiveItem('operacoes_calculadora')}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-colors cursor-pointer ${
+                    activeItem === 'operacoes_calculadora'
+                      ? 'bg-[#F0B55E] text-[#1E1B4B] font-bold shadow-2xs'
+                      : 'text-[#DAD2C4] hover:bg-[#2B2566] hover:text-white'
+                  }`}
+                >
+                  <Compass className="h-3.5 w-3.5" />
+                  <span>Calculadora</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveItem('operacoes_agenda')}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors cursor-pointer ${
+                    activeItem === 'operacoes_agenda'
+                      ? 'bg-[#F0B55E] text-[#1E1B4B] font-bold shadow-2xs'
+                      : 'text-[#DAD2C4] hover:bg-[#2B2566] hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Calendar className="h-3.5 w-3.5" />
+                    <span>Agenda</span>
+                  </div>
+                  {appointments.length > 0 && (
+                    <span className="text-[9px] bg-[#372B69] text-white px-1.5 py-0.2 rounded-full font-mono">
+                      {appointments.length}
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => setActiveItem('operacoes_cadastros')}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors cursor-pointer ${
+                    activeItem === 'operacoes_cadastros'
+                      ? 'bg-[#F0B55E] text-[#1E1B4B] font-bold shadow-2xs'
+                      : 'text-[#DAD2C4] hover:bg-[#2B2566] hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Users className="h-3.5 w-3.5" />
+                    <span>Cadastros</span>
+                  </div>
+                  {contacts.length > 0 && (
+                    <span className="text-[9px] bg-[#F0B55E] text-[#1E1B4B] px-1.5 py-0.2 rounded-full font-bold">
+                      {contacts.length}
+                    </span>
+                  )}
+                </button>
               </div>
-              {contacts.length > 0 && (
-                <span className="text-[10px] bg-[#F0B55E] text-[#1E1B4B] px-1.5 py-0.2 rounded-full font-bold">
-                  {contacts.length}
-                </span>
+            )}
+          </div>
+
+          {/* ==========================================
+              SEÇÃO 2: SERVIÇOS (Apenas "Serviços" com Ícone Grande)
+              ========================================== */}
+          <div className="rounded-xl bg-[#22205A]/70 border border-[#372B69] overflow-hidden">
+            <button
+              onClick={() => toggleSection('servicos')}
+              className="w-full flex items-center justify-between p-3.5 hover:bg-[#2B2566] transition-colors cursor-pointer text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-[#2B2566] text-[#F0B55E] border border-[#F0B55E]/30">
+                  <Sparkles className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-black text-xs uppercase tracking-wider text-white">
+                    SERVIÇOS
+                  </h3>
+                  <span className="text-[10px] text-[#DAD2C4]/70">Catálogo & Preços</span>
+                </div>
+              </div>
+              {openSections.servicos ? (
+                <ChevronDown className="h-4 w-4 text-[#F0B55E]" />
+              ) : (
+                <ChevronRight className="h-4 w-4 text-[#DAD2C4]" />
               )}
             </button>
+
+            {openSections.servicos && (
+              <div className="px-2 pb-2 space-y-1 border-t border-[#372B69] pt-2">
+                {[
+                  { id: 'servicos_atendimentos', label: 'Atendimentos', icon: Compass },
+                  { id: 'servicos_palestras', label: 'Palestras', icon: Presentation },
+                  { id: 'servicos_parcerias', label: 'Parcerias', icon: Handshake },
+                  { id: 'servicos_patota', label: 'Patota', icon: Sparkles },
+                  { id: 'servicos_bussola', label: 'Bússola', icon: Compass },
+                  { id: 'servicos_lojinha', label: 'Lojinha e frete', icon: ShoppingBag }
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeItem === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveItem(item.id as AdminItemKey)}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-colors cursor-pointer ${
+                        isActive
+                          ? 'bg-[#F0B55E] text-[#1E1B4B] font-bold shadow-2xs'
+                          : 'text-[#DAD2C4] hover:bg-[#2B2566] hover:text-white'
+                      }`}
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          {/* 2. SEÇÃO SERVIÇOS */}
-          <div className="space-y-1">
-            <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#F0B55E]">
-              Serviços & Catálogo
-            </div>
-
+          {/* ==========================================
+              SEÇÃO 3: FLUXOS (Apenas "Fluxos" com Ícone Grande)
+              ========================================== */}
+          <div className="rounded-xl bg-[#22205A]/70 border border-[#372B69] overflow-hidden">
             <button
-              onClick={() => handleSelectHubItem('servicos', 'serv_atendimentos')}
-              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                activeItem === 'serv_atendimentos' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
-              }`}
+              onClick={() => toggleSection('fluxos')}
+              className="w-full flex items-center justify-between p-3.5 hover:bg-[#2B2566] transition-colors cursor-pointer text-left"
             >
-              <Compass className="h-3.5 w-3.5" />
-              <span>Atendimentos</span>
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-[#2B2566] text-[#F0B55E] border border-[#F0B55E]/30">
+                  <Workflow className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-black text-xs uppercase tracking-wider text-white">
+                    FLUXOS
+                  </h3>
+                  <span className="text-[10px] text-[#DAD2C4]/70">Integrações & Conexões</span>
+                </div>
+              </div>
+              {openSections.fluxos ? (
+                <ChevronDown className="h-4 w-4 text-[#F0B55E]" />
+              ) : (
+                <ChevronRight className="h-4 w-4 text-[#DAD2C4]" />
+              )}
             </button>
 
-            <button
-              onClick={() => handleSelectHubItem('servicos', 'serv_palestras')}
-              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                activeItem === 'serv_palestras' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
-              }`}
-            >
-              <Presentation className="h-3.5 w-3.5" />
-              <span>Palestras (NR-1)</span>
-            </button>
-
-            <button
-              onClick={() => handleSelectHubItem('servicos', 'serv_parcerias')}
-              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                activeItem === 'serv_parcerias' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
-              }`}
-            >
-              <Handshake className="h-3.5 w-3.5" />
-              <span>Parcerias</span>
-            </button>
-
-            <button
-              onClick={() => handleSelectHubItem('servicos', 'serv_patota')}
-              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                activeItem === 'serv_patota' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
-              }`}
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>Patota (R$ 47/mês)</span>
-            </button>
-
-            <button
-              onClick={() => handleSelectHubItem('servicos', 'serv_bussola')}
-              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                activeItem === 'serv_bussola' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
-              }`}
-            >
-              <Compass className="h-3.5 w-3.5" />
-              <span>Bússolas (R$ 47)</span>
-            </button>
-
-            <button
-              onClick={() => handleSelectHubItem('servicos', 'serv_lojinha')}
-              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                activeItem === 'serv_lojinha' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
-              }`}
-            >
-              <ShoppingBag className="h-3.5 w-3.5" />
-              <span>Lojinha & Frete</span>
-            </button>
+            {openSections.fluxos && (
+              <div className="px-2 pb-2 space-y-1 border-t border-[#372B69] pt-2">
+                {[
+                  { id: 'fluxos_mensagens', label: 'Mensagens', icon: MessageSquare },
+                  { id: 'fluxos_automacoes', label: 'Automações', icon: Mail },
+                  { id: 'fluxos_blog', label: 'Blog', icon: BookOpen },
+                  { id: 'fluxos_pagamentos', label: 'Pagamentos', icon: CreditCard },
+                  { id: 'fluxos_vinculacoes', label: 'Vinculações', icon: Share2 },
+                  { id: 'fluxos_usuarios', label: 'Usuários', icon: Shield }
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeItem === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveItem(item.id as AdminItemKey)}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-colors cursor-pointer ${
+                        isActive
+                          ? 'bg-[#F0B55E] text-[#1E1B4B] font-bold shadow-2xs'
+                          : 'text-[#DAD2C4] hover:bg-[#2B2566] hover:text-white'
+                      }`}
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          {/* 3. SEÇÃO FLUXOS */}
-          <div className="space-y-1">
-            <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#F0B55E]">
-              Fluxos & Conexões
-            </div>
-
+          {/* ==========================================
+              SEÇÃO 4: PÁGINAS (Apenas "Páginas" com Ícone Grande)
+              ========================================== */}
+          <div className="rounded-xl bg-[#22205A]/70 border border-[#372B69] overflow-hidden">
             <button
-              onClick={() => handleSelectHubItem('fluxos', 'fluxo_mensagens')}
-              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                activeItem === 'fluxo_mensagens' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
-              }`}
+              onClick={() => toggleSection('paginas')}
+              className="w-full flex items-center justify-between p-3.5 hover:bg-[#2B2566] transition-colors cursor-pointer text-left"
             >
-              <MessageSquare className="h-3.5 w-3.5" />
-              <span>WhatsApp Templates</span>
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-[#2B2566] text-[#F0B55E] border border-[#F0B55E]/30">
+                  <Globe className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-black text-xs uppercase tracking-wider text-white">
+                    PÁGINAS
+                  </h3>
+                  <span className="text-[10px] text-[#DAD2C4]/70">CMS das 9 Páginas</span>
+                </div>
+              </div>
+              {openSections.paginas ? (
+                <ChevronDown className="h-4 w-4 text-[#F0B55E]" />
+              ) : (
+                <ChevronRight className="h-4 w-4 text-[#DAD2C4]" />
+              )}
             </button>
 
-            <button
-              onClick={() => handleSelectHubItem('fluxos', 'fluxo_automacoes')}
-              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                activeItem === 'fluxo_automacoes' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
-              }`}
-            >
-              <Mail className="h-3.5 w-3.5" />
-              <span>Automações & E-mail</span>
-            </button>
-
-            <button
-              onClick={() => handleSelectHubItem('fluxos', 'fluxo_blog')}
-              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                activeItem === 'fluxo_blog' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
-              }`}
-            >
-              <BookOpen className="h-3.5 w-3.5" />
-              <span>Blog Caderno Astral</span>
-            </button>
-
-            <button
-              onClick={() => handleSelectHubItem('fluxos', 'fluxo_pagamento')}
-              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                activeItem === 'fluxo_pagamento' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
-              }`}
-            >
-              <CreditCard className="h-3.5 w-3.5" />
-              <span>Mercado Pago</span>
-            </button>
-
-            <button
-              onClick={() => handleSelectHubItem('fluxos', 'fluxo_vinculacoes')}
-              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                activeItem === 'fluxo_vinculacoes' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
-              }`}
-            >
-              <Share2 className="h-3.5 w-3.5" />
-              <span>Pixels & Tracking</span>
-            </button>
-
-            <button
-              onClick={() => handleSelectHubItem('fluxos', 'fluxo_acessos')}
-              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                activeItem === 'fluxo_acessos' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
-              }`}
-            >
-              <Shield className="h-3.5 w-3.5" />
-              <span>Acessos & Usuários</span>
-            </button>
-          </div>
-
-          {/* 4. SEÇÃO PÁGINAS CMS */}
-          <div className="space-y-1">
-            <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#F0B55E]">
-              Páginas CMS (9 Páginas)
-            </div>
-
-            <button
-              onClick={() => handleSelectHubItem('paginas', 'pag_inicio')}
-              className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                activeSection === 'paginas' ? 'bg-[#2B2566] text-[#F0B55E] font-bold' : 'text-[#DAD2C4] hover:bg-[#2B2566]/60'
-              }`}
-            >
-              <Layers className="h-3.5 w-3.5" />
-              <span>Editor de Páginas</span>
-            </button>
+            {openSections.paginas && (
+              <div className="px-2 pb-2 space-y-1 border-t border-[#372B69] pt-2">
+                {[
+                  { id: 'paginas_inicio', label: 'Início', slug: 'inicio' },
+                  { id: 'paginas_sobre', label: 'Sobre', slug: 'sobre' },
+                  { id: 'paginas_atendimentos', label: 'Atendimentos', slug: 'atendimentos' },
+                  { id: 'paginas_palestras', label: 'Palestras', slug: 'palestras' },
+                  { id: 'paginas_parcerias', label: 'Parcerias', slug: 'parcerias' },
+                  { id: 'paginas_bussola', label: 'Bússola', slug: 'bussola' },
+                  { id: 'paginas_patota', label: 'Patota', slug: 'patota' },
+                  { id: 'paginas_leituras', label: 'Leituras', slug: 'leituras' },
+                  { id: 'paginas_lojinha', label: 'Lojinha', slug: 'lojinha' }
+                ].map((item) => {
+                  const isActive = activeItem === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveItem(item.id as AdminItemKey)}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-colors cursor-pointer ${
+                        isActive
+                          ? 'bg-[#F0B55E] text-[#1E1B4B] font-bold shadow-2xs'
+                          : 'text-[#DAD2C4] hover:bg-[#2B2566] hover:text-white'
+                      }`}
+                    >
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#F0B55E]" />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </nav>
 
@@ -524,74 +581,33 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
         </div>
       </aside>
 
-      {/* ÁREA DE CONTEÚDO PRINCIPAL DO PAINEL */}
-      <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto">
+      {/* ÁREA DE CONTEÚDO PRINCIPAL (TODA CLARA COM FUNDO #F8F6F2) */}
+      <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto bg-[#F8F6F2]">
         
-        {/* BARRA DE NAVEGAÇÃO SUPERIOR / BREADCRUMBS */}
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#372B69] pb-4">
-          <div className="flex items-center gap-2 text-xs text-[#DAD2C4]">
-            <button
-              onClick={handleBackToHub}
-              className="text-[#F0B55E] hover:underline font-bold flex items-center gap-1 cursor-pointer"
-            >
-              <span>Hub Principal</span>
-            </button>
+        {/* ROTEAMENTO DIRETO DOS ITENS (SEM TELA DE HUB GERAL) */}
+        {activeItem === 'operacoes_calculadora' && <OperationsCalculator />}
+        {activeItem === 'operacoes_agenda' && <OperationsAgenda />}
+        {activeItem === 'operacoes_cadastros' && <OperationsCRM />}
 
-            {activeItem && (
-              <>
-                <ChevronRight className="h-3.5 w-3.5 text-[#DAD2C4]/50" />
-                <span className="uppercase text-[11px] font-bold text-white tracking-wider">
-                  {activeSection} &bull; {activeItem}
-                </span>
-              </>
-            )}
-          </div>
+        {/* Serviços */}
+        {activeItem === 'servicos_atendimentos' && <ServicesManager initialSubTab="serv_atendimentos" />}
+        {activeItem === 'servicos_palestras' && <ServicesManager initialSubTab="serv_palestras" />}
+        {activeItem === 'servicos_parcerias' && <ServicesManager initialSubTab="serv_parcerias" />}
+        {activeItem === 'servicos_patota' && <ServicesManager initialSubTab="serv_patota" />}
+        {activeItem === 'servicos_bussola' && <ServicesManager initialSubTab="serv_bussola" />}
+        {activeItem === 'servicos_lojinha' && <ServicesManager initialSubTab="serv_lojinha" />}
 
-          {activeItem && (
-            <button
-              onClick={handleBackToHub}
-              className="py-1.5 px-3 rounded-lg bg-[#2B2566] hover:bg-[#372B69] text-[#F0B55E] text-xs font-bold flex items-center gap-1.5 self-start sm:self-auto transition-colors cursor-pointer"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              <span>Voltar ao Hub</span>
-            </button>
-          )}
-        </div>
+        {/* Fluxos */}
+        {activeItem === 'fluxos_mensagens' && <FlowsManager initialSubTab="fluxo_mensagens" currentUser={currentUser} />}
+        {activeItem === 'fluxos_automacoes' && <FlowsManager initialSubTab="fluxo_automacoes" currentUser={currentUser} />}
+        {activeItem === 'fluxos_blog' && <FlowsManager initialSubTab="fluxo_blog" currentUser={currentUser} />}
+        {activeItem === 'fluxos_pagamentos' && <FlowsManager initialSubTab="fluxo_pagamento" currentUser={currentUser} />}
+        {activeItem === 'fluxos_vinculacoes' && <FlowsManager initialSubTab="fluxo_vinculacoes" currentUser={currentUser} />}
+        {activeItem === 'fluxos_usuarios' && <FlowsManager initialSubTab="fluxo_acessos" currentUser={currentUser} />}
 
-        {/* =========================================================================
-            ROTEAMENTO INTERNO DOS MÓDULOS
-            ========================================================================= */}
-        {activeItem === null ? (
-          // VISÃO 1: HUB VISUAL COMPLETO COM AS 4 SEÇÕES E CARTÕES
-          <AdminHubGrid
-            onSelectItem={handleSelectHubItem}
-            crmCount={contacts.length}
-            agendaCount={appointments.length}
-          />
-        ) : activeItem === 'calculadora' ? (
-          // OPERAÇÕES: CALCULADORA ASTRAL
-          <OperationsCalculator />
-        ) : activeItem === 'agenda' ? (
-          // OPERAÇÕES: AGENDA ATENDIMENTOS
-          <OperationsAgenda />
-        ) : activeItem === 'cadastros' ? (
-          // OPERAÇÕES: CADASTROS (CRM)
-          <OperationsCRM />
-        ) : activeItem.startsWith('serv_') ? (
-          // SERVIÇOS: GERENCIADOR DE CATÁLOGO & FRETE
-          <ServicesManager initialSubTab={activeItem as ServiceSubTab} />
-        ) : activeItem.startsWith('fluxo_') ? (
-          // FLUXOS: WHATSAPP, AUTOMAÇÕES, BLOG, MERCADO PAGO, PIXELS, ACESSOS
-          <FlowsManager initialSubTab={activeItem as FlowSubTab} currentUser={currentUser} />
-        ) : activeItem.startsWith('pag_') ? (
-          // PÁGINAS: CMS DE 9 PÁGINAS COM RESTAURAÇÃO
-          <PagesManager initialSlug={activeItem as PageSlug} />
-        ) : (
-          <AdminHubGrid
-            onSelectItem={handleSelectHubItem}
-            crmCount={contacts.length}
-            agendaCount={appointments.length}
-          />
+        {/* Páginas */}
+        {activeItem.startsWith('paginas_') && (
+          <PagesManager initialSlug={activeItem.replace('paginas_', '')} />
         )}
       </main>
     </div>

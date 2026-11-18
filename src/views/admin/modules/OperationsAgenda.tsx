@@ -2,6 +2,7 @@
  * @license
  * Casa 6 — Bianca Tofoli
  * Módulo: Agenda de Atendimentos (Calendário Mensal & Sincronização Google)
+ * Tema Claro (Light Theme)
  */
 
 import React, { useState, useEffect } from 'react';
@@ -16,14 +17,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
-  User,
-  Phone,
-  Mail,
   Send,
   Trash2,
-  Edit2,
-  RefreshCw,
-  Share2
+  Edit2
 } from 'lucide-react';
 import {
   AppointmentItem,
@@ -37,7 +33,7 @@ import { CRMContactDetail, getCRMContactsList } from '../../../services/crmServi
 export const OperationsAgenda: React.FC = () => {
   const [appointments, setAppointments] = useState<AppointmentItem[]>([]);
   const [contacts, setContacts] = useState<CRMContactDetail[]>([]);
-  const [currentMonthDate, setCurrentMonthDate] = useState<Date>(new Date(2026, 10, 1)); // Nov 2026
+  const [currentMonthDate, setCurrentMonthDate] = useState<Date>(new Date(2026, 10, 1));
   const [filterAccount, setFilterAccount] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -74,11 +70,10 @@ export const OperationsAgenda: React.FC = () => {
     year: 'numeric'
   });
 
-  // Dias do mês atual para montar a grade
   const year = currentMonthDate.getFullYear();
   const month = currentMonthDate.getMonth();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDayWeekIndex = new Date(year, month, 1).getDay(); // 0 = Domingo
+  const firstDayWeekIndex = new Date(year, month, 1).getDay();
 
   const filteredAppointments = appointments.filter((apt) => {
     if (filterAccount !== 'all' && apt.gmailAccount !== filterAccount) return false;
@@ -154,25 +149,25 @@ export const OperationsAgenda: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn">
+    <div className="space-y-6 animate-fadeIn text-[#22205A]">
       {/* Cabeçalho */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#372B69] pb-6">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2 text-[#F0B55E] text-xs font-bold uppercase tracking-widest">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#E5E0D8] pb-4">
+        <div>
+          <div className="flex items-center gap-2 text-[#D99426] text-xs font-bold uppercase tracking-widest">
             <CalendarIcon className="h-4 w-4" />
             <span>Operações &bull; Gestão de Consultas</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-heading font-black text-white capitalize">
+          <h2 className="text-2xl font-heading font-black text-[#22205A] mt-1 capitalize">
             Agenda de Atendimentos ({monthYearLabel})
           </h2>
-          <p className="text-xs sm:text-sm text-[#DAD2C4]">
+          <p className="text-xs sm:text-sm text-[#68638C]">
             Visualização em calendário mensal sincronizável com múltiplos e-mails Google e conectado ao CRM.
           </p>
         </div>
 
         <button
           onClick={() => handleOpenNewModal()}
-          className="py-2.5 px-4 rounded-xl bg-[#F0B55E] hover:bg-[#E5A344] text-[#1E1B4B] font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg transition-all cursor-pointer self-start sm:self-auto"
+          className="py-2.5 px-4 rounded-xl bg-[#22205A] hover:bg-[#1B1948] text-[#F0B55E] font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-xs transition-all cursor-pointer self-start sm:self-auto"
         >
           <Plus className="h-4 w-4" />
           <span>Novo Agendamento</span>
@@ -183,30 +178,30 @@ export const OperationsAgenda: React.FC = () => {
         <div
           className={`p-4 rounded-xl flex items-center gap-3 text-xs sm:text-sm font-semibold transition-all ${
             notification.type === 'success'
-              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-              : 'bg-red-500/20 text-red-300 border border-red-500/30'
+              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+              : 'bg-red-50 text-red-800 border border-red-200'
           }`}
         >
-          {notification.type === 'success' ? <CheckCircle2 className="h-5 w-5 shrink-0" /> : <AlertCircle className="h-5 w-5 shrink-0" />}
+          {notification.type === 'success' ? <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" /> : <AlertCircle className="h-5 w-5 shrink-0 text-red-600" />}
           <span>{notification.text}</span>
         </div>
       )}
 
-      {/* Barra de Filtros e Contas Vinculadas */}
-      <div className="bg-[#1D1B48] border border-[#372B69] rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xl">
-        <div className="flex items-center gap-3">
+      {/* Barra de Filtros */}
+      <div className="bg-white border border-[#E5E0D8] rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xs">
+        <div className="flex items-center gap-2">
           <button
             onClick={handlePrevMonth}
-            className="p-2 rounded-lg bg-[#2B2566] text-white hover:text-[#F0B55E] transition-colors cursor-pointer"
+            className="p-2 rounded-lg border border-[#E5E0D8] text-[#22205A] hover:bg-[#FAF8F5] transition-colors cursor-pointer"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
-          <span className="font-heading font-bold text-sm text-white capitalize min-w-[130px] text-center">
+          <span className="font-heading font-bold text-sm text-[#22205A] capitalize min-w-[130px] text-center">
             {monthYearLabel}
           </span>
           <button
             onClick={handleNextMonth}
-            className="p-2 rounded-lg bg-[#2B2566] text-white hover:text-[#F0B55E] transition-colors cursor-pointer"
+            className="p-2 rounded-lg border border-[#E5E0D8] text-[#22205A] hover:bg-[#FAF8F5] transition-colors cursor-pointer"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -214,11 +209,11 @@ export const OperationsAgenda: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-3 text-xs">
           <div className="flex items-center gap-2">
-            <span className="text-[#DAD2C4]">Conta Google:</span>
+            <span className="text-[#68638C]">Conta Google:</span>
             <select
               value={filterAccount}
               onChange={(e) => setFilterAccount(e.target.value)}
-              className="bg-[#2B2566] border border-[#372B69] rounded-lg px-2.5 py-1.5 text-white text-xs focus:outline-none"
+              className="bg-[#FAF8F5] border border-[#DCD6CC] rounded-lg px-2.5 py-1.5 text-[#22205A] text-xs focus:outline-none"
             >
               <option value="all">Todas as contas ({googleAccounts.length})</option>
               {googleAccounts.map((acc) => (
@@ -230,11 +225,11 @@ export const OperationsAgenda: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[#DAD2C4]">Status:</span>
+            <span className="text-[#68638C]">Status:</span>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="bg-[#2B2566] border border-[#372B69] rounded-lg px-2.5 py-1.5 text-white text-xs focus:outline-none"
+              className="bg-[#FAF8F5] border border-[#DCD6CC] rounded-lg px-2.5 py-1.5 text-[#22205A] text-xs focus:outline-none"
             >
               <option value="all">Todos</option>
               <option value="agendado">Agendados</option>
@@ -246,9 +241,9 @@ export const OperationsAgenda: React.FC = () => {
         </div>
       </div>
 
-      {/* Calendário Mensal Estilo Google Agenda */}
-      <div className="bg-[#1D1B48] border border-[#372B69] rounded-2xl overflow-hidden shadow-2xl">
-        <div className="grid grid-cols-7 bg-[#2B2566] border-b border-[#372B69] text-center text-xs font-bold text-[#F0B55E] uppercase py-3">
+      {/* Calendário Mensal Estilo Google Agenda Claro */}
+      <div className="bg-white border border-[#E5E0D8] rounded-2xl overflow-hidden shadow-xs">
+        <div className="grid grid-cols-7 bg-[#FAF8F5] border-b border-[#E5E0D8] text-center text-xs font-bold text-[#22205A] uppercase py-3">
           <span>Dom</span>
           <span>Seg</span>
           <span>Ter</span>
@@ -258,10 +253,10 @@ export const OperationsAgenda: React.FC = () => {
           <span>Sáb</span>
         </div>
 
-        <div className="grid grid-cols-7 auto-rows-fr divide-x divide-y divide-[#372B69]">
-          {/* Espaços em branco antes do 1º dia */}
+        <div className="grid grid-cols-7 auto-rows-fr divide-x divide-y divide-[#E5E0D8]">
+          {/* Espaços antes do 1º dia */}
           {Array.from({ length: firstDayWeekIndex }).map((_, idx) => (
-            <div key={`empty-${idx}`} className="min-h-[110px] bg-[#161438]/50 p-2 opacity-30" />
+            <div key={`empty-${idx}`} className="min-h-[105px] bg-[#FAF8F5]/60 p-2 opacity-50" />
           ))}
 
           {/* Dias do Mês */}
@@ -274,20 +269,20 @@ export const OperationsAgenda: React.FC = () => {
               <div
                 key={dateStr}
                 onClick={() => handleOpenNewModal(dateStr)}
-                className="min-h-[110px] p-2 bg-[#1D1B48] hover:bg-[#25225a] transition-colors cursor-pointer group flex flex-col justify-between"
+                className="min-h-[105px] p-2 bg-white hover:bg-[#FAF8F5] transition-colors cursor-pointer group flex flex-col justify-between"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#DAD2C4] group-hover:text-white">
+                  <span className="text-xs font-bold text-[#554F70] group-hover:text-[#22205A]">
                     {dayNum}
                   </span>
                   {dayApts.length > 0 && (
-                    <span className="text-[10px] bg-[#F0B55E] text-[#1E1B4B] font-extrabold px-1.5 py-0.2 rounded-full">
+                    <span className="text-[10px] bg-[#22205A] text-[#F0B55E] font-extrabold px-1.5 py-0.2 rounded-full">
                       {dayApts.length}
                     </span>
                   )}
                 </div>
 
-                <div className="space-y-1 mt-1 overflow-y-auto max-h-[85px]">
+                <div className="space-y-1 mt-1 overflow-y-auto max-h-[80px]">
                   {dayApts.map((apt) => (
                     <div
                       key={apt.id}
@@ -296,11 +291,11 @@ export const OperationsAgenda: React.FC = () => {
                         setEditingAppointment(apt);
                         setIsModalOpen(true);
                       }}
-                      className="text-[10px] p-1.5 rounded-md bg-[#2B2566] border border-[#F0B55E]/30 text-white truncate hover:border-[#F0B55E] transition-all"
+                      className="text-[10px] p-1.5 rounded-md bg-[#FAF8F5] border border-[#E5E0D8] text-[#22205A] truncate hover:border-[#D99426] transition-all"
                     >
-                      <div className="font-bold text-[#F0B55E] flex items-center justify-between">
+                      <div className="font-bold text-[#D99426] flex items-center justify-between">
                         <span>{apt.time}</span>
-                        <span className="capitalize text-[9px] text-[#DAD2C4]">
+                        <span className="capitalize text-[9px] text-[#68638C]">
                           {apt.status}
                         </span>
                       </div>
@@ -315,40 +310,40 @@ export const OperationsAgenda: React.FC = () => {
       </div>
 
       {/* Lista Rápida dos Próximos Atendimentos */}
-      <div className="bg-[#1D1B48] border border-[#372B69] rounded-2xl p-6 shadow-xl space-y-4">
-        <h3 className="font-heading text-lg font-bold text-white flex items-center gap-2 border-b border-[#372B69] pb-3">
-          <Clock className="h-5 w-5 text-[#F0B55E]" />
-          Próximos Atendimentos Agendados & Ações Rápidas
+      <div className="bg-white border border-[#E5E0D8] rounded-2xl p-6 shadow-xs space-y-4">
+        <h3 className="font-heading text-base font-bold text-[#22205A] flex items-center gap-2 border-b border-[#F0EBE1] pb-3">
+          <Clock className="h-4 w-4 text-[#D99426]" />
+          Próximos Atendimentos & Ações Rápidas
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredAppointments.slice(0, 6).map((apt) => (
             <div
               key={apt.id}
-              className="bg-[#2B2566] border border-[#372B69] rounded-xl p-4 space-y-3 hover:border-[#F0B55E]/60 transition-all flex flex-col justify-between"
+              className="bg-[#FAF8F5] border border-[#E5E0D8] rounded-xl p-4 space-y-3 hover:border-[#D99426] transition-all flex flex-col justify-between"
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-[#1D1B48] text-[#F0B55E] border border-[#F0B55E]/30">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-white text-[#22205A] border border-[#E5E0D8]">
                     {apt.date} às {apt.time}
                   </span>
-                  <span className="text-[10px] text-white/70">{apt.durationMinutes} min</span>
+                  <span className="text-[10px] text-[#68638C]">{apt.durationMinutes} min</span>
                 </div>
                 <div>
-                  <h4 className="text-white font-bold text-sm truncate">{apt.clientName}</h4>
-                  <p className="text-xs text-[#DAD2C4] font-medium">{apt.serviceName}</p>
+                  <h4 className="text-[#22205A] font-bold text-sm truncate">{apt.clientName}</h4>
+                  <p className="text-xs text-[#554F70] font-medium">{apt.serviceName}</p>
                 </div>
-                <p className="text-[11px] text-[#DAD2C4]/80 italic line-clamp-2">
+                <p className="text-[11px] text-[#68638C] italic line-clamp-2">
                   "{apt.notes || 'Sem observações adicionais.'}"
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+              <div className="pt-3 border-t border-[#EAE5DC] flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleSendReminderWhatsApp(apt)}
                     title="Enviar lembrete via WhatsApp"
-                    className="p-1.5 rounded-lg bg-emerald-600/30 text-emerald-300 hover:bg-emerald-600 hover:text-white transition-colors"
+                    className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 hover:bg-emerald-600 hover:text-white transition-colors"
                   >
                     <Send className="h-3.5 w-3.5" />
                   </button>
@@ -357,7 +352,7 @@ export const OperationsAgenda: React.FC = () => {
                     target="_blank"
                     rel="noreferrer"
                     title="Entrar na sala Google Meet"
-                    className="p-1.5 rounded-lg bg-blue-600/30 text-blue-300 hover:bg-blue-600 hover:text-white transition-colors"
+                    className="p-1.5 rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-600 hover:text-white transition-colors"
                   >
                     <Video className="h-3.5 w-3.5" />
                   </a>
@@ -366,7 +361,7 @@ export const OperationsAgenda: React.FC = () => {
                     target="_blank"
                     rel="noreferrer"
                     title="Adicionar à Agenda Google"
-                    className="p-1.5 rounded-lg bg-[#1D1B48] text-[#F0B55E] hover:bg-[#F0B55E] hover:text-[#1E1B4B] transition-colors"
+                    className="p-1.5 rounded-lg bg-white border border-[#E5E0D8] text-[#22205A] hover:bg-[#22205A] hover:text-[#F0B55E] transition-colors"
                   >
                     <ExternalLink className="h-3.5 w-3.5" />
                   </a>
@@ -378,13 +373,13 @@ export const OperationsAgenda: React.FC = () => {
                       setEditingAppointment(apt);
                       setIsModalOpen(true);
                     }}
-                    className="p-1.5 text-[#DAD2C4] hover:text-white"
+                    className="p-1.5 text-[#554F70] hover:text-[#22205A]"
                   >
                     <Edit2 className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() => handleDelete(apt.id)}
-                    className="p-1.5 text-red-400 hover:text-red-300"
+                    className="p-1.5 text-red-500 hover:text-red-700"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -395,30 +390,29 @@ export const OperationsAgenda: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal de Criação / Edição de Atendimento */}
+      {/* Modal de Criação / Edição */}
       {isModalOpen && editingAppointment && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-[#1D1B48] border border-[#F0B55E]/40 rounded-2xl w-full max-w-lg p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-[#372B69] pb-3">
-              <h3 className="font-heading text-lg font-bold text-white flex items-center gap-2">
-                <CalendarIcon className="h-5 w-5 text-[#F0B55E]" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white border border-[#E5E0D8] rounded-2xl w-full max-w-lg p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#F0EBE1] pb-3">
+              <h3 className="font-heading text-base font-bold text-[#22205A] flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4 text-[#D99426]" />
                 {editingAppointment.id ? 'Editar Atendimento' : 'Novo Atendimento'}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-[#DAD2C4] hover:text-white text-sm"
+                className="text-[#68638C] hover:text-[#22205A] text-sm"
               >
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleSaveAppointment} className="space-y-4">
-              {/* Vincular Cliente do CRM */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#DAD2C4]">Vincular Cliente do CRM</label>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#22205A]">Vincular Cliente do CRM</label>
                 <select
                   onChange={(e) => handleSelectContactForModal(e.target.value)}
-                  className="w-full bg-[#2B2566] border border-[#372B69] rounded-xl px-3 py-2 text-white text-xs"
+                  className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
                 >
                   <option value="">Selecione para autopreencher dados...</option>
                   {contacts.map((c) => (
@@ -429,68 +423,68 @@ export const OperationsAgenda: React.FC = () => {
                 </select>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-[#DAD2C4]">Nome do Cliente *</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#22205A]">Nome do Cliente *</label>
                   <input
                     type="text"
                     required
                     value={editingAppointment.clientName || ''}
                     onChange={(e) => setEditingAppointment({ ...editingAppointment, clientName: e.target.value })}
-                    className="w-full bg-[#2B2566] border border-[#372B69] rounded-xl px-3 py-2 text-white text-xs"
+                    className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-[#DAD2C4]">WhatsApp do Cliente *</label>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#22205A]">WhatsApp do Cliente *</label>
                   <input
                     type="text"
                     required
                     value={editingAppointment.clientWhatsapp || ''}
                     onChange={(e) => setEditingAppointment({ ...editingAppointment, clientWhatsapp: e.target.value })}
-                    className="w-full bg-[#2B2566] border border-[#372B69] rounded-xl px-3 py-2 text-white text-xs"
+                    className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-[#DAD2C4]">Data *</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#22205A]">Data *</label>
                   <input
                     type="date"
                     required
                     value={editingAppointment.date || ''}
                     onChange={(e) => setEditingAppointment({ ...editingAppointment, date: e.target.value })}
-                    className="w-full bg-[#2B2566] border border-[#372B69] rounded-xl px-3 py-2 text-white text-xs"
+                    className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-[#DAD2C4]">Horário *</label>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#22205A]">Horário *</label>
                   <input
                     type="time"
                     required
                     value={editingAppointment.time || ''}
                     onChange={(e) => setEditingAppointment({ ...editingAppointment, time: e.target.value })}
-                    className="w-full bg-[#2B2566] border border-[#372B69] rounded-xl px-3 py-2 text-white text-xs"
+                    className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-[#DAD2C4]">Serviço</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#22205A]">Serviço</label>
                   <input
                     type="text"
                     value={editingAppointment.serviceName || ''}
                     onChange={(e) => setEditingAppointment({ ...editingAppointment, serviceName: e.target.value })}
-                    className="w-full bg-[#2B2566] border border-[#372B69] rounded-xl px-3 py-2 text-white text-xs"
+                    className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-[#DAD2C4]">Conta Google Calendar</label>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#22205A]">Conta Google Calendar</label>
                   <select
                     value={editingAppointment.gmailAccount || ''}
                     onChange={(e) => setEditingAppointment({ ...editingAppointment, gmailAccount: e.target.value })}
-                    className="w-full bg-[#2B2566] border border-[#372B69] rounded-xl px-3 py-2 text-white text-xs"
+                    className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
                   >
                     {googleAccounts.map((a) => (
                       <option key={a.email} value={a.email}>
@@ -501,37 +495,37 @@ export const OperationsAgenda: React.FC = () => {
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#DAD2C4]">Link do Google Meet</label>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#22205A]">Link do Google Meet</label>
                 <input
                   type="url"
                   value={editingAppointment.meetLink || ''}
                   onChange={(e) => setEditingAppointment({ ...editingAppointment, meetLink: e.target.value })}
-                  className="w-full bg-[#2B2566] border border-[#372B69] rounded-xl px-3 py-2 text-white text-xs"
+                  className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#DAD2C4]">Observações Internas</label>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#22205A]">Observações Internas</label>
                 <textarea
-                  rows={3}
+                  rows={2}
                   value={editingAppointment.notes || ''}
                   onChange={(e) => setEditingAppointment({ ...editingAppointment, notes: e.target.value })}
-                  className="w-full bg-[#2B2566] border border-[#372B69] rounded-xl px-3 py-2 text-white text-xs"
+                  className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#372B69]">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#F0EBE1]">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-transparent hover:bg-white/5 text-xs text-[#DAD2C4]"
+                  className="px-4 py-2 rounded-xl text-xs text-[#68638C] hover:bg-[#FAF8F5]"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-[#F0B55E] hover:bg-[#E5A344] text-[#1E1B4B] font-bold text-xs uppercase tracking-wider shadow-md"
+                  className="px-5 py-2.5 rounded-xl bg-[#22205A] hover:bg-[#1B1948] text-[#F0B55E] font-bold text-xs uppercase tracking-wider shadow-xs"
                 >
                   Salvar Atendimento
                 </button>
