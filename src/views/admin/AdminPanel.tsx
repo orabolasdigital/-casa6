@@ -423,12 +423,12 @@ export const AdminPanel: React.FC<{ onNavigateHome: () => void }> = ({ onNavigat
             {openSections.servicos && (
               <div className="px-2 pb-2 space-y-1 border-t border-[#372B69] pt-2">
                 {[
-                  { id: 'servicos_atendimentos', label: 'Atendimentos', icon: Compass },
+                  { id: 'servicos_atendimentos', label: 'Atendimento', icon: Compass },
                   { id: 'servicos_palestras', label: 'Palestras', icon: Presentation },
                   { id: 'servicos_parcerias', label: 'Parcerias', icon: Handshake },
                   { id: 'servicos_patota', label: 'Patota', icon: Sparkles },
                   { id: 'servicos_bussola', label: 'Bússola', icon: Compass },
-                  { id: 'servicos_lojinha', label: 'Lojinha e frete', icon: ShoppingBag }
+                  { id: 'servicos_lojinha', label: 'Lojinha', icon: ShoppingBag }
                 ].map((item) => {
                   const Icon = item.icon;
                   const isActive = activeItem === item.id;

@@ -382,35 +382,6 @@ export const ServicesManager: React.FC<ServicesManagerProps> = ({
         </div>
       )}
 
-      {/* Navegação entre os 6 Serviços */}
-      <div className="flex flex-wrap gap-2 border-b border-[#E5E0D8] pb-3">
-        {[
-          { id: 'serv_atendimentos', label: 'Atendimentos', icon: Compass },
-          { id: 'serv_palestras', label: 'Palestras', icon: Presentation },
-          { id: 'serv_parcerias', label: 'Parcerias', icon: Handshake },
-          { id: 'serv_patota', label: 'Patota', icon: Sparkles },
-          { id: 'serv_bussola', label: 'Bússola', icon: Compass },
-          { id: 'serv_lojinha', label: 'Lojinha e Frete', icon: ShoppingBag }
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as ServiceSubTab)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                isActive
-                  ? 'bg-[#22205A] text-[#F0B55E] shadow-sm'
-                  : 'bg-white text-[#554F70] hover:bg-[#FAF8F5] border border-[#E5E0D8]'
-              }`}
-            >
-              <Icon className="h-4 w-4" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
       {/* =========================================================================
           ABA 1: ATENDIMENTOS
           ========================================================================= */}

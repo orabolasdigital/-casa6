@@ -45,12 +45,14 @@ import {
 } from '../../../utils/astroEngine';
 import { AstroChartMandala } from '../../../components/AstroChartMandala';
 
-type ActiveTab = 'mandala' | 'planetas' | 'aspectos' | 'interpretacoes' | 'bussola';
+type CalculatorMainTab = 'mapa_natal' | 'bussola';
+type NatalSubTab = 'mandala' | 'planetas' | 'aspectos' | 'interpretacoes';
 
 export const OperationsCalculator: React.FC = () => {
   const [contacts, setContacts] = useState<CRMContactDetail[]>([]);
   const [selectedContactId, setSelectedContactId] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<ActiveTab>('mandala');
+  const [mainTab, setMainTab] = useState<CalculatorMainTab>('mapa_natal');
+  const [natalSubTab, setNatalSubTab] = useState<NatalSubTab>('mandala');
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Dados do formulário para cálculo
@@ -197,48 +199,31 @@ Bianca Tófoli — Casa 6`);
 
   return (
     <div className="space-y-6 animate-fadeIn text-[#22205A]">
-      {/* Cabeçalho */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-[#E5E0D8] pb-4">
-        <div>
-          <div className="flex items-center gap-2 text-[#D99426] text-xs font-bold uppercase tracking-widest">
-            <Sparkles className="h-4 w-4" />
-            <span>Operações &bull; Calculadora Astral Estilo Astrolink</span>
-          </div>
-          <h2 className="text-2xl font-heading font-black text-[#22205A] mt-1">
-            Motor de Geração de Mapa Astral (Astrolink Pro)
-          </h2>
-          <p className="text-xs sm:text-sm text-[#68638C]">
-            Mandala circular vetorial interativa, balanço de elementos, matriz de aspectos, posições exatas e interpretações personalizadas.
-          </p>
-        </div>
+      {/* 2 ABAS PRINCIPAIS: MAPA NATAL E BÚSSOLA */}
+      <div className="flex border-b border-[#E5E0D8] gap-2 pb-px">
+        <button
+          onClick={() => setMainTab('mapa_natal')}
+          className={`py-3 px-6 text-xs sm:text-sm font-heading font-black uppercase tracking-wider rounded-t-2xl transition-all cursor-pointer flex items-center gap-2.5 border-t border-l border-r ${
+            mainTab === 'mapa_natal'
+              ? 'bg-white text-[#22205A] border-[#E5E0D8] border-b-white -mb-px shadow-xs'
+              : 'text-[#68638C] hover:text-[#22205A] border-transparent hover:bg-white/50'
+          }`}
+        >
+          <Sparkles className="h-4 w-4 text-[#D99426]" />
+          <span>Mapa Natal</span>
+        </button>
 
-        <div className="flex flex-wrap items-center gap-2.5">
-          <button
-            onClick={() => window.print()}
-            title="Imprimir / Salvar Relatório em PDF"
-            className="py-2.5 px-4 rounded-xl bg-white hover:bg-[#FAF8F5] border border-[#DCD6CC] text-[#22205A] font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-xs transition-all cursor-pointer"
-          >
-            <Printer className="h-4 w-4 text-[#D99426]" />
-            <span>Imprimir PDF Oficial</span>
-          </button>
-
-          <button
-            onClick={handleShareWhatsApp}
-            title="Enviar Resumo Astrológico pelo WhatsApp"
-            className="py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-xs transition-all cursor-pointer"
-          >
-            <Send className="h-4 w-4" />
-            <span>Enviar WhatsApp</span>
-          </button>
-
-          <button
-            onClick={handleShareEmail}
-            title="Enviar por E-mail"
-            className="py-2.5 px-3.5 rounded-xl bg-[#22205A] hover:bg-[#1B1948] text-white font-bold text-xs uppercase flex items-center gap-2 shadow-xs cursor-pointer"
-          >
-            <Mail className="h-4 w-4" />
-          </button>
-        </div>
+        <button
+          onClick={() => setMainTab('bussola')}
+          className={`py-3 px-6 text-xs sm:text-sm font-heading font-black uppercase tracking-wider rounded-t-2xl transition-all cursor-pointer flex items-center gap-2.5 border-t border-l border-r ${
+            mainTab === 'bussola'
+              ? 'bg-white text-[#22205A] border-[#E5E0D8] border-b-white -mb-px shadow-xs'
+              : 'text-[#68638C] hover:text-[#22205A] border-transparent hover:bg-white/50'
+          }`}
+        >
+          <Compass className="h-4 w-4 text-[#D99426]" />
+          <span>Bússola</span>
+        </button>
       </div>
 
       {notification && (
@@ -262,6 +247,55 @@ Bianca Tófoli — Casa 6`);
           </button>
         </div>
       )}
+
+      {/* =========================================================================
+          ABA 1: MAPA NATAL
+          ========================================================================= */}
+      {mainTab === 'mapa_natal' && (
+        <div className="space-y-6">
+          {/* Cabeçalho */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-[#E5E0D8] pb-4">
+            <div>
+              <div className="flex items-center gap-2 text-[#D99426] text-xs font-bold uppercase tracking-widest">
+                <Sparkles className="h-4 w-4" />
+                <span>Operações &bull; Calculadora Astral &bull; Mapa Natal</span>
+              </div>
+              <h2 className="text-2xl font-heading font-black text-[#22205A] mt-1">
+                Motor de Geração de Mapa Astral (Astrolink Pro)
+              </h2>
+              <p className="text-xs sm:text-sm text-[#68638C]">
+                Mandala circular vetorial interativa, balanço de elementos, matriz de aspectos, posições exatas e interpretações personalizadas.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                onClick={() => window.print()}
+                title="Imprimir / Salvar Relatório em PDF"
+                className="py-2.5 px-4 rounded-xl bg-white hover:bg-[#FAF8F5] border border-[#DCD6CC] text-[#22205A] font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+              >
+                <Printer className="h-4 w-4 text-[#D99426]" />
+                <span>Imprimir PDF Oficial</span>
+              </button>
+
+              <button
+                onClick={handleShareWhatsApp}
+                title="Enviar Resumo Astrológico pelo WhatsApp"
+                className="py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+              >
+                <Send className="h-4 w-4" />
+                <span>Enviar WhatsApp</span>
+              </button>
+
+              <button
+                onClick={handleShareEmail}
+                title="Enviar por E-mail"
+                className="py-2.5 px-3.5 rounded-xl bg-[#22205A] hover:bg-[#1B1948] text-white font-bold text-xs uppercase flex items-center gap-2 shadow-xs cursor-pointer"
+              >
+                <Mail className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
 
       {/* BARRA DE SELEÇÃO RÁPIDA DE CLIENTES DO CRM & FORMULÁRIO DE CÁLCULO */}
       <div className="bg-white border border-[#E5E0D8] rounded-2xl p-5 shadow-xs space-y-4">
@@ -365,74 +399,62 @@ Bianca Tófoli — Casa 6`);
         </form>
       </div>
 
-      {/* NAVEGAÇÃO POR ABAS ESTILO ASTROLINK */}
-      <div className="flex border-b border-[#E5E0D8] gap-1 overflow-x-auto pb-px">
-        <button
-          onClick={() => setActiveTab('mandala')}
-          className={`py-3 px-5 text-xs font-bold uppercase tracking-wider rounded-t-xl transition-all cursor-pointer flex items-center gap-2 border-t border-l border-r ${
-            activeTab === 'mandala'
-              ? 'bg-white text-[#22205A] border-[#E5E0D8] border-b-white -mb-px shadow-xs'
-              : 'text-[#68638C] hover:text-[#22205A] border-transparent'
-          }`}
-        >
-          <Compass className="h-4 w-4 text-[#D99426]" />
-          <span>1. Mandala & Síntese</span>
-        </button>
+          {/* NAVEGAÇÃO POR SUB-ABAS DO MAPA NATAL */}
+          <div className="flex border-b border-[#E5E0D8] gap-1 overflow-x-auto pb-px">
+            <button
+              onClick={() => setNatalSubTab('mandala')}
+              className={`py-2.5 px-4 text-xs font-bold uppercase tracking-wider rounded-t-xl transition-all cursor-pointer flex items-center gap-2 border-t border-l border-r ${
+                natalSubTab === 'mandala'
+                  ? 'bg-white text-[#22205A] border-[#E5E0D8] border-b-white -mb-px shadow-xs'
+                  : 'text-[#68638C] hover:text-[#22205A] border-transparent'
+              }`}
+            >
+              <Compass className="h-3.5 w-3.5 text-[#D99426]" />
+              <span>1. Mandala & Síntese</span>
+            </button>
 
-        <button
-          onClick={() => setActiveTab('planetas')}
-          className={`py-3 px-5 text-xs font-bold uppercase tracking-wider rounded-t-xl transition-all cursor-pointer flex items-center gap-2 border-t border-l border-r ${
-            activeTab === 'planetas'
-              ? 'bg-white text-[#22205A] border-[#E5E0D8] border-b-white -mb-px shadow-xs'
-              : 'text-[#68638C] hover:text-[#22205A] border-transparent'
-          }`}
-        >
-          <Layers className="h-4 w-4 text-[#D99426]" />
-          <span>2. Planetas & Casas</span>
-        </button>
+            <button
+              onClick={() => setNatalSubTab('planetas')}
+              className={`py-2.5 px-4 text-xs font-bold uppercase tracking-wider rounded-t-xl transition-all cursor-pointer flex items-center gap-2 border-t border-l border-r ${
+                natalSubTab === 'planetas'
+                  ? 'bg-white text-[#22205A] border-[#E5E0D8] border-b-white -mb-px shadow-xs'
+                  : 'text-[#68638C] hover:text-[#22205A] border-transparent'
+              }`}
+            >
+              <Layers className="h-3.5 w-3.5 text-[#D99426]" />
+              <span>2. Planetas & Casas</span>
+            </button>
 
-        <button
-          onClick={() => setActiveTab('aspectos')}
-          className={`py-3 px-5 text-xs font-bold uppercase tracking-wider rounded-t-xl transition-all cursor-pointer flex items-center gap-2 border-t border-l border-r ${
-            activeTab === 'aspectos'
-              ? 'bg-white text-[#22205A] border-[#E5E0D8] border-b-white -mb-px shadow-xs'
-              : 'text-[#68638C] hover:text-[#22205A] border-transparent'
-          }`}
-        >
-          <PieChart className="h-4 w-4 text-[#D99426]" />
-          <span>3. Matriz de Aspectos</span>
-        </button>
+            <button
+              onClick={() => setNatalSubTab('aspectos')}
+              className={`py-2.5 px-4 text-xs font-bold uppercase tracking-wider rounded-t-xl transition-all cursor-pointer flex items-center gap-2 border-t border-l border-r ${
+                natalSubTab === 'aspectos'
+                  ? 'bg-white text-[#22205A] border-[#E5E0D8] border-b-white -mb-px shadow-xs'
+                  : 'text-[#68638C] hover:text-[#22205A] border-transparent'
+              }`}
+            >
+              <PieChart className="h-3.5 w-3.5 text-[#D99426]" />
+              <span>3. Matriz de Aspectos</span>
+            </button>
 
-        <button
-          onClick={() => setActiveTab('interpretacoes')}
-          className={`py-3 px-5 text-xs font-bold uppercase tracking-wider rounded-t-xl transition-all cursor-pointer flex items-center gap-2 border-t border-l border-r ${
-            activeTab === 'interpretacoes'
-              ? 'bg-white text-[#22205A] border-[#E5E0D8] border-b-white -mb-px shadow-xs'
-              : 'text-[#68638C] hover:text-[#22205A] border-transparent'
-          }`}
-        >
-          <BookOpen className="h-4 w-4 text-[#D99426]" />
-          <span>4. Interpretações Cósmicas</span>
-        </button>
+            <button
+              onClick={() => setNatalSubTab('interpretacoes')}
+              className={`py-2.5 px-4 text-xs font-bold uppercase tracking-wider rounded-t-xl transition-all cursor-pointer flex items-center gap-2 border-t border-l border-r ${
+                natalSubTab === 'interpretacoes'
+                  ? 'bg-white text-[#22205A] border-[#E5E0D8] border-b-white -mb-px shadow-xs'
+                  : 'text-[#68638C] hover:text-[#22205A] border-transparent'
+              }`}
+            >
+              <BookOpen className="h-3.5 w-3.5 text-[#D99426]" />
+              <span>4. Interpretações Cósmicas</span>
+            </button>
+          </div>
 
-        <button
-          onClick={() => setActiveTab('bussola')}
-          className={`py-3 px-5 text-xs font-bold uppercase tracking-wider rounded-t-xl transition-all cursor-pointer flex items-center gap-2 border-t border-l border-r ${
-            activeTab === 'bussola'
-              ? 'bg-white text-[#22205A] border-[#E5E0D8] border-b-white -mb-px shadow-xs'
-              : 'text-[#68638C] hover:text-[#22205A] border-transparent'
-          }`}
-        >
-          <FileText className="h-4 w-4 text-[#D99426]" />
-          <span>5. Bússola Pessoal & Trânsitos</span>
-        </button>
-      </div>
-
-      {/* CONTEÚDO DAS ABAS */}
-      {chartData && (
-        <div className="space-y-6">
-          {/* ABA 1: MANDALA ASTRAL & SÍNTESE */}
-          {activeTab === 'mandala' && (
+          {/* CONTEÚDO DAS SUB-ABAS DO MAPA NATAL */}
+          {chartData && (
+            <div className="space-y-6">
+              {/* SUB-ABA 1: MANDALA ASTRAL & SÍNTESE */}
+              {natalSubTab === 'mandala' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               {/* Coluna Esquerda: Mandala SVG Interativa (7 cols) */}
               <div className="lg:col-span-7 bg-white border border-[#E5E0D8] rounded-2xl p-6 shadow-xs flex flex-col items-center">
@@ -616,8 +638,8 @@ Bianca Tófoli — Casa 6`);
             </div>
           )}
 
-          {/* ABA 2: PLANETAS & CASAS (TABELAS TÉCNICAS ASTRO.COM) */}
-          {activeTab === 'planetas' && (
+          {/* SUB-ABA 2: PLANETAS & CASAS (TABELAS TÉCNICAS ASTRO.COM) */}
+          {natalSubTab === 'planetas' && (
             <div className="space-y-4">
               {/* Painel Técnico Astrodienst Swiss Ephemeris */}
               <div className="bg-white border border-[#E5E0D8] rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-4 text-xs">
@@ -768,8 +790,8 @@ Bianca Tófoli — Casa 6`);
           </div>
           )}
 
-          {/* ABA 3: MATRIZ DE ASPECTOS (ASPECTARIUM) */}
-          {activeTab === 'aspectos' && (
+          {/* SUB-ABA 3: MATRIZ DE ASPECTOS (ASPECTARIUM) */}
+          {natalSubTab === 'aspectos' && (
             <div className="bg-white border border-[#E5E0D8] rounded-2xl p-6 shadow-xs space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#F0EBE1] pb-4">
                 <div>
@@ -832,8 +854,8 @@ Bianca Tófoli — Casa 6`);
             </div>
           )}
 
-          {/* ABA 4: INTERPRETAÇÕES CÓSMICAS (TEXTOS PROFUNDOS) */}
-          {activeTab === 'interpretacoes' && (
+          {/* SUB-ABA 4: INTERPRETAÇÕES CÓSMICAS (TEXTOS PROFUNDOS) */}
+          {natalSubTab === 'interpretacoes' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               {/* Menu Lateral de Tópicos (4 cols) */}
               <div className="lg:col-span-4 bg-white border border-[#E5E0D8] rounded-2xl p-4 shadow-xs space-y-2">
@@ -934,146 +956,250 @@ Bianca Tófoli — Casa 6`);
             </div>
           )}
 
-          {/* ABA 5: BÚSSOLA PESSOAL & TRÂNSITOS QUINZENAIS */}
-          {activeTab === 'bussola' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Formulário de Trânsitos (7 cols) */}
-              <div className="lg:col-span-7 bg-white border border-[#E5E0D8] rounded-2xl p-6 shadow-xs space-y-5">
-                <div className="flex items-center justify-between border-b border-[#F0EBE1] pb-3">
-                  <h3 className="font-heading text-base font-bold text-[#22205A] flex items-center gap-2">
-                    <Compass className="h-4 w-4 text-[#D99426]" />
-                    Parâmetros dos Trânsitos Ativos (Bússola Pessoal)
-                  </h3>
-                  <span className="text-[10px] bg-purple-100 text-[#22205A] px-2 py-0.5 rounded-full font-bold">
-                    Quinzena Ativa
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-[#22205A]">Ciclo / Período da Bússola</label>
-                    <input
-                      type="text"
-                      value={cyclePeriod}
-                      onChange={(e) => setCyclePeriod(e.target.value)}
-                      className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-[#22205A]">Planeta Regente do Momento</label>
-                    <input
-                      type="text"
-                      value={dominantPlanet}
-                      onChange={(e) => setDominantPlanet(e.target.value)}
-                      className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-[#22205A]">Signo & Casa Ativada</label>
-                    <input
-                      type="text"
-                      value={signTransit}
-                      onChange={(e) => setSignTransit(e.target.value)}
-                      className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-[#22205A]">Aspecto Planetário Maior</label>
-                    <input
-                      type="text"
-                      value={transitAspect}
-                      onChange={(e) => setTransitAspect(e.target.value)}
-                      className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-[#22205A]">Foco de Potência & Direção Positiva</label>
-                  <input
-                    type="text"
-                    value={themeFocus}
-                    onChange={(e) => setThemeFocus(e.target.value)}
-                    className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-[#22205A]">Alerta de Sombra / Desafio Astrológico</label>
-                  <textarea
-                    rows={2}
-                    value={shadowWarning}
-                    onChange={(e) => setShadowWarning(e.target.value)}
-                    className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs resize-none"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-[#22205A]">Mantra ou Afirmação de Alinhamento</label>
-                  <input
-                    type="text"
-                    value={affirmationGuidance}
-                    onChange={(e) => setAffirmationGuidance(e.target.value)}
-                    className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
-                  />
-                </div>
-              </div>
-
-              {/* Preview do Documento Oficial (5 cols) */}
-              <div className="lg:col-span-5 bg-white border border-[#E5E0D8] rounded-2xl p-6 shadow-xs space-y-4">
-                <div className="flex items-center justify-between border-b border-[#F0EBE1] pb-3">
-                  <h3 className="font-heading text-base font-bold text-[#22205A] flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-[#D99426]" />
-                    Bússola Personalizada Pronta
-                  </h3>
-                  <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">
-                    Oficial Casa 6
-                  </span>
-                </div>
-
-                <div className="bg-[#FAF8F5] border-2 border-[#D99426]/30 rounded-xl p-4 text-xs space-y-3 font-mono leading-relaxed text-[#22205A]">
-                  <div className="font-bold text-[#D99426] font-heading text-sm">
-                    ✨ BÚSSOLA PESSOAL — {chartData.clientName} ✨
-                  </div>
-                  <p>
-                    <strong>Ciclo:</strong> {cyclePeriod}
-                    <br />
-                    <strong>Trânsito Ativo:</strong> {dominantPlanet} em {signTransit}
-                    <br />
-                    <strong>Aspecto:</strong> {transitAspect}
-                  </p>
-                  <p>
-                    <strong>🎯 Foco:</strong> {themeFocus}
-                  </p>
-                  <p>
-                    <strong>⚠️ Atenção à Sombra:</strong>
-                    <br />
-                    {shadowWarning}
-                  </p>
-                  <p>
-                    <strong>🕊️ Mantra:</strong> "{affirmationGuidance}"
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  <button
-                    onClick={handleShareWhatsApp}
-                    className="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
-                  >
-                    <Send className="h-4 w-4" />
-                    <span>WhatsApp</span>
-                  </button>
-                  <button
-                    onClick={handleShareEmail}
-                    className="py-3 px-4 rounded-xl bg-[#22205A] hover:bg-[#1B1948] text-white font-bold text-xs uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
-                  >
-                    <Mail className="h-4 w-4" />
-                    <span>E-mail</span>
-                  </button>
-                </div>
-              </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* =========================================================================
+          ABA 2: BÚSSOLA PESSOAL & TRÂNSITOS
+          ========================================================================= */}
+      {mainTab === 'bussola' && (
+        <div className="space-y-6">
+          {/* Cabeçalho da Bússola */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-[#E5E0D8] pb-4">
+            <div>
+              <div className="flex items-center gap-2 text-[#D99426] text-xs font-bold uppercase tracking-widest">
+                <Compass className="h-4 w-4" />
+                <span>Operações &bull; Calculadora Astral &bull; Bússola Pessoal</span>
+              </div>
+              <h2 className="text-2xl font-heading font-black text-[#22205A] mt-1">
+                Bússola Pessoal & Trânsitos Astrológicos
+              </h2>
+              <p className="text-xs sm:text-sm text-[#68638C]">
+                Mapeamento quinzenal e mensal de ciclos, lunações, trânsitos dominantes e orientações práticas para a consulente.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                onClick={() => window.print()}
+                title="Imprimir / Salvar Relatório em PDF"
+                className="py-2.5 px-4 rounded-xl bg-white hover:bg-[#FAF8F5] border border-[#DCD6CC] text-[#22205A] font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+              >
+                <Printer className="h-4 w-4 text-[#D99426]" />
+                <span>Imprimir PDF Oficial</span>
+              </button>
+
+              <button
+                onClick={handleShareWhatsApp}
+                title="Enviar Bússola pelo WhatsApp"
+                className="py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+              >
+                <Send className="h-4 w-4" />
+                <span>Enviar no WhatsApp</span>
+              </button>
+
+              <button
+                onClick={handleShareEmail}
+                title="Enviar por E-mail"
+                className="py-2.5 px-3.5 rounded-xl bg-[#22205A] hover:bg-[#1B1948] text-white font-bold text-xs uppercase flex items-center gap-2 shadow-xs cursor-pointer"
+              >
+                <Mail className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Banner de Aviso de Configuração da Ferramenta */}
+          <div className="p-4 rounded-2xl bg-amber-50/70 border border-[#F0B55E]/40 text-[#22205A] text-xs sm:text-sm flex items-start gap-3 shadow-2xs">
+            <Compass className="h-5 w-5 text-[#D99426] shrink-0 mt-0.5" />
+            <div>
+              <strong className="font-bold text-[#D99426]">Módulo Bússola Pessoal em Estruturação:</strong>
+              <p className="mt-0.5 text-[#554F70]">
+                Esta aba foi reservada e estruturada para a montagem completa da sua Bússola. Você pode selecionar qualquer cliente do CRM, definir o ciclo quinzenal ou mensal, apontar o trânsito e enviar o dossiê personalizado diretamente.
+              </p>
+            </div>
+          </div>
+
+          {/* Seleção de Cliente para a Bússola */}
+          <div className="bg-white border border-[#E5E0D8] rounded-2xl p-5 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-[#D99426]" />
+                <h3 className="font-heading font-bold text-sm text-[#22205A]">
+                  Consulente Selecionada para a Bússola
+                </h3>
+              </div>
+
+              <div className="flex items-center gap-2 min-w-[280px] max-w-md w-full">
+                <span className="text-xs text-[#68638C] font-semibold whitespace-nowrap">Cliente do CRM:</span>
+                <select
+                  value={selectedContactId}
+                  onChange={(e) => handleSelectContactChange(e.target.value)}
+                  className="w-full bg-[#FAF8F5] border border-[#DCD6CC] focus:border-[#F0B55E] rounded-xl px-3 py-2 text-[#22205A] text-xs focus:outline-none"
+                >
+                  <option value="">Selecione a consulente ({contacts.length})...</option>
+                  {contacts.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.fullName || c.nome} {c.dataNascimento ? `(${c.dataNascimento})` : ''} - {c.cidade || 's/ cidade'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Formulário de Parâmetros e Prévia da Bússola */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Formulário de Trânsitos (7 cols) */}
+            <div className="lg:col-span-7 bg-white border border-[#E5E0D8] rounded-2xl p-6 shadow-xs space-y-5">
+              <div className="flex items-center justify-between border-b border-[#F0EBE1] pb-3">
+                <h3 className="font-heading text-base font-bold text-[#22205A] flex items-center gap-2">
+                  <Compass className="h-4 w-4 text-[#D99426]" />
+                  Parâmetros da Bússola Pessoal & Trânsitos
+                </h3>
+                <span className="text-[10px] bg-purple-100 text-[#22205A] px-2 py-0.5 rounded-full font-bold">
+                  Quinzena Ativa
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#22205A]">Ciclo / Período da Bússola</label>
+                  <input
+                    type="text"
+                    value={cyclePeriod}
+                    onChange={(e) => setCyclePeriod(e.target.value)}
+                    placeholder="Ex: Quinzena de 15 a 30 de Novembro"
+                    className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#22205A]">Planeta Regente do Momento</label>
+                  <input
+                    type="text"
+                    value={dominantPlanet}
+                    onChange={(e) => setDominantPlanet(e.target.value)}
+                    placeholder="Ex: Saturno retrógrado"
+                    className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#22205A]">Signo & Casa Ativada</label>
+                  <input
+                    type="text"
+                    value={signTransit}
+                    onChange={(e) => setSignTransit(e.target.value)}
+                    placeholder="Ex: Peixes na Casa 10"
+                    className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#22205A]">Aspecto Planetário Maior</label>
+                  <input
+                    type="text"
+                    value={transitAspect}
+                    onChange={(e) => setTransitAspect(e.target.value)}
+                    placeholder="Ex: Trígono com Júpiter em Câncer"
+                    className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#22205A]">Foco de Potência & Direção Positiva</label>
+                <input
+                  type="text"
+                  value={themeFocus}
+                  onChange={(e) => setThemeFocus(e.target.value)}
+                  placeholder="Ex: Carreira, Estruturação e Limites Saudáveis"
+                  className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#22205A]">Alerta de Sombra / Desafio Astrológico</label>
+                <textarea
+                  rows={2}
+                  value={shadowWarning}
+                  onChange={(e) => setShadowWarning(e.target.value)}
+                  placeholder="Ex: Cuidado com a sobrecarga mental e autocrítica paralisante."
+                  className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs resize-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#22205A]">Mantra ou Afirmação de Alinhamento</label>
+                <input
+                  type="text"
+                  value={affirmationGuidance}
+                  onChange={(e) => setAffirmationGuidance(e.target.value)}
+                  placeholder="Ex: Reconheço o valor do meu tempo e construo minhas conquistas passo a passo."
+                  className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
+                />
+              </div>
+            </div>
+
+            {/* Preview do Documento Oficial da Bússola (5 cols) */}
+            <div className="lg:col-span-5 bg-white border border-[#E5E0D8] rounded-2xl p-6 shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-[#F0EBE1] pb-3">
+                <h3 className="font-heading text-base font-bold text-[#22205A] flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-[#D99426]" />
+                  Dossiê da Bússola Personalizada
+                </h3>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">
+                  Oficial Casa 6
+                </span>
+              </div>
+
+              <div className="bg-[#FAF8F5] border-2 border-[#D99426]/30 rounded-xl p-5 text-xs space-y-3 font-mono leading-relaxed text-[#22205A] shadow-inner">
+                <div className="font-bold text-[#D99426] font-heading text-sm border-b border-[#D99426]/20 pb-2 flex items-center justify-between">
+                  <span>✨ BÚSSOLA PESSOAL — CASA 6 ✨</span>
+                  <span className="text-[10px] text-[#68638C] font-normal">{currentContact?.cidade || 'São Paulo'}</span>
+                </div>
+                <div>
+                  <strong className="text-[#22205A]">Consulente:</strong> {chartData?.clientName || clientName}
+                </div>
+                <p>
+                  <strong>Ciclo:</strong> {cyclePeriod}
+                  <br />
+                  <strong>Trânsito Ativo:</strong> {dominantPlanet} em {signTransit}
+                  <br />
+                  <strong>Aspecto:</strong> {transitAspect}
+                </p>
+                <p>
+                  <strong>🎯 Foco:</strong> {themeFocus}
+                </p>
+                <p>
+                  <strong>⚠️ Atenção à Sombra:</strong>
+                  <br />
+                  {shadowWarning}
+                </p>
+                <p>
+                  <strong>🕊️ Mantra de Alinhamento:</strong>
+                  <br />
+                  <em>"{affirmationGuidance}"</em>
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button
+                  onClick={handleShareWhatsApp}
+                  className="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+                >
+                  <Send className="h-4 w-4" />
+                  <span>Enviar WhatsApp</span>
+                </button>
+                <button
+                  onClick={handleShareEmail}
+                  className="py-3 px-4 rounded-xl bg-[#22205A] hover:bg-[#1B1948] text-white font-bold text-xs uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+                >
+                  <Mail className="h-4 w-4" />
+                  <span>Enviar E-mail</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

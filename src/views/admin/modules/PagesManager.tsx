@@ -231,6 +231,12 @@ export const PagesManager: React.FC<{ initialSlug?: string }> = ({ initialSlug =
   const [activeSlug, setActiveSlug] = useState<string>(initialSlug.replace('pag_', ''));
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  useEffect(() => {
+    if (initialSlug) {
+      setActiveSlug(initialSlug.replace('pag_', ''));
+    }
+  }, [initialSlug]);
+
   const currentPage = pagesData[activeSlug] || pagesData['inicio'];
 
   const handleUpdateCurrentPage = (field: keyof FullPageCMS, value: string) => {
@@ -315,27 +321,6 @@ export const PagesManager: React.FC<{ initialSlug?: string }> = ({ initialSlug =
           <span>{notification.text}</span>
         </div>
       )}
-
-      {/* Seletor Rápido das 9 Páginas */}
-      <div className="flex flex-wrap gap-1.5 bg-white p-2 rounded-2xl border border-[#E5E0D8] shadow-xs">
-        {Object.values(DEFAULT_FULL_PAGES).map((p) => {
-          const isSelected = activeSlug === p.slug;
-          return (
-            <button
-              key={p.slug}
-              type="button"
-              onClick={() => setActiveSlug(p.slug)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                isSelected
-                  ? 'bg-[#22205A] text-[#F0B55E] shadow-2xs'
-                  : 'text-[#554F70] hover:bg-[#FAF8F5]'
-              }`}
-            >
-              {p.name}
-            </button>
-          );
-        })}
-      </div>
 
       {/* Formulário Completo de Edição dos Textos da Página */}
       <form onSubmit={handleSaveCurrentPage} className="bg-white border border-[#E5E0D8] rounded-2xl p-6 shadow-xs space-y-6">
