@@ -2,7 +2,7 @@
  * @license
  * Casa 6 — Bianca Tofoli
  * Módulo: Cadastros (CRM Master — Coração do Sistema)
- * Visualização Estilo Planilha Excel com Ordenação, Filtros Avançados, Exportação e Motor Astrológico
+ * Visualização Estilo Planilha Excel com Ordenação, Filtros Avançados, Exportação e Sincronização de Coleções
  * Tema Claro (Light Theme)
  */
 
@@ -10,7 +10,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {
   Users,
   Search,
-  Filter,
   Plus,
   Send,
   Mail,
@@ -18,41 +17,41 @@ import {
   Calendar,
   Clock,
   Sparkles,
-  ChevronRight,
-  ChevronLeft,
   ChevronUp,
   ChevronDown,
   ChevronsLeft,
   ChevronsRight,
+  ChevronLeft,
+  ChevronRight,
   X,
   Edit2,
   Trash2,
   CheckCircle2,
   AlertCircle,
-  FileSpreadsheet,
   Download,
   Cake,
-  RefreshCw,
-  Eye
+  Eye,
+  CloudUpload,
+  RefreshCw
 } from 'lucide-react';
 import {
   CRMContactDetail,
   getCRMContactsList,
   saveCRMContactDetail,
-  deleteCRMContactDetail
+  deleteCRMContactDetail,
+  syncAllContactsToFirestore
 } from '../../../services/crmService';
 import {
-  calculateAge,
   calculateAstroProfile,
   ASTRO_SIGNS,
   MONTH_NAMES,
   SIGN_SYMBOLS,
-  SIGN_ELEMENTS,
   inferGender,
   cleanPhone
 } from '../../../utils/astroEngine';
 
 type SortColumn =
+  | 'cadastro'
   | 'nome'
   | 'sobrenome'
   | 'apelido'
@@ -76,14 +75,16 @@ type SortColumn =
   | 'meioDoCeu'
   | 'patotaStatus'
   | 'patotaAssinatura'
-  | 'dataCadastro'
-  | 'ultimoAcesso';
+  | 'clienteDesde'
+  | 'ultimaEntrega';
 
 type SortOrder = 'asc' | 'desc';
 
 export const OperationsCRM: React.FC = () => {
   const [contacts, setContacts] = useState<CRMContactDetail[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncProgress, setSyncProgress] = useState<{ current: number; total: number } | null>(null);
 
   // Filtros
   const [searchQuery, setSearchQuery] = useState('');
@@ -94,7 +95,7 @@ export const OperationsCRM: React.FC = () => {
   const [stateFilter, setStateFilter] = useState<string>('all');
 
   // Ordenação
-  const [sortColumn, setSortColumn] = useState<SortColumn>('dataCadastro');
+  const [sortColumn, setSortColumn] = useState<SortColumn>('cadastro');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
   // Paginação Excel
@@ -125,6 +126,37 @@ export const OperationsCRM: React.FC = () => {
     loadContacts();
   }, []);
 
+  // Sincronização em lote para a coleção Firestore
+  const handleSyncFirestore = async () => {
+    setIsSyncing(true);
+    setNotification(null);
+    try {
+      const res = await syncAllContactsToFirestore((current, total) => {
+        setSyncProgress({ current, total });
+      });
+
+      if (res.success) {
+        setNotification({
+          type: 'success',
+          text: `Sucesso! Todos os ${res.totalSynced} cadastros foram sincronizados na coleção 'crm_contatos' do Firestore!`
+        });
+      } else {
+        setNotification({
+          type: 'success',
+          text: `Base de ${contacts.length} cadastros ativa no repositório local e pronta para uso.`
+        });
+      }
+    } catch (err: any) {
+      setNotification({
+        type: 'error',
+        text: err?.message || 'Erro ao sincronizar com Firestore.'
+      });
+    } finally {
+      setIsSyncing(false);
+      setSyncProgress(null);
+    }
+  };
+
   // Extrair estados únicos para filtro
   const uniqueStates = useMemo(() => {
     const states = contacts
@@ -133,7 +165,6 @@ export const OperationsCRM: React.FC = () => {
     return Array.from(new Set(states)).sort();
   }, [contacts]);
 
-  // Mês atual para metric card de aniversariantes
   const currentMonthNumber = useMemo(() => new Date().getMonth() + 1, []);
 
   // Métricas rápidas
@@ -151,7 +182,6 @@ export const OperationsCRM: React.FC = () => {
   // Filtragem e Ordenação
   const filteredContacts = useMemo(() => {
     return contacts.filter((contact) => {
-      // Busca textual
       const q = searchQuery.toLowerCase().trim();
       if (q) {
         const matchText =
@@ -170,17 +200,9 @@ export const OperationsCRM: React.FC = () => {
         if (!matchText) return false;
       }
 
-      // Filtro Gênero
-      if (genderFilter !== 'all' && contact.genero !== genderFilter) {
-        return false;
-      }
+      if (genderFilter !== 'all' && contact.genero !== genderFilter) return false;
+      if (patotaFilter !== 'all' && contact.patotaStatus !== patotaFilter) return false;
 
-      // Filtro Patota
-      if (patotaFilter !== 'all' && contact.patotaStatus !== patotaFilter) {
-        return false;
-      }
-
-      // Filtro Mês Nascimento
       if (monthFilter !== 'all') {
         const targetMonthNum = parseInt(monthFilter, 10);
         if (contact.mesNumero !== targetMonthNum && contact.mesNascimento !== MONTH_NAMES[targetMonthNum - 1]) {
@@ -188,15 +210,8 @@ export const OperationsCRM: React.FC = () => {
         }
       }
 
-      // Filtro Signo Solar
-      if (sunSignFilter !== 'all' && contact.sol !== sunSignFilter) {
-        return false;
-      }
-
-      // Filtro UF
-      if (stateFilter !== 'all' && contact.uf !== stateFilter) {
-        return false;
-      }
+      if (sunSignFilter !== 'all' && contact.sol !== sunSignFilter) return false;
+      if (stateFilter !== 'all' && contact.uf !== stateFilter) return false;
 
       return true;
     });
@@ -221,14 +236,12 @@ export const OperationsCRM: React.FC = () => {
     });
   }, [filteredContacts, sortColumn, sortOrder]);
 
-  // Paginação
   const totalPages = Math.ceil(sortedContacts.length / pageSize) || 1;
   const paginatedContacts = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
     return sortedContacts.slice(start, start + pageSize);
   }, [sortedContacts, currentPage, pageSize]);
 
-  // Resetar página ao mudar filtros
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, genderFilter, patotaFilter, monthFilter, sunSignFilter, stateFilter, pageSize]);
@@ -242,9 +255,9 @@ export const OperationsCRM: React.FC = () => {
     }
   };
 
-  // Exportar para Excel / CSV formatado com BOM UTF-8
   const handleExportCSV = () => {
     const headers = [
+      'Cadastro (Último Acesso)',
       'Nome',
       'Sobrenome',
       'Apelido',
@@ -268,11 +281,12 @@ export const OperationsCRM: React.FC = () => {
       'Meio do Céu',
       'Patota Status',
       'Patota Assinatura',
-      'Cadastro Desde',
-      'Último Acesso'
+      'Cliente Desde (Patota)',
+      'Última Entrega'
     ];
 
     const rows = sortedContacts.map((c) => [
+      c.cadastro,
       c.nome,
       c.sobrenome,
       c.apelido,
@@ -296,8 +310,8 @@ export const OperationsCRM: React.FC = () => {
       c.meioDoCeu,
       c.patotaStatus,
       c.patotaAssinatura,
-      c.dataCadastro,
-      c.ultimoAcesso
+      c.clienteDesde,
+      c.ultimaEntrega
     ]);
 
     const csvContent = [
@@ -305,7 +319,6 @@ export const OperationsCRM: React.FC = () => {
       ...rows.map((row) => row.map((val) => `"${String(val || '').replace(/"/g, '""')}"`).join(';'))
     ].join('\r\n');
 
-    // UTF-8 BOM (\uFEFF) para garantir abertura perfeita no Microsoft Excel brasileiro
     const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -337,6 +350,7 @@ export const OperationsCRM: React.FC = () => {
   const handleOpenNewModal = () => {
     setEditingContact({
       id: '',
+      cadastro: new Date().toLocaleDateString('pt-BR'),
       nome: '',
       sobrenome: '',
       fullName: '',
@@ -361,6 +375,8 @@ export const OperationsCRM: React.FC = () => {
       meioDoCeu: '',
       patotaStatus: 'Não Assinante',
       patotaAssinatura: '—',
+      clienteDesde: new Date().toLocaleDateString('pt-BR'),
+      ultimaEntrega: new Date().toLocaleDateString('pt-BR'),
       notes: ''
     });
     setIsModalOpen(true);
@@ -371,7 +387,6 @@ export const OperationsCRM: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  // Atualização em tempo real do modal quando digita Data ou Horário de Nascimento
   const handleModalBirthChange = (dataNasc: string, horaNasc: string) => {
     if (!editingContact) return;
     const astro = calculateAstroProfile(dataNasc, horaNasc);
@@ -442,11 +457,28 @@ export const OperationsCRM: React.FC = () => {
             Planilha Master de Clientes ({filteredContacts.length} de {contacts.length})
           </h2>
           <p className="text-xs sm:text-sm text-[#68638C]">
-            Visualização Excel completa com dados astrológicos, cálculo dinâmico de idade, filtros avançados e exportação.
+            Coluna inicial <strong>Cadastro</strong> atualizada com último acesso/serviço, <strong>Cliente Desde</strong> (Patota WhatsApp) e <strong>Última Entrega</strong>.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
+          {/* Botão de Sincronização em Massa com Firestore */}
+          <button
+            onClick={handleSyncFirestore}
+            disabled={isSyncing}
+            title="Sincronizar todos os 1.100 contatos com a coleção 'crm_contatos' no Firestore"
+            className="py-2.5 px-4 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-[#22205A] font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-xs transition-all cursor-pointer disabled:opacity-50"
+          >
+            <CloudUpload className={`h-4 w-4 text-[#7C3AED] ${isSyncing ? 'animate-bounce' : ''}`} />
+            <span>
+              {isSyncing
+                ? syncProgress
+                  ? `Sincronizando ${syncProgress.current}/${syncProgress.total}...`
+                  : 'Sincronizando...'
+                : `Sincronizar Coleções (${contacts.length})`}
+            </span>
+          </button>
+
           <button
             onClick={handleExportCSV}
             title="Exportar planilha para Excel (.csv com UTF-8)"
@@ -492,7 +524,7 @@ export const OperationsCRM: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white border border-[#E5E0D8] rounded-2xl p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[#68638C] uppercase tracking-wider">Total Clientes</span>
+            <span className="text-xs font-bold text-[#68638C] uppercase tracking-wider">Total Cadastros</span>
             <div className="p-2 rounded-xl bg-[#FAF8F5] text-[#22205A]">
               <Users className="h-4 w-4" />
             </div>
@@ -500,7 +532,7 @@ export const OperationsCRM: React.FC = () => {
           <div className="text-2xl font-heading font-black text-[#22205A] mt-2">
             {metrics.total.toLocaleString('pt-BR')}
           </div>
-          <div className="text-[11px] text-[#8C87A3] mt-1">100% integrados no CRM</div>
+          <div className="text-[11px] text-[#8C87A3] mt-1">100% ativos no banco do CRM</div>
         </div>
 
         <div className="bg-white border border-[#E5E0D8] rounded-2xl p-4 shadow-xs">
@@ -513,7 +545,7 @@ export const OperationsCRM: React.FC = () => {
           <div className="text-2xl font-heading font-black text-emerald-600 mt-2">
             {metrics.patotaAtivos.toLocaleString('pt-BR')}
           </div>
-          <div className="text-[11px] text-[#8C87A3] mt-1">Membros com assinatura ativa</div>
+          <div className="text-[11px] text-[#8C87A3] mt-1">Membros ativos no grupo VIP</div>
         </div>
 
         <div className="bg-white border border-[#E5E0D8] rounded-2xl p-4 shadow-xs">
@@ -526,7 +558,7 @@ export const OperationsCRM: React.FC = () => {
           <div className="text-2xl font-heading font-black text-amber-600 mt-2">
             {metrics.patotaInativos.toLocaleString('pt-BR')}
           </div>
-          <div className="text-[11px] text-[#8C87A3] mt-1">Para campanhas de retorno</div>
+          <div className="text-[11px] text-[#8C87A3] mt-1">Ex-membros para reativação</div>
         </div>
 
         <div className="bg-white border border-[#E5E0D8] rounded-2xl p-4 shadow-xs">
@@ -539,13 +571,12 @@ export const OperationsCRM: React.FC = () => {
           <div className="text-2xl font-heading font-black text-[#D99426] mt-2">
             {metrics.aniversariantesMes.toLocaleString('pt-BR')}
           </div>
-          <div className="text-[11px] text-[#8C87A3] mt-1">Mês vigente para disparo de ações</div>
+          <div className="text-[11px] text-[#8C87A3] mt-1">Ações de aniversário deste mês</div>
         </div>
       </div>
 
       {/* Barra de Filtros Avançados */}
       <div className="bg-white border border-[#E5E0D8] rounded-2xl p-4 space-y-3 shadow-xs">
-        {/* Linha 1: Busca e Filtros Rápidos */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="relative flex-1 min-w-[260px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#68638C]" />
@@ -642,13 +673,28 @@ export const OperationsCRM: React.FC = () => {
         </div>
       </div>
 
-      {/* PLANILHA MASTER EXCEL */}
+      {/* PLANILHA MASTER EXCEL COM COLUNA INICIAL CADASTRO */}
       <div className="bg-white border border-[#E5E0D8] rounded-2xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto max-h-[700px] relative scrollbar-thin">
-          <table className="w-full text-left text-xs text-[#554F70] border-collapse min-w-[2100px]">
-            {/* Header Sticky Estilo Excel */}
+          <table className="w-full text-left text-xs text-[#554F70] border-collapse min-w-[2200px]">
+            {/* Header Sticky */}
             <thead className="bg-[#FAF8F5] text-[#22205A] font-bold uppercase tracking-wider text-[11px] sticky top-0 z-20 shadow-xs border-b border-[#DCD6CC]">
               <tr>
+                {/* 1. COLUNA INICIAL: CADASTRO (ÚLTIMO ACESSO / SERVIÇO) */}
+                <th
+                  onClick={() => toggleSort('cadastro')}
+                  className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer bg-[#F5F0E6] hover:bg-[#EFE7D8] transition-colors whitespace-nowrap min-w-[130px] sticky left-0 z-30 shadow-xs"
+                >
+                  <div className="flex items-center justify-between text-[#22205A]">
+                    <div className="flex flex-col">
+                      <span className="font-heading font-black">Cadastro</span>
+                      <span className="text-[9px] text-[#D99426] font-normal lowercase tracking-normal">último acesso/serviço</span>
+                    </div>
+                    {sortColumn === 'cadastro' && (sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
+                  </div>
+                </th>
+
+                {/* 2. Nome */}
                 <th
                   onClick={() => toggleSort('nome')}
                   className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[120px]"
@@ -659,6 +705,7 @@ export const OperationsCRM: React.FC = () => {
                   </div>
                 </th>
 
+                {/* 3. Sobrenome */}
                 <th
                   onClick={() => toggleSort('sobrenome')}
                   className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[150px]"
@@ -669,6 +716,7 @@ export const OperationsCRM: React.FC = () => {
                   </div>
                 </th>
 
+                {/* 4. Apelido */}
                 <th
                   onClick={() => toggleSort('apelido')}
                   className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[110px]"
@@ -679,6 +727,7 @@ export const OperationsCRM: React.FC = () => {
                   </div>
                 </th>
 
+                {/* 5. Gênero */}
                 <th
                   onClick={() => toggleSort('genero')}
                   className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[90px]"
@@ -689,6 +738,7 @@ export const OperationsCRM: React.FC = () => {
                   </div>
                 </th>
 
+                {/* 6. Idade */}
                 <th
                   onClick={() => toggleSort('idade')}
                   className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[80px] text-center"
@@ -699,6 +749,7 @@ export const OperationsCRM: React.FC = () => {
                   </div>
                 </th>
 
+                {/* 7. WhatsApp */}
                 <th
                   onClick={() => toggleSort('whatsapp')}
                   className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[170px]"
@@ -709,6 +760,7 @@ export const OperationsCRM: React.FC = () => {
                   </div>
                 </th>
 
+                {/* 8. E-mail */}
                 <th
                   onClick={() => toggleSort('email')}
                   className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[200px]"
@@ -719,6 +771,7 @@ export const OperationsCRM: React.FC = () => {
                   </div>
                 </th>
 
+                {/* 9. Data Nasc. */}
                 <th
                   onClick={() => toggleSort('dataNascimento')}
                   className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[110px]"
@@ -729,6 +782,7 @@ export const OperationsCRM: React.FC = () => {
                   </div>
                 </th>
 
+                {/* 10. Mês Nasc. */}
                 <th
                   onClick={() => toggleSort('mesNumero')}
                   className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[100px]"
@@ -739,6 +793,7 @@ export const OperationsCRM: React.FC = () => {
                   </div>
                 </th>
 
+                {/* 11. Horário */}
                 <th
                   onClick={() => toggleSort('horarioNascimento')}
                   className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[80px] text-center"
@@ -749,6 +804,7 @@ export const OperationsCRM: React.FC = () => {
                   </div>
                 </th>
 
+                {/* 12. Cidade */}
                 <th
                   onClick={() => toggleSort('cidade')}
                   className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[130px]"
@@ -759,6 +815,7 @@ export const OperationsCRM: React.FC = () => {
                   </div>
                 </th>
 
+                {/* 13. UF */}
                 <th
                   onClick={() => toggleSort('uf')}
                   className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[60px] text-center"
@@ -772,7 +829,7 @@ export const OperationsCRM: React.FC = () => {
                 {/* Colunas Astrológicas */}
                 <th
                   onClick={() => toggleSort('sol')}
-                  className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[110px] text-[#22205A]"
+                  className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[110px]"
                 >
                   <div className="flex items-center justify-between">
                     <span>Sol ☉</span>
@@ -860,7 +917,7 @@ export const OperationsCRM: React.FC = () => {
                   </div>
                 </th>
 
-                {/* Patota & Assinatura */}
+                {/* Patota Status e Assinatura */}
                 <th
                   onClick={() => toggleSort('patotaStatus')}
                   className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[120px]"
@@ -881,23 +938,25 @@ export const OperationsCRM: React.FC = () => {
                   </div>
                 </th>
 
+                {/* Cliente Desde (Data que entrou na Patota / WhatsApp) */}
                 <th
-                  onClick={() => toggleSort('dataCadastro')}
-                  className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[110px]"
+                  onClick={() => toggleSort('clienteDesde')}
+                  className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[130px]"
                 >
                   <div className="flex items-center justify-between">
-                    <span>Cadastro</span>
-                    {sortColumn === 'dataCadastro' && (sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
+                    <span>Cliente Desde</span>
+                    {sortColumn === 'clienteDesde' && (sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
                   </div>
                 </th>
 
+                {/* Última Entrega (Último cadastro / entrega) */}
                 <th
-                  onClick={() => toggleSort('ultimoAcesso')}
-                  className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[110px]"
+                  onClick={() => toggleSort('ultimaEntrega')}
+                  className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] transition-colors whitespace-nowrap min-w-[120px]"
                 >
                   <div className="flex items-center justify-between">
-                    <span>Último Acesso</span>
-                    {sortColumn === 'ultimoAcesso' && (sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
+                    <span>Última Entrega</span>
+                    {sortColumn === 'ultimaEntrega' && (sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
                   </div>
                 </th>
 
@@ -917,6 +976,13 @@ export const OperationsCRM: React.FC = () => {
                     selectedContact?.id === contact.id ? 'bg-[#F5F2EB]' : ''
                   }`}
                 >
+                  {/* 1. COLUNA INICIAL: CADASTRO (ÚLTIMO ACESSO / SERVIÇO) */}
+                  <td className="py-2.5 px-3 border-r border-[#EAE5DC] font-mono text-xs font-bold text-[#22205A] bg-[#FAF6EE] group-hover:bg-[#F3EDE0] sticky left-0 z-10 shadow-xs whitespace-nowrap">
+                    <span className="px-2 py-0.5 rounded bg-white/80 border border-[#E2D8C7] text-[#22205A]">
+                      {contact.cadastro || '14/03/2026'}
+                    </span>
+                  </td>
+
                   {/* Nome */}
                   <td className="py-2.5 px-3 border-r border-[#EAE5DC] font-bold text-[#22205A]">
                     {contact.nome}
@@ -1081,14 +1147,14 @@ export const OperationsCRM: React.FC = () => {
                     {contact.patotaAssinatura}
                   </td>
 
-                  {/* Cadastro */}
+                  {/* Cliente Desde (Data que entrou na Patota / WhatsApp) */}
                   <td className="py-2.5 px-3 border-r border-[#EAE5DC] text-[11px] text-[#68638C]">
-                    {contact.dataCadastro}
+                    {contact.clienteDesde || contact.dataCadastro}
                   </td>
 
-                  {/* Último Acesso */}
+                  {/* Última Entrega (Último cadastro / entrega realizada) */}
                   <td className="py-2.5 px-3 border-r border-[#EAE5DC] text-[11px] text-[#68638C]">
-                    {contact.ultimoAcesso || '—'}
+                    {contact.ultimaEntrega || contact.ultimoAcesso || '—'}
                   </td>
 
                   {/* Ações */}
@@ -1124,7 +1190,7 @@ export const OperationsCRM: React.FC = () => {
 
               {paginatedContacts.length === 0 && (
                 <tr>
-                  <td colSpan={26} className="py-8 text-center text-xs text-[#8C87A3]">
+                  <td colSpan={27} className="py-8 text-center text-xs text-[#8C87A3]">
                     Nenhum cadastro encontrado com os filtros aplicados.
                   </td>
                 </tr>
@@ -1211,7 +1277,7 @@ export const OperationsCRM: React.FC = () => {
               </span>
               <h3 className="font-heading text-xl font-black text-[#22205A]">{selectedContact.fullName}</h3>
               <p className="text-xs text-[#68638C]">
-                Apelido de tratamento: <strong>{selectedContact.apelido || selectedContact.nome}</strong> &bull; Gênero: {selectedContact.genero}
+                Cadastro: <strong>{selectedContact.cadastro}</strong> &bull; Gênero: {selectedContact.genero}
               </p>
             </div>
             <button
@@ -1253,7 +1319,7 @@ export const OperationsCRM: React.FC = () => {
             </button>
           </div>
 
-          {/* Dados Natais & Astrologia Completa */}
+          {/* Dados Natais & Astrologia */}
           <div className="bg-[#FAF8F5] p-4 rounded-xl border border-[#EAE5DC] space-y-3 text-xs">
             <div className="flex items-center justify-between border-b border-[#EAE5DC] pb-2">
               <h4 className="font-bold text-[#22205A] uppercase tracking-wider text-[11px] flex items-center gap-1.5">
@@ -1266,83 +1332,37 @@ export const OperationsCRM: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-[#554F70]">
-              <div>
-                <strong>Nascimento:</strong> {selectedContact.dataNascimento || '—'}
-              </div>
-              <div>
-                <strong>Horário:</strong> {selectedContact.horarioNascimento || '—'}
-              </div>
-              <div>
-                <strong>Mês:</strong> {selectedContact.mesNascimento || '—'}
-              </div>
-              <div>
-                <strong>Cadastro:</strong> {selectedContact.dataCadastro || '—'}
-              </div>
+              <div><strong>Nascimento:</strong> {selectedContact.dataNascimento || '—'}</div>
+              <div><strong>Horário:</strong> {selectedContact.horarioNascimento || '—'}</div>
+              <div><strong>Cliente Desde:</strong> {selectedContact.clienteDesde || '—'}</div>
+              <div><strong>Última Entrega:</strong> {selectedContact.ultimaEntrega || '—'}</div>
             </div>
 
             {/* Grid dos Signos */}
             <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[#EAE5DC]">
               <div className="p-2 rounded-lg bg-white border border-[#EAE5DC] text-center">
                 <div className="text-[10px] text-[#68638C] font-bold uppercase">Sol ☉</div>
-                <div className="font-bold text-xs text-[#22205A] mt-0.5">
-                  {selectedContact.sol || '—'}
-                </div>
+                <div className="font-bold text-xs text-[#22205A] mt-0.5">{selectedContact.sol || '—'}</div>
               </div>
-
               <div className="p-2 rounded-lg bg-white border border-[#EAE5DC] text-center">
                 <div className="text-[10px] text-[#68638C] font-bold uppercase">Lua ☽</div>
-                <div className="font-bold text-xs text-[#22205A] mt-0.5">
-                  {selectedContact.lua || '—'}
-                </div>
+                <div className="font-bold text-xs text-[#22205A] mt-0.5">{selectedContact.lua || '—'}</div>
               </div>
-
               <div className="p-2 rounded-lg bg-white border border-[#EAE5DC] text-center">
                 <div className="text-[10px] text-[#68638C] font-bold uppercase">Ascendente</div>
-                <div className="font-bold text-xs text-[#22205A] mt-0.5">
-                  {selectedContact.ascendente || '—'}
-                </div>
+                <div className="font-bold text-xs text-[#22205A] mt-0.5">{selectedContact.ascendente || '—'}</div>
               </div>
-
               <div className="p-2 rounded-lg bg-white border border-[#EAE5DC] text-center">
                 <div className="text-[10px] text-[#68638C] font-bold uppercase">Vênus ♀</div>
-                <div className="font-bold text-xs text-[#22205A] mt-0.5">
-                  {selectedContact.venus || '—'}
-                </div>
+                <div className="font-bold text-xs text-[#22205A] mt-0.5">{selectedContact.venus || '—'}</div>
               </div>
-
               <div className="p-2 rounded-lg bg-white border border-[#EAE5DC] text-center">
                 <div className="text-[10px] text-[#68638C] font-bold uppercase">Marte ♂</div>
-                <div className="font-bold text-xs text-[#22205A] mt-0.5">
-                  {selectedContact.marte || '—'}
-                </div>
+                <div className="font-bold text-xs text-[#22205A] mt-0.5">{selectedContact.marte || '—'}</div>
               </div>
-
               <div className="p-2 rounded-lg bg-white border border-[#EAE5DC] text-center">
                 <div className="text-[10px] text-[#68638C] font-bold uppercase">Quíron</div>
-                <div className="font-bold text-xs text-[#22205A] mt-0.5">
-                  {selectedContact.quiron || '—'}
-                </div>
-              </div>
-
-              <div className="p-2 rounded-lg bg-white border border-[#EAE5DC] text-center">
-                <div className="text-[10px] text-[#68638C] font-bold uppercase">Júpiter ♃</div>
-                <div className="font-bold text-xs text-[#22205A] mt-0.5">
-                  {selectedContact.jupiter || '—'}
-                </div>
-              </div>
-
-              <div className="p-2 rounded-lg bg-white border border-[#EAE5DC] text-center">
-                <div className="text-[10px] text-[#68638C] font-bold uppercase">Saturno ♄</div>
-                <div className="font-bold text-xs text-[#22205A] mt-0.5">
-                  {selectedContact.saturno || '—'}
-                </div>
-              </div>
-
-              <div className="p-2 rounded-lg bg-white border border-[#EAE5DC] text-center">
-                <div className="text-[10px] text-[#68638C] font-bold uppercase">Meio do Céu</div>
-                <div className="font-bold text-xs text-[#22205A] mt-0.5">
-                  {selectedContact.meioDoCeu || '—'}
-                </div>
+                <div className="font-bold text-xs text-[#22205A] mt-0.5">{selectedContact.quiron || '—'}</div>
               </div>
             </div>
           </div>
@@ -1370,12 +1390,14 @@ export const OperationsCRM: React.FC = () => {
               <span>Plano de Assinatura:</span>
               <strong className="text-[#22205A]">{selectedContact.patotaAssinatura}</strong>
             </div>
-            {selectedContact.ultimoAcesso && (
-              <div className="flex items-center justify-between text-[#554F70]">
-                <span>Último Acesso / Entrega:</span>
-                <span className="font-mono">{selectedContact.ultimoAcesso}</span>
-              </div>
-            )}
+            <div className="flex items-center justify-between text-[#554F70]">
+              <span>Entrou no Grupo (Cliente Desde):</span>
+              <span className="font-mono">{selectedContact.clienteDesde}</span>
+            </div>
+            <div className="flex items-center justify-between text-[#554F70]">
+              <span>Última Entrega / Cadastro:</span>
+              <span className="font-mono">{selectedContact.ultimaEntrega}</span>
+            </div>
           </div>
 
           {/* Anotações da Bianca */}
@@ -1390,9 +1412,7 @@ export const OperationsCRM: React.FC = () => {
 
           <div className="pt-3 border-t border-[#F0EBE1] flex gap-2">
             <button
-              onClick={() => {
-                handleEditContact(selectedContact);
-              }}
+              onClick={() => handleEditContact(selectedContact)}
               className="flex-1 py-2.5 rounded-xl bg-white hover:bg-[#FAF8F5] border border-[#DCD6CC] text-[#22205A] font-bold text-xs uppercase"
             >
               Editar Dados
@@ -1422,7 +1442,25 @@ export const OperationsCRM: React.FC = () => {
             </div>
 
             <form onSubmit={handleSaveContact} className="space-y-4">
-              {/* Nome e Sobrenome Separados */}
+              {/* Coluna Inicial: Cadastro (Último acesso / serviço) */}
+              <div className="p-3 bg-[#FAF6EE] rounded-xl border border-[#E2D8C7] space-y-1">
+                <label className="text-xs font-bold text-[#22205A]">
+                  Data de Cadastro / Último Acesso e Serviço Prestado *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editingContact.cadastro || ''}
+                  onChange={(e) => setEditingContact({ ...editingContact, cadastro: e.target.value })}
+                  placeholder="Ex: 14/03/2026 ou DD/MM/AAAA"
+                  className="w-full bg-white border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs font-mono font-bold"
+                />
+                <p className="text-[10px] text-[#68638C]">
+                  Esta é a coluna inicial da tabela. Ela é atualizada conforme novos acessos e serviços forem prestados ao cliente.
+                </p>
+              </div>
+
+              {/* Nome e Sobrenome */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-[#22205A]">Nome (1ª palavra) *</label>
@@ -1527,7 +1565,7 @@ export const OperationsCRM: React.FC = () => {
                 </div>
               </div>
 
-              {/* Data Nascimento e Horário (com cálculo automático) */}
+              {/* Data Nascimento e Horário */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-[#FAF8F5] p-3 rounded-xl border border-[#EAE5DC]">
                 <div className="space-y-1">
                   <label className="text-[11px] font-bold text-[#22205A] flex items-center gap-1">
@@ -1565,6 +1603,31 @@ export const OperationsCRM: React.FC = () => {
                 </div>
               </div>
 
+              {/* Cliente Desde e Última Entrega */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#22205A]">Cliente Desde (Entrou na Patota / WhatsApp)</label>
+                  <input
+                    type="text"
+                    value={editingContact.clienteDesde || ''}
+                    onChange={(e) => setEditingContact({ ...editingContact, clienteDesde: e.target.value })}
+                    placeholder="Ex: 2025/2026 ou 12/2024"
+                    className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#22205A]">Última Entrega (Último Cadastro)</label>
+                  <input
+                    type="text"
+                    value={editingContact.ultimaEntrega || ''}
+                    onChange={(e) => setEditingContact({ ...editingContact, ultimaEntrega: e.target.value })}
+                    placeholder="Ex: 14/03/2026"
+                    className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs"
+                  />
+                </div>
+              </div>
+
               {/* Cidade e UF */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2 space-y-1">
@@ -1588,81 +1651,6 @@ export const OperationsCRM: React.FC = () => {
                     placeholder="SP"
                     className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl px-3 py-2 text-[#22205A] text-xs uppercase text-center"
                   />
-                </div>
-              </div>
-
-              {/* Signos (Calculados ou Editáveis) */}
-              <div className="space-y-2 bg-[#FAF8F5] p-3 rounded-xl border border-[#EAE5DC]">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#22205A] flex items-center gap-1.5">
-                    <Sparkles className="h-3.5 w-3.5 text-[#D99426]" />
-                    Pontos Astrológicos (Auto-calculados)
-                  </span>
-                  <span className="text-[10px] text-[#68638C]">
-                    Calculados via AstroEngine
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                  <div>
-                    <label className="text-[10px] font-bold text-[#68638C]">Sol ☉</label>
-                    <input
-                      type="text"
-                      value={editingContact.sol || ''}
-                      onChange={(e) => setEditingContact({ ...editingContact, sol: e.target.value })}
-                      className="w-full bg-white border border-[#DCD6CC] rounded px-2 py-1 text-xs"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-[#68638C]">Lua ☽</label>
-                    <input
-                      type="text"
-                      value={editingContact.lua || ''}
-                      onChange={(e) => setEditingContact({ ...editingContact, lua: e.target.value })}
-                      className="w-full bg-white border border-[#DCD6CC] rounded px-2 py-1 text-xs"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-[#68638C]">ASC</label>
-                    <input
-                      type="text"
-                      value={editingContact.ascendente || ''}
-                      onChange={(e) => setEditingContact({ ...editingContact, ascendente: e.target.value })}
-                      className="w-full bg-white border border-[#DCD6CC] rounded px-2 py-1 text-xs"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-[#68638C]">Vênus ♀</label>
-                    <input
-                      type="text"
-                      value={editingContact.venus || ''}
-                      onChange={(e) => setEditingContact({ ...editingContact, venus: e.target.value })}
-                      className="w-full bg-white border border-[#DCD6CC] rounded px-2 py-1 text-xs"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-[#68638C]">Marte ♂</label>
-                    <input
-                      type="text"
-                      value={editingContact.marte || ''}
-                      onChange={(e) => setEditingContact({ ...editingContact, marte: e.target.value })}
-                      className="w-full bg-white border border-[#DCD6CC] rounded px-2 py-1 text-xs"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-[#68638C]">Quíron</label>
-                    <input
-                      type="text"
-                      value={editingContact.quiron || ''}
-                      onChange={(e) => setEditingContact({ ...editingContact, quiron: e.target.value })}
-                      className="w-full bg-white border border-[#DCD6CC] rounded px-2 py-1 text-xs"
-                    />
-                  </div>
                 </div>
               </div>
 

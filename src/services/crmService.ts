@@ -5,7 +5,7 @@
  * Coleção Firestore: 'crm_contatos'
  */
 
-import { collection, doc, setDoc, getDocs, deleteDoc } from 'firebase/firestore';
+import { collection, doc, setDoc, getDocs, deleteDoc, writeBatch } from 'firebase/firestore';
 import { db, isFirebaseReady } from './firebase';
 import importedContactsData from '../data/imported_crm_contacts.json';
 import {
@@ -19,6 +19,7 @@ import {
 
 export interface CRMContactDetail {
   id: string;
+  cadastro: string; // COLUNA INICIAL: data do último acesso ou serviço prestado para este cliente
   nome: string;
   sobrenome: string;
   fullName: string;
@@ -49,8 +50,10 @@ export interface CRMContactDetail {
   patotaStatus: 'Ativo' | 'Inativo' | 'Não Assinante';
   patotaAssinatura: 'Mensal' | 'Trimestral' | 'Semestral' | 'Anual' | 'Bonificado' | '—';
   patotaValor?: string;
-  dataCadastro: string;
-  ultimoAcesso: string;
+  clienteDesde: string; // Data que a pessoa entrou na Patota (grupo de WhatsApp)
+  ultimaEntrega: string; // Último cadastro / entrega realizada
+  dataCadastro: string; // Compatibilidade legada
+  ultimoAcesso: string; // Compatibilidade legada
   tags: string[];
   totalInvested: number;
   notes: string;
@@ -66,7 +69,7 @@ export interface CRMContactDetail {
   updatedAt: string;
 }
 
-const LOCAL_STORAGE_CRM_KEY = 'casa6_crm_master_contacts_v2';
+const LOCAL_STORAGE_CRM_KEY = 'casa6_crm_master_contacts_v3';
 
 // Normaliza o contato para garantir que idade e campos derivados estejam sempre frescos
 export function normalizeContact(contact: any): CRMContactDetail {
@@ -95,8 +98,17 @@ export function normalizeContact(contact: any): CRMContactDetail {
 
   const phoneInfo = cleanPhone(contact.ddd, contact.telefone || contact.whatsapp);
 
+  // Definição das colunas solicitadas pelo usuário:
+  // - clienteDesde: Data que entrou na Patota (grupo de WhatsApp)
+  // - ultimaEntrega: Último cadastro / entrega
+  // - cadastro: Coluna inicial que exibe o último acesso ou serviço prestado para este cliente
+  const clienteDesde = contact.clienteDesde || contact.dataCadastro || '2025/2026';
+  const ultimaEntrega = contact.ultimaEntrega || contact.ultimoAcesso || '—';
+  const cadastro = contact.cadastro || contact.ultimoAcesso || contact.dataCadastro || '14/03/2026';
+
   return {
     id: contact.id || `crm_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+    cadastro,
     nome,
     sobrenome,
     fullName,
@@ -127,8 +139,10 @@ export function normalizeContact(contact: any): CRMContactDetail {
     patotaStatus: contact.patotaStatus || 'Não Assinante',
     patotaAssinatura: contact.patotaAssinatura || '—',
     patotaValor: contact.patotaValor || '',
-    dataCadastro: contact.dataCadastro || contact.createdAt || '2025/2026',
-    ultimoAcesso: contact.ultimoAcesso || '',
+    clienteDesde,
+    ultimaEntrega,
+    dataCadastro: clienteDesde,
+    ultimoAcesso: ultimaEntrega,
     tags: Array.isArray(contact.tags) ? contact.tags : [],
     totalInvested: Number(contact.totalInvested) || 0,
     notes: contact.notes || '',
@@ -139,12 +153,18 @@ export function normalizeContact(contact: any): CRMContactDetail {
   };
 }
 
+/**
+ * Retorna a lista completa de contatos do CRM.
+ * Garante que todos os 1.100 contatos importados do arquivo da Casa 6 estejam sempre presentes!
+ */
 export async function getCRMContactsList(): Promise<CRMContactDetail[]> {
+  const masterInitialList = (importedContactsData as any[]).map(normalizeContact);
+
   // 1. Tentar Firestore se estiver conectado
   if (isFirebaseReady && db) {
     try {
       const snapshot = await getDocs(collection(db, 'crm_contatos'));
-      if (!snapshot.empty) {
+      if (!snapshot.empty && snapshot.docs.length >= 1000) {
         return snapshot.docs.map((d) => normalizeContact(d.data()));
       }
     } catch (err) {
@@ -158,27 +178,50 @@ export async function getCRMContactsList(): Promise<CRMContactDetail[]> {
       const cached = localStorage.getItem(LOCAL_STORAGE_CRM_KEY);
       if (cached) {
         const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed) && parsed.length >= 1000) {
           return parsed.map(normalizeContact);
         }
       }
+      // Se não tiver ou for incompleto, salva a lista mestre de 1.100 contatos
+      localStorage.setItem(LOCAL_STORAGE_CRM_KEY, JSON.stringify(masterInitialList));
     } catch {
       // Ignora erro de storage
     }
   }
 
-  // 3. Importação Inicial (1.100 contatos do arquivo da Casa 6)
-  const initialList = (importedContactsData as any[]).map(normalizeContact);
+  return masterInitialList;
+}
 
-  if (typeof window !== 'undefined') {
-    try {
-      localStorage.setItem(LOCAL_STORAGE_CRM_KEY, JSON.stringify(initialList));
-    } catch {
-      // Storage pode estar com cota reduzida no navegador
-    }
+/**
+ * Sincroniza em lotes todos os 1.100 contatos para a coleção 'crm_contatos' no Firestore
+ */
+export async function syncAllContactsToFirestore(
+  onProgress?: (current: number, total: number) => void
+): Promise<{ success: boolean; totalSynced: number }> {
+  const list = await getCRMContactsList();
+  if (!isFirebaseReady || !db) {
+    return { success: false, totalSynced: list.length };
   }
 
-  return initialList;
+  try {
+    const chunkSize = 400; // Limite seguro do batch do Firestore (máx 500)
+    for (let i = 0; i < list.length; i += chunkSize) {
+      const chunk = list.slice(i, i + chunkSize);
+      const batch = writeBatch(db);
+      for (const item of chunk) {
+        const ref = doc(db, 'crm_contatos', item.id);
+        batch.set(ref, item, { merge: true });
+      }
+      await batch.commit();
+      if (onProgress) {
+        onProgress(Math.min(i + chunkSize, list.length), list.length);
+      }
+    }
+    return { success: true, totalSynced: list.length };
+  } catch (err) {
+    console.error('[CRMService] Erro ao sincronizar coleção Firestore:', err);
+    return { success: false, totalSynced: 0 };
+  }
 }
 
 export async function saveCRMContactDetail(contact: Partial<CRMContactDetail>): Promise<CRMContactDetail> {
@@ -186,7 +229,6 @@ export async function saveCRMContactDetail(contact: Partial<CRMContactDetail>): 
   const now = new Date().toISOString();
   const id = contact.id || `crm_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
-  // Auto-cálculo de astrologia e idade caso tenha data/hora de nascimento
   let astroProfile: any = {};
   if (contact.dataNascimento) {
     astroProfile = calculateAstroProfile(contact.dataNascimento, contact.horarioNascimento);
@@ -200,8 +242,13 @@ export async function saveCRMContactDetail(contact: Partial<CRMContactDetail>): 
 
   const phoneInfo = cleanPhone(contact.ddd, contact.telefone || contact.whatsapp);
 
+  const clienteDesde = contact.clienteDesde || contact.dataCadastro || new Date().toLocaleDateString('pt-BR');
+  const ultimaEntrega = contact.ultimaEntrega || contact.ultimoAcesso || new Date().toLocaleDateString('pt-BR');
+  const cadastro = new Date().toLocaleDateString('pt-BR'); // Atualizado com o último acesso ou serviço prestado
+
   const mergedContact: CRMContactDetail = {
     id,
+    cadastro,
     nome,
     sobrenome,
     fullName,
@@ -232,8 +279,10 @@ export async function saveCRMContactDetail(contact: Partial<CRMContactDetail>): 
     patotaStatus: contact.patotaStatus || 'Não Assinante',
     patotaAssinatura: contact.patotaAssinatura || '—',
     patotaValor: contact.patotaValor || '',
-    dataCadastro: contact.dataCadastro || new Date().toLocaleDateString('pt-BR'),
-    ultimoAcesso: contact.ultimoAcesso || '',
+    clienteDesde,
+    ultimaEntrega,
+    dataCadastro: clienteDesde,
+    ultimoAcesso: ultimaEntrega,
     tags: Array.isArray(contact.tags) ? contact.tags : ['Novo Cadastro'],
     totalInvested: Number(contact.totalInvested) || 0,
     notes: contact.notes || '',

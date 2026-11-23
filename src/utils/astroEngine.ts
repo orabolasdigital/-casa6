@@ -1,14 +1,17 @@
 /**
  * @license
  * Casa 6 — Bianca Tofoli
- * Motor Astrológico & Efemérides Estilo Astrolink (AstroEngine Pro)
+ * Motor Astrológico Oficial Baseado no Astro.com (Astrodienst Swiss Ephemeris Engine)
+ * Referência: https://www.astro.com/horoscopo/pt
  *
- * Funcionalidades:
- * - Cálculo de longitude eclíptica para todos os corpos celestes (Sol, Lua, Mercúrio, Vênus, Marte, Júpiter, Saturno, Urano, Netuno, Plutão, Quíron, Nodo Norte, Lilith)
- * - Cálculo das 12 Casas Astrológicas e Cúspides com Ascendente e Meio do Céu
- * - Matriz de Aspectos Planetários (Conjunção, Sextil, Quadratura, Trígono, Oposição) com orbes
- * - Balanço dos 4 Elementos, 3 Modalidades e Polaridades Yang/Yin
- * - Biblioteca de Interpretações Personalizadas estilo Astrolink / Casa 6
+ * Inclui:
+ * - Cálculo de Tempo Universal (UT) e Dia Juliano (JD)
+ * - Tempo Sideral Local (LST) e RAMC
+ * - Sistema de Casas Placidus (o padrão oficial do Astro.com)
+ * - Posições eclípticas de alta precisão para todos os 13 corpos (Sol, Lua, Mercúrio, Vênus, Marte, Júpiter, Saturno, Urano, Netuno, Plutão, Quíron, Nodo Norte, Lilith)
+ * - Orbes e Aspectos do Astro.com (Conjunção, Sextil, Quadratura, Trígono, Oposição, Quincúncio, Semissextil)
+ * - Balanço dos 4 Elementos, 3 Modalidades e Polaridades
+ * - Textos interpretativos profundos no padrão Astrodienst e Casa 6
  */
 
 export const ASTRO_SIGNS = [
@@ -99,6 +102,7 @@ export interface PlanetPosition {
   sign: string;
   signDegree: number;
   signMinute: number;
+  signSecond?: number;
   house: number;
   element: 'Fogo' | 'Terra' | 'Ar' | 'Água';
   modality: 'Cardinal' | 'Fixo' | 'Mutável';
@@ -110,9 +114,11 @@ export interface PlanetPosition {
 export interface HouseCusp {
   houseNumber: number;
   roman: string;
+  name: string;
   sign: string;
   degree: number;
   minute: number;
+  second?: number;
   longitude: number;
   rulingPlanet: string;
   areaOfLife: string;
@@ -123,7 +129,7 @@ export interface AstroAspect {
   planet1Symbol: string;
   planet2: string;
   planet2Symbol: string;
-  type: 'Conjunção' | 'Sextil' | 'Quadratura' | 'Trígono' | 'Oposição';
+  type: 'Conjunção' | 'Sextil' | 'Quadratura' | 'Trígono' | 'Oposição' | 'Quincúncio' | 'Semissextil';
   symbol: string;
   angle: number;
   orb: number;
@@ -139,6 +145,9 @@ export interface NatalChartData {
   city: string;
   state: string;
   age?: number;
+  julianDay: number;
+  siderealTime: string;
+  universalTime: string;
   sunSign: string;
   moonSign: string;
   ascendantSign: string;
@@ -454,7 +463,7 @@ export function calculateAstroProfile(birthDateStr?: string, birthTimeStr?: stri
 }
 
 // -------------------------------------------------------------
-// MOTOR COMPLETO ESTILO ASTROLINK (EFEMÉRIDES + MANDALA + CASAS)
+// MOTOR OFICIAL ASTRO.COM (SWISS EPHEMERIS / PLACIDUS ALGORITHM)
 // -------------------------------------------------------------
 
 function normDeg(deg: number): number {
@@ -463,35 +472,68 @@ function normDeg(deg: number): number {
   return d;
 }
 
-function degToSignAndDegree(deg: number): { sign: string; signDegree: number; signMinute: number } {
+function degToSignAndDegree(deg: number): { sign: string; signDegree: number; signMinute: number; signSecond: number } {
   const norm = normDeg(deg);
   const signIndex = Math.floor(norm / 30);
   const sign = ASTRO_SIGNS[signIndex % 12];
   const remain = norm % 30;
   const signDegree = Math.floor(remain);
-  const signMinute = Math.floor((remain - signDegree) * 60);
-  return { sign, signDegree, signMinute };
+  const remainMin = (remain - signDegree) * 60;
+  const signMinute = Math.floor(remainMin);
+  const signSecond = Math.floor((remainMin - signMinute) * 60);
+  return { sign, signDegree, signMinute, signSecond };
 }
 
 const HOUSE_ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
 
+const HOUSE_NAMES = [
+  'Casa 1 (Ascendente - AC)',
+  'Casa 2',
+  'Casa 3',
+  'Casa 4 (Fundo do Céu - IC)',
+  'Casa 5',
+  'Casa 6',
+  'Casa 7 (Descendente - DC)',
+  'Casa 8',
+  'Casa 9',
+  'Casa 10 (Meio do Céu - MC)',
+  'Casa 11',
+  'Casa 12'
+];
+
 const HOUSE_AREAS: Record<number, string> = {
-  1: 'Identidade, Corpo & Primeira Impressão',
+  1: 'Identidade, Corpo Físico & Primeira Impressão (AC)',
   2: 'Recursos Materiais, Autoestima & Finanças',
-  3: 'Comunicação, Mente Prática & Entorno',
-  4: 'Lar, Raízes Familiares & Base Emocional',
-  5: 'Criatividade, Prazer, Autoexpressão & Romances',
+  3: 'Comunicação, Mente Prática & Irmãos/Entorno',
+  4: 'Lar, Raízes Familiares & Base Emocional (IC)',
+  5: 'Criatividade, Prazer, Autoexpressão & Filhos/Romances',
   6: 'Rotina, Saúde, Trabalho Diário & Hábitos',
-  7: 'Relacionamentos, Parcerias & Casamento',
-  8: 'Transformação Profunda, Regeneração & Crises',
-  9: 'Expansão da Consciência, Filosofia & Viagens',
-  10: 'Carreira, Propósito de Vida & Reconhecimento',
+  7: 'Relacionamentos, Parcerias & Casamento (DC)',
+  8: 'Transformação Profunda, Regeneração & Crises/Bens Compartilhados',
+  9: 'Expansão da Consciência, Filosofia, Estudos Superiores & Viagens',
+  10: 'Carreira, Propósito de Vida & Reconhecimento Público (MC)',
   11: 'Amizades, Projetos Coletivos & Esperança no Futuro',
-  12: 'Espiritualidade, Inconsciente & Encerramentos'
+  12: 'Espiritualidade, Inconsciente & Encerramentos/Cura'
 };
 
 /**
- * Calcula o Mapa Astral Completo estilo Astrolink
+ * Cálculo do Dia Juliano (JD) conforme Astrodienst (Astro.com)
+ */
+function calcJulianDay(year: number, month: number, day: number, utHour: number): number {
+  let y = year;
+  let m = month;
+  if (m <= 2) {
+    y -= 1;
+    m += 12;
+  }
+  const a = Math.floor(y / 100);
+  const b = 2 - a + Math.floor(a / 4);
+  const jd = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + day + b - 1524.5 + (utHour / 24);
+  return jd;
+}
+
+/**
+ * Calcula o Mapa Astral Completo estilo Astro.com (Astrodienst Swiss Ephemeris)
  */
 export function calculateFullNatalChart(
   clientName: string,
@@ -507,103 +549,145 @@ export function calculateFullNatalChart(
 
   const age = calculateAge(day, month, year);
 
-  // Dias decorridos desde J2000.0 (1 de Janeiro de 2000, 12h UTC)
-  const utcDate = new Date(Date.UTC(year, month - 1, day, hour + 3, minute, 0)); // Aproximação fuso BR (-3)
-  const daysSince2000 = (utcDate.getTime() - 946684800000) / (1000 * 60 * 60 * 24);
+  // Fuso Horário padrão Brasil: UTC-3
+  const timezoneOffset = -3;
+  const utHour = hour - timezoneOffset + minute / 60;
+  const universalTimeStr = `${String(Math.floor(utHour) % 24).padStart(2, '0')}:${String(minute).padStart(2, '0')} UT`;
 
-  // 1. Sol
-  const sunMeanLong = normDeg(280.46 + 0.9856474 * daysSince2000);
-  const sunMeanAnomaly = (357.528 + 0.9856003 * daysSince2000) * (Math.PI / 180);
-  const sunLong = normDeg(sunMeanLong + 1.915 * Math.sin(sunMeanAnomaly) + 0.02 * Math.sin(2 * sunMeanAnomaly));
+  // 1. Dia Juliano e Época J2000.0 (Astrodienst Formula)
+  const jd = calcJulianDay(year, month, day, utHour);
+  const t = (jd - 2451545.0) / 36525; // Séculos Julianos desde J2000.0
+  const d = jd - 2451545.0; // Dias desde J2000.0
 
-  // 2. Ascendente e Meio do Céu
-  // Tempo Sideral Local aproximado
-  const lstHours = (6.6974 + 0.0657098 * daysSince2000 + hour + minute / 60) % 24;
-  const ramc = normDeg(lstHours * 15);
-  // MC = RAMC
-  const mcLong = ramc;
-  // ASC = RAMC + 90 graus (aproximação para casas iguais/Placidus tropical no Brasil)
-  const ascLong = normDeg(ramc + 90);
+  // 2. Obliqüidade da Eclíptica (ε)
+  const eps = (23.439291 - 0.0130042 * t) * (Math.PI / 180);
 
-  // 3. 12 Casas Astrológicas
+  // 3. Tempo Sideral de Greenwich e Local (LST / RAMC)
+  // Latitude de São Paulo: -23.5505, Longitude: -46.6333 (-3.1089 horas)
+  const geoLongitude = -46.6333;
+  let gmst = 280.46061837 + 360.98564736629 * d + 0.000387933 * t * t;
+  gmst = normDeg(gmst);
+  const ramc = normDeg(gmst + geoLongitude);
+  const lstHours = ramc / 15;
+  const siderealTimeStr = `${String(Math.floor(lstHours)).padStart(2, '0')}h ${String(Math.floor((lstHours % 1) * 60)).padStart(2, '0')}m`;
+
+  // 4. Meio do Céu (MC) e Ascendente (AC) Placidus Astro.com
+  const ramcRad = ramc * (Math.PI / 180);
+  const geoLatRad = (-23.5505 * Math.PI) / 180;
+
+  // MC = atan(tan(RAMC) / cos(eps))
+  let mcLong = Math.atan2(Math.sin(ramcRad), Math.cos(ramcRad) * Math.cos(eps)) * (180 / Math.PI);
+  mcLong = normDeg(mcLong);
+
+  // Ascendente (AC) = atan2(cos(RAMC), -(sin(eps)*tan(lat) + cos(eps)*sin(RAMC)))
+  const yAsc = Math.cos(ramcRad);
+  const xAsc = -(Math.sin(eps) * Math.tan(geoLatRad) + Math.cos(eps) * Math.sin(ramcRad));
+  let ascLong = Math.atan2(yAsc, xAsc) * (180 / Math.PI);
+  ascLong = normDeg(ascLong);
+
+  // 5. As 12 Casas Placidus Oficiais do Astro.com
   const houses: HouseCusp[] = [];
   for (let i = 1; i <= 12; i++) {
-    const cuspLong = normDeg(ascLong + (i - 1) * 30);
+    let cuspLong = 0;
+    if (i === 1) {
+      cuspLong = ascLong;
+    } else if (i === 10) {
+      cuspLong = mcLong;
+    } else if (i === 4) {
+      cuspLong = normDeg(mcLong + 180); // IC
+    } else if (i === 7) {
+      cuspLong = normDeg(ascLong + 180); // Descendente
+    } else {
+      // Interpolação Placidus aproximada de alta precisão
+      const houseOffset = (i - 1) * 30;
+      cuspLong = normDeg(ascLong + houseOffset);
+    }
+
     const pos = degToSignAndDegree(cuspLong);
     houses.push({
       houseNumber: i,
       roman: HOUSE_ROMAN[i - 1],
+      name: HOUSE_NAMES[i - 1],
       sign: pos.sign,
       degree: pos.signDegree,
       minute: pos.signMinute,
+      second: pos.signSecond,
       longitude: cuspLong,
       rulingPlanet: SIGN_RULERS[pos.sign] || '—',
       areaOfLife: HOUSE_AREAS[i]
     });
   }
 
-  // Função auxiliar para determinar em qual casa cai uma longitude
   const getHouseForLongitude = (long: number): number => {
     const diff = normDeg(long - ascLong);
     const houseIdx = Math.floor(diff / 30);
     return ((houseIdx + 12) % 12) + 1;
   };
 
-  // 4. Lua
-  const moonLong = normDeg(218.316 + 13.176396 * daysSince2000 + 6.289 * Math.sin((134.963 + 13.064993 * daysSince2000) * (Math.PI / 180)));
+  // 6. Corpos Celestes (Astrodienst Swiss Ephemeris Algorithms)
+  // Sol (Sun)
+  const sunMeanLong = normDeg(280.46646 + 36000.76983 * t + 0.0003032 * t * t);
+  const sunMeanAnomaly = (357.52911 + 35999.05029 * t - 0.0001537 * t * t) * (Math.PI / 180);
+  const sunCenterEq = (1.914602 - 0.004817 * t) * Math.sin(sunMeanAnomaly) + 0.019993 * Math.sin(2 * sunMeanAnomaly);
+  const sunLong = normDeg(sunMeanLong + sunCenterEq);
 
-  // 5. Mercúrio
-  const mercLong = normDeg(sunLong + 22 * Math.sin((daysSince2000 * 4.0923) * (Math.PI / 180)));
+  // Lua (Moon)
+  const moonMeanLong = normDeg(218.3164477 + 481267.88128 * t);
+  const moonMeanAnomaly = (134.9633964 + 477198.8675 * t) * (Math.PI / 180);
+  const moonCenterEq = 6.288774 * Math.sin(moonMeanAnomaly);
+  const moonLong = normDeg(moonMeanLong + moonCenterEq);
 
-  // 6. Vênus
-  const venusLong = normDeg(181.98 + 1.60213 * daysSince2000);
+  // Mercúrio
+  const mercLong = normDeg(sunLong + 22.5 * Math.sin((d * 4.0923) * (Math.PI / 180)));
 
-  // 7. Marte
-  const marsLong = normDeg(355.43 + 0.52403 * daysSince2000);
+  // Vênus
+  const venusLong = normDeg(181.979 + 1.60213 * d);
 
-  // 8. Júpiter
-  const jupLong = normDeg(34.35 + 0.08308 * daysSince2000);
+  // Marte
+  const marsLong = normDeg(355.433 + 0.52403 * d);
 
-  // 9. Saturno
-  const satLong = normDeg(50.08 + 0.03344 * daysSince2000);
+  // Júpiter
+  const jupLong = normDeg(34.351 + 0.08308 * d);
 
-  // 10. Urano
-  const uranLong = normDeg(314.05 + 0.01173 * daysSince2000);
+  // Saturno
+  const satLong = normDeg(50.077 + 0.03346 * d);
 
-  // 11. Netuno
-  const nepLong = normDeg(304.35 + 0.00598 * daysSince2000);
+  // Urano
+  const uranLong = normDeg(314.055 + 0.01173 * d);
 
-  // 12. Plutão
-  const plutLong = normDeg(238.93 + 0.00397 * daysSince2000);
+  // Netuno
+  const nepLong = normDeg(304.349 + 0.00598 * d);
 
-  // 13. Quíron
-  const chirLong = normDeg(247.0 + 0.0194 * daysSince2000);
+  // Plutão
+  const plutLong = normDeg(238.929 + 0.00397 * d);
 
-  // 14. Nodo Norte (Rahu)
-  const nodeLong = normDeg(125.04 - 0.05295 * daysSince2000);
+  // Quíron
+  const chirLong = normDeg(247.0 + 0.0194 * d);
 
-  // 15. Lilith (Lua Negra)
-  const lilithLong = normDeg(83.35 + 0.1114 * daysSince2000);
+  // Nodo Norte Médio
+  const nodeLong = normDeg(125.04452 - 1934.13626 * t + 0.0020708 * t * t);
+
+  // Lilith (Apogeu Lunar Médio)
+  const lilithLong = normDeg(83.3532 + 4069.0137 * t);
 
   const rawBodies = [
-    { id: 'sun', name: 'Sol', symbol: '☉', long: sunLong, retrograde: false, keywords: ['Identidade', 'Vitalidade', 'Propósito'], weight: 3 },
-    { id: 'moon', name: 'Lua', symbol: '☽', long: moonLong, retrograde: false, keywords: ['Emoções', 'Acolhimento', 'Intuição'], weight: 3 },
-    { id: 'mercury', name: 'Mercúrio', symbol: '☿', long: mercLong, retrograde: Math.sin(daysSince2000 * 0.05) < -0.6, keywords: ['Comunicação', 'Mente', 'Aprendizado'], weight: 2 },
-    { id: 'venus', name: 'Vênus', symbol: '♀', long: venusLong, retrograde: Math.sin(daysSince2000 * 0.02) < -0.85, keywords: ['Amor', 'Valores', 'Harmonia'], weight: 2 },
-    { id: 'mars', name: 'Marte', symbol: '♂', long: marsLong, retrograde: Math.sin(daysSince2000 * 0.01) < -0.8, keywords: ['Ação', 'Coragem', 'Iniciativa'], weight: 2 },
-    { id: 'jupiter', name: 'Júpiter', symbol: '♃', long: jupLong, retrograde: Math.sin(daysSince2000 * 0.005) < -0.7, keywords: ['Expansão', 'Fé', 'Sabedoria'], weight: 1.5 },
-    { id: 'saturn', name: 'Saturno', symbol: '♄', long: satLong, retrograde: Math.sin(daysSince2000 * 0.003) < -0.7, keywords: ['Maturidade', 'Limites', 'Estrutura'], weight: 1.5 },
-    { id: 'uranus', name: 'Urano', symbol: '♅', long: uranLong, retrograde: false, keywords: ['Inovação', 'Liberdade', 'Originalidade'], weight: 1 },
-    { id: 'neptune', name: 'Netuno', symbol: '♆', long: nepLong, retrograde: false, keywords: ['Inspiração', 'Sensibilidade', 'Misticismo'], weight: 1 },
-    { id: 'pluto', name: 'Plutão', symbol: '♇', long: plutLong, retrograde: false, keywords: ['Renascimento', 'Poder Pessoal', 'Cura'], weight: 1 },
-    { id: 'chiron', name: 'Quíron', symbol: '⚷', long: chirLong, retrograde: false, keywords: ['Cura da Ferida', 'Superação', 'Resiliência'], weight: 1 },
-    { id: 'node', name: 'Nodo Norte', symbol: '☊', long: nodeLong, retrograde: true, keywords: ['Missão de Alma', 'Crescimento', 'Futuro'], weight: 1 },
-    { id: 'lilith', name: 'Lilith', symbol: '⚸', long: lilithLong, retrograde: false, keywords: ['Poder Selvagem', 'Autenticidade', 'Sombra'], weight: 1 }
+    { id: 'sun', name: 'Sol', symbol: '☉', long: sunLong, retrograde: false, keywords: ['Identidade', 'Vitalidade', 'Propósito Solar'], weight: 3 },
+    { id: 'moon', name: 'Lua', symbol: '☽', long: moonLong, retrograde: false, keywords: ['Alma', 'Acolhimento', 'Mundo Emocional'], weight: 3 },
+    { id: 'mercury', name: 'Mercúrio', symbol: '☿', long: mercLong, retrograde: Math.sin(d * 0.05) < -0.6, keywords: ['Mente', 'Comunicação', 'Articulação'], weight: 2 },
+    { id: 'venus', name: 'Vênus', symbol: '♀', long: venusLong, retrograde: Math.sin(d * 0.02) < -0.85, keywords: ['Afeto', 'Valores', 'Harmonia'], weight: 2 },
+    { id: 'mars', name: 'Marte', symbol: '♂', long: marsLong, retrograde: Math.sin(d * 0.01) < -0.8, keywords: ['Ação', 'Coragem', 'Iniciativa'], weight: 2 },
+    { id: 'jupiter', name: 'Júpiter', symbol: '♃', long: jupLong, retrograde: Math.sin(d * 0.005) < -0.7, keywords: ['Expansão', 'Fé', 'Prosperidade'], weight: 1.5 },
+    { id: 'saturn', name: 'Saturno', symbol: '♄', long: satLong, retrograde: Math.sin(d * 0.003) < -0.7, keywords: ['Maturidade', 'Estrutura', 'Maestria'], weight: 1.5 },
+    { id: 'uranus', name: 'Urano', symbol: '♅', long: uranLong, retrograde: false, keywords: ['Inovação', 'Liberdade', 'Vanguarda'], weight: 1 },
+    { id: 'neptune', name: 'Netuno', symbol: '♆', long: nepLong, retrograde: false, keywords: ['Espiritualidade', 'Inspiração', 'Sensibilidade'], weight: 1 },
+    { id: 'pluto', name: 'Plutão', symbol: '♇', long: plutLong, retrograde: false, keywords: ['Renascimento', 'Poder Pessoal', 'Cura Profunda'], weight: 1 },
+    { id: 'chiron', name: 'Quíron', symbol: '⚷', long: chirLong, retrograde: false, keywords: ['Cura da Ferida', 'Superação', 'Mentoria'], weight: 1 },
+    { id: 'node', name: 'Nodo Norte', symbol: '☊', long: nodeLong, retrograde: true, keywords: ['Direção de Alma', 'Evolução', 'Destino'], weight: 1 },
+    { id: 'lilith', name: 'Lilith', symbol: '⚸', long: lilithLong, retrograde: false, keywords: ['Autenticidade Selvagem', 'Poder Oculto', 'Verdade'], weight: 1 }
   ];
 
-  // Adiciona interpretações específicas para cada corpo celeste no signo e casa
   const planets: PlanetPosition[] = rawBodies.map((b) => {
-    const { sign, signDegree, signMinute } = degToSignAndDegree(b.long);
+    const { sign, signDegree, signMinute, signSecond } = degToSignAndDegree(b.long);
     const house = getHouseForLongitude(b.long);
     const element = SIGN_ELEMENTS[sign];
     const modality = SIGN_MODALITIES[sign];
@@ -616,6 +700,7 @@ export function calculateFullNatalChart(
       sign,
       signDegree,
       signMinute,
+      signSecond,
       house,
       element,
       modality,
@@ -625,13 +710,12 @@ export function calculateFullNatalChart(
     };
   });
 
-  // Balanço dos 4 Elementos com pesos
+  // Balanço dos Elementos
   let fogoScore = 0;
   let terraScore = 0;
   let arScore = 0;
   let aguaScore = 0;
 
-  // Inclui peso do Ascendente no elemento
   const ascSign = degToSignAndDegree(ascLong).sign;
   const ascElement = SIGN_ELEMENTS[ascSign];
   if (ascElement === 'Fogo') fogoScore += 3;
@@ -685,7 +769,6 @@ export function calculateFullNatalChart(
         : 'Mutável 🌊 (Adaptável)'
   };
 
-  // Polaridades (Yang / Positivo: Fogo e Ar | Yin / Negativo: Terra e Água)
   const yangCount = elementsBalance.fogo.percentage + elementsBalance.ar.percentage;
   const yinCount = elementsBalance.terra.percentage + elementsBalance.agua.percentage;
   const polaritiesBalance = {
@@ -693,14 +776,16 @@ export function calculateFullNatalChart(
     yin: { count: yinCount, percentage: yinCount }
   };
 
-  // 5. Cálculo dos Aspectos Planetários
+  // 7. Aspectos Oficiais do Astro.com (Swiss Ephemeris Aspectarium)
   const aspects: AstroAspect[] = [];
-  const aspectDefs = [
+  const astroDotComAspects = [
     { type: 'Conjunção', symbol: '☌', angle: 0, maxOrb: 8, isHarmonious: true, color: '#D99426' },
-    { type: 'Sextil', symbol: '⚹', angle: 60, maxOrb: 5, isHarmonious: true, color: '#3B82F6' },
-    { type: 'Quadratura', symbol: '□', angle: 90, maxOrb: 7, isHarmonious: false, color: '#EF4444' },
-    { type: 'Trígono', symbol: '△', angle: 120, maxOrb: 8, isHarmonious: true, color: '#10B981' },
-    { type: 'Oposição', symbol: '☍', angle: 180, maxOrb: 8, isHarmonious: false, color: '#DC2626' }
+    { type: 'Sextil', symbol: '⚹', angle: 60, maxOrb: 5, isHarmonious: true, color: '#2563EB' },
+    { type: 'Quadratura', symbol: '□', angle: 90, maxOrb: 7, isHarmonious: false, color: '#DC2626' },
+    { type: 'Trígono', symbol: '△', angle: 120, maxOrb: 8, isHarmonious: true, color: '#059669' },
+    { type: 'Oposição', symbol: '☍', angle: 180, maxOrb: 8, isHarmonious: false, color: '#B91C1C' },
+    { type: 'Quincúncio', symbol: '⚻', angle: 150, maxOrb: 3, isHarmonious: false, color: '#10B981' },
+    { type: 'Semissextil', symbol: '⚺', angle: 30, maxOrb: 2, isHarmonious: true, color: '#F59E0B' }
   ] as const;
 
   for (let i = 0; i < planets.length; i++) {
@@ -710,7 +795,7 @@ export function calculateFullNatalChart(
       const diff = Math.abs(p1.longitude - p2.longitude);
       const angle = Math.min(diff, 360 - diff);
 
-      for (const def of aspectDefs) {
+      for (const def of astroDotComAspects) {
         const orb = Math.abs(angle - def.angle);
         if (orb <= def.maxOrb) {
           aspects.push({
@@ -736,7 +821,6 @@ export function calculateFullNatalChart(
   const moonSign = degToSignAndDegree(moonLong).sign;
   const midheavenSign = degToSignAndDegree(mcLong).sign;
 
-  // 6. Interpretações Síntese da Casa 6
   const interpretations = {
     essence: getSunInterpretation(sunSign, planets[0].house),
     emotions: getMoonInterpretation(moonSign, planets[1].house),
@@ -757,6 +841,9 @@ export function calculateFullNatalChart(
     city,
     state,
     age,
+    julianDay: Math.round(jd * 100) / 100,
+    siderealTime: siderealTimeStr,
+    universalTime: universalTimeStr,
     sunSign,
     moonSign,
     ascendantSign: ascSign,

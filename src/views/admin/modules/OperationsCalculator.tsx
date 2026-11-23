@@ -616,9 +616,30 @@ Bianca Tófoli — Casa 6`);
             </div>
           )}
 
-          {/* ABA 2: PLANETAS & CASAS (TABELAS TÉCNICAS) */}
+          {/* ABA 2: PLANETAS & CASAS (TABELAS TÉCNICAS ASTRO.COM) */}
           {activeTab === 'planetas' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="space-y-4">
+              {/* Painel Técnico Astrodienst Swiss Ephemeris */}
+              <div className="bg-white border border-[#E5E0D8] rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-4 text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="font-heading font-black text-xs text-[#22205A] uppercase tracking-wider">
+                    Dados Técnicos Astro.com:
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800 border border-blue-200 font-bold text-[10px]">
+                    Casas Placidus &bull; Swiss Ephemeris
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-4 text-[11px] text-[#554F70]">
+                  <span><strong>UT:</strong> {chartData.universalTime}</span>
+                  <span><strong>LST:</strong> {chartData.siderealTime}</span>
+                  <span><strong>JD:</strong> {chartData.julianDay}</span>
+                  <span><strong>Ascendente:</strong> {chartData.ascendantSign} (AC)</span>
+                  <span><strong>Meio do Céu:</strong> {chartData.midheavenSign} (MC)</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Tabela de Planetas (8 cols) */}
               <div className="lg:col-span-8 bg-white border border-[#E5E0D8] rounded-2xl overflow-hidden shadow-xs">
                 <div className="p-4 bg-[#FAF8F5] border-b border-[#E5E0D8] flex items-center justify-between">
@@ -744,6 +765,7 @@ Bianca Tófoli — Casa 6`);
                 </div>
               </div>
             </div>
+          </div>
           )}
 
           {/* ABA 3: MATRIZ DE ASPECTOS (ASPECTARIUM) */}

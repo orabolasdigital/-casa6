@@ -1,20 +1,18 @@
 /**
  * @license
  * Casa 6 — Bianca Tofoli
- * Componente: Roda / Mandala Astrológica Interativa Estilo Astrolink
- * Renderização Vetorial SVG de Alta Precisão
+ * Componente: Carta / Mandala Astrológica no Padrão Astrodienst / Astro.com
+ * Referência: https://www.astro.com/horoscopo/pt (Swiss Ephemeris Chart Drawing)
  */
 
 import React, { useState } from 'react';
 import {
   NatalChartData,
   PlanetPosition,
-  AstroAspect,
   SIGN_SYMBOLS,
-  SIGN_ELEMENTS,
-  ELEMENT_COLORS
+  SIGN_ELEMENTS
 } from '../utils/astroEngine';
-import { Sparkles, Info } from 'lucide-react';
+import { Info } from 'lucide-react';
 
 interface AstroChartMandalaProps {
   chartData: NatalChartData;
@@ -35,14 +33,10 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
   const housesInnerRadius = 165;
   const aspectsCenterRadius = 120;
 
-  // No padrão astrológico tradicional (Astrolink / Geocêntrico):
-  // O Ascendente é ancorado no horizonte oriental (lado esquerdo / 9 horas, ou seja, 180° no círculo cartesiano)
-  // Os signos giram no sentido anti-horário
+  // No Astro.com (Astrodienst), a carta é ancorada no Ascendente (AC) à esquerda (180° / 9 horas)
   const ascLong = chartData.houses[0]?.longitude || 0;
 
-  // Converte longitude zodiacal (0-360) em coordenadas cartesianas relativas ao Ascendente
   const getCoordinates = (longitude: number, radius: number) => {
-    // Offset para que o ASC fique a 180° (esquerda)
     const angleDeg = (180 - (longitude - ascLong)) % 360;
     const angleRad = (angleDeg * Math.PI) / 180;
     const x = center + radius * Math.cos(angleRad);
@@ -50,13 +44,12 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
     return { x, y, angleDeg, angleRad };
   };
 
-  // Cores de fundo dos signos baseadas no elemento
   const getSignFill = (sign: string) => {
     const el = SIGN_ELEMENTS[sign];
-    if (el === 'Fogo') return '#FEF2F2'; // Vermelho suave
-    if (el === 'Terra') return '#ECFDF5'; // Verde suave
-    if (el === 'Ar') return '#FFFBEB'; // Amarelo suave
-    return '#EFF6FF'; // Azul suave
+    if (el === 'Fogo') return '#FEF2F2';
+    if (el === 'Terra') return '#ECFDF5';
+    if (el === 'Ar') return '#FFFBEB';
+    return '#EFF6FF';
   };
 
   const getSignStroke = (sign: string) => {
@@ -77,7 +70,6 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
 
   const activePlanet = hoveredPlanet || selectedPlanet;
 
-  // Filtra aspectos do planeta ativo ou mostra todos os principais
   const visibleAspects = activePlanet
     ? chartData.aspects.filter(
         (a) => a.planet1 === activePlanet.name || a.planet2 === activePlanet.name
@@ -93,19 +85,22 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
     }
   };
 
+  // Coordenadas das cúspides principais
+  const ascCoord = getCoordinates(chartData.houses[0].longitude, outerRadius + 8);
+  const mcCoord = getCoordinates(chartData.houses[9].longitude, outerRadius + 8);
+
   return (
-    <div className="flex flex-col items-center select-none">
+    <div className="flex flex-col items-center select-none w-full">
       <div className="relative w-full max-w-[560px] aspect-square flex items-center justify-center p-2 bg-white rounded-3xl border border-[#E5E0D8] shadow-sm">
         <svg
           viewBox={`0 0 ${size} ${size}`}
           className="w-full h-full drop-shadow-xs"
         >
           <defs>
-            {/* Gradiente sutil do centro da mandala */}
-            <radialGradient id="centerGradient" cx="50%" cy="50%" r="50%">
+            <radialGradient id="astroComCenterGradient" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.95" />
               <stop offset="85%" stopColor="#FAF8F5" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#F2ECE4" stopOpacity="0.6" />
+              <stop offset="100%" stopColor="#F0ECE4" stopOpacity="0.6" />
             </radialGradient>
           </defs>
 
@@ -119,7 +114,7 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
             strokeWidth="2"
           />
 
-          {/* 1. ANEL EXTERIOR: OS 12 SIGNOS DO ZODÍACO */}
+          {/* 1. ANEL EXTERIOR: OS 12 SIGNOS DO ZODÍACO COM MARCADORES ESTILO ASTRO.COM */}
           {Array.from({ length: 12 }).map((_, i) => {
             const startLong = i * 30;
             const endLong = (i + 1) * 30;
@@ -137,7 +132,6 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
             const midLong = startLong + 15;
             const labelCoord = getCoordinates(midLong, (outerRadius + signsInnerRadius) / 2);
 
-            // Path em arco para o setor do signo
             const arcPath = `
               M ${p1.x} ${p1.y}
               A ${outerRadius} ${outerRadius} 0 0 0 ${p2.x} ${p2.y}
@@ -147,7 +141,7 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
             `;
 
             return (
-              <g key={signName} className="transition-opacity duration-200">
+              <g key={signName}>
                 <path
                   d={arcPath}
                   fill={getSignFill(signName)}
@@ -155,13 +149,13 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
                   strokeWidth="1"
                 />
 
-                {/* Símbolo do Signo */}
+                {/* Símbolo Astrológico Oficial */}
                 <text
                   x={labelCoord.x}
-                  y={labelCoord.y + 5}
+                  y={labelCoord.y + 6}
                   textAnchor="middle"
                   fill={getSignText(signName)}
-                  fontSize="17"
+                  fontSize="18"
                   fontWeight="bold"
                   fontFamily="sans-serif"
                 >
@@ -181,21 +175,21 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
             strokeWidth="1.5"
           />
 
-          {/* 2. ANEL INTERMEDIÁRIO: AS 12 CASAS ASTROLÓGICAS */}
+          {/* 2. AS 12 CASAS PLACIDUS (ASTRO.COM STYLE) */}
           {chartData.houses.map((house, idx) => {
-            const nextHouse = chartData.houses[(idx + 1) % 12];
             const startCoord = getCoordinates(house.longitude, signsInnerRadius);
             const endCoord = getCoordinates(house.longitude, aspectsCenterRadius);
 
+            const nextHouse = chartData.houses[(idx + 1) % 12];
             const midHouseLong = (house.longitude + 15) % 360;
-            const romanCoord = getCoordinates(midHouseLong, (signsInnerRadius + housesInnerRadius) / 2);
+            const numCoord = getCoordinates(midHouseLong, (signsInnerRadius + housesInnerRadius) / 2);
 
             const isAscendant = idx === 0;
             const isMidheaven = idx === 9;
 
             return (
               <g key={`house-${house.houseNumber}`}>
-                {/* Linha divisória da cúspide */}
+                {/* Linha da Cúspide */}
                 <line
                   x1={startCoord.x}
                   y1={startCoord.y}
@@ -206,53 +200,85 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
                   strokeDasharray={isAscendant || isMidheaven ? 'none' : '3,3'}
                 />
 
-                {/* Numeração Romana da Casa */}
+                {/* Numeração da Casa no Estilo Astro.com (Azul / Destacado) */}
                 <text
-                  x={romanCoord.x}
-                  y={romanCoord.y + 4}
+                  x={numCoord.x}
+                  y={numCoord.y + 4}
                   textAnchor="middle"
-                  fill={isAscendant ? '#D99426' : '#8C87A3'}
+                  fill={isAscendant ? '#D99426' : '#3B82F6'}
                   fontSize="11"
-                  fontWeight={isAscendant ? 'bold' : '600'}
-                  fontFamily="serif"
+                  fontWeight="bold"
+                  fontFamily="sans-serif"
                 >
-                  {house.roman}
+                  {house.houseNumber}
                 </text>
               </g>
             );
           })}
 
-          {/* Linha do Eixo Ascendente - Descendente (Horizontal Principal) */}
+          {/* Seta do Ascendente (AC) Oficial Astro.com */}
           <line
-            x1={center - outerRadius}
+            x1={center - outerRadius - 12}
             y1={center}
             x2={center - signsInnerRadius}
             y2={center}
             stroke="#D99426"
-            strokeWidth="3"
+            strokeWidth="3.5"
+          />
+          <polygon
+            points={`${center - outerRadius - 14},${center - 5} ${center - outerRadius - 4},${center} ${center - outerRadius - 14},${center + 5}`}
+            fill="#D99426"
           />
           <text
-            x={center - signsInnerRadius + 18}
+            x={center - outerRadius - 18}
             y={center + 4}
             fill="#D99426"
-            fontSize="10"
+            fontSize="11"
             fontWeight="900"
-            textAnchor="middle"
+            textAnchor="end"
           >
-            ASC
+            AC
           </text>
 
-          {/* Círculo do Centro das Linhas de Aspectos */}
+          {/* Seta do Meio do Céu (MC) Oficial Astro.com */}
+          {(() => {
+            const mcOuter = getCoordinates(chartData.houses[9].longitude, outerRadius + 14);
+            const mcInner = getCoordinates(chartData.houses[9].longitude, signsInnerRadius);
+            return (
+              <g>
+                <line
+                  x1={mcOuter.x}
+                  y1={mcOuter.y}
+                  x2={mcInner.x}
+                  y2={mcInner.y}
+                  stroke="#7C3AED"
+                  strokeWidth="3"
+                />
+                <text
+                  x={mcOuter.x}
+                  y={mcOuter.y - 4}
+                  fill="#7C3AED"
+                  fontSize="11"
+                  fontWeight="900"
+                  textAnchor="middle"
+                >
+                  MC
+                </text>
+              </g>
+            );
+          })()}
+
+          {/* Círculo Interno de Aspectos */}
           <circle
             cx={center}
             cy={center}
             r={aspectsCenterRadius}
-            fill="url(#centerGradient)"
+            fill="url(#astroComCenterGradient)"
             stroke="#DCD6CC"
             strokeWidth="1.5"
           />
 
-          {/* 3. LINHAS DE ASPECTOS NO CENTRO DA MANDALA */}
+          {/* 3. LINHAS DE ASPECTOS NO CENTRO (ASTRO.COM STYLE) */}
           {visibleAspects.map((aspect, idx) => {
             const p1 = chartData.planets.find((p) => p.name === aspect.planet1);
             const p2 = chartData.planets.find((p) => p.name === aspect.planet2);
@@ -272,14 +298,20 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
                 x2={c2.x}
                 y2={c2.y}
                 stroke={aspect.color}
-                strokeWidth={isHighlighted ? 2.5 : 1}
-                strokeOpacity={isHighlighted ? 1 : 0.65}
-                strokeDasharray={aspect.type === 'Sextil' || aspect.type === 'Quadratura' ? '4,3' : 'none'}
+                strokeWidth={isHighlighted ? 2.5 : 1.2}
+                strokeOpacity={isHighlighted ? 1 : 0.7}
+                strokeDasharray={
+                  aspect.type === 'Sextil' || aspect.type === 'Quadratura'
+                    ? '4,3'
+                    : aspect.type === 'Quincúncio' || aspect.type === 'Semissextil'
+                    ? '2,2'
+                    : 'none'
+                }
               />
             );
           })}
 
-          {/* 4. PLANETAS PLOTADOS NO ANEL PLANETÁRIO */}
+          {/* 4. PLANETAS PLOTADOS NO ANEL PLANETÁRIO COM GRAUS ASTRO.COM */}
           {chartData.planets.map((planet) => {
             const coord = getCoordinates(planet.longitude, (signsInnerRadius + housesInnerRadius) / 2);
             const isSelected = selectedPlanet?.id === planet.id;
@@ -293,7 +325,6 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
                 onMouseLeave={() => setHoveredPlanet(null)}
                 onClick={() => handlePlanetClick(planet)}
               >
-                {/* Halo em destaque no hover ou seleção */}
                 {(isSelected || isHovered) && (
                   <circle
                     cx={coord.x}
@@ -305,18 +336,16 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
                   />
                 )}
 
-                {/* Fundo do Glifo do Planeta */}
                 <circle
                   cx={coord.x}
                   cy={coord.y}
                   r="13"
                   fill={isSelected ? '#22205A' : '#FFFFFF'}
-                  stroke={isSelected ? '#F0B55E' : '#D99426'}
+                  stroke={isSelected ? '#F0B55E' : '#22205A'}
                   strokeWidth="1.5"
                   className="shadow-sm"
                 />
 
-                {/* Símbolo do Planeta */}
                 <text
                   x={coord.x}
                   y={coord.y + 4.5}
@@ -328,7 +357,6 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
                   {planet.symbol}
                 </text>
 
-                {/* Marcador de Retrógrado [R] */}
                 {planet.isRetrograde && (
                   <text
                     x={coord.x + 9}
@@ -344,12 +372,12 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
             );
           })}
 
-          {/* Centro Decorativo da Casa 6 */}
+          {/* Centro Decorativo */}
           <circle cx={center} cy={center} r="6" fill="#22205A" />
           <circle cx={center} cy={center} r="2" fill="#F0B55E" />
         </svg>
 
-        {/* Card Flutuante / Tooltip Interativo do Planeta Selecionado */}
+        {/* Card Flutuante / Tooltip do Planeta Selecionado */}
         {activePlanet && (
           <div className="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-xs border border-[#D99426]/40 p-3 rounded-2xl shadow-lg flex items-center justify-between text-xs animate-fadeIn">
             <div className="flex items-center gap-3">
@@ -371,7 +399,7 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
                   )}
                 </div>
                 <div className="text-[11px] text-[#554F70] flex items-center gap-2 mt-0.5">
-                  <span>Casa {activePlanet.house}</span>
+                  <span>Casa {activePlanet.house} (Placidus)</span>
                   <span>&bull;</span>
                   <span>Elemento {activePlanet.element}</span>
                   <span>&bull;</span>
@@ -393,31 +421,31 @@ export const AstroChartMandala: React.FC<AstroChartMandalaProps> = ({
         )}
       </div>
 
-      {/* Legenda de Aspectos & Elementos Estilo Astrolink */}
+      {/* Legenda de Aspectos no Padrão Astro.com */}
       <div className="w-full max-w-[560px] mt-4 flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 bg-[#FAF8F5] rounded-2xl border border-[#E5E0D8] text-[11px] text-[#554F70]">
         <div className="flex items-center gap-3">
-          <span className="font-bold text-[#22205A]">Aspectos:</span>
+          <span className="font-bold text-[#22205A]">Aspectos (Astro.com):</span>
           <span className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#059669]" />
             Trígono (120°)
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#3B82F6]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB]" />
             Sextil (60°)
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#DC2626]" />
             Quadratura (90°)
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#DC2626]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#B91C1C]" />
             Oposição (180°)
           </span>
         </div>
 
         <div className="text-[10px] text-[#8C87A3] flex items-center gap-1">
           <Info className="h-3 w-3" />
-          <span>Passe o mouse nos planetas para ver aspectos</span>
+          <span>Sistema Placidus &bull; Swiss Ephemeris</span>
         </div>
       </div>
     </div>
