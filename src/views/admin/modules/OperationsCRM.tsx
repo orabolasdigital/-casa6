@@ -2,10 +2,11 @@
  * @license
  * Casa 6 — Bianca Tofoli
  * Módulo: Cadastros (CRM Master — Coração do Sistema)
- * Visualização Estilo Planilha Excel com Sub-Abas:
- * 1. Geral (Planilha Geral de Todos os Clientes)
- * 2. Patota (Assinantes, Entrada, Status e Alertas de Tempo: 1m, 3m, 6m, 12m)
- * 3. Bússola (Dados Astrológicos e Mapas Natais Astro.com)
+ * Visualização Estilo Planilha Excel com 4 Sub-Abas:
+ * 1. Geral (Cadastros gerais com Sol, Lua e Ascendente)
+ * 2. Patota (Assinantes, Entrada, Status, Tempo no Grupo e Envio do Link VIP WhatsApp)
+ * 3. Bússola (Membros da Patota > 1 ano com dados natais completos)
+ * 4. Mapas Astrais (Todos os clientes com Mapa Natal gerado no motor Astro.com + Mandala Interativa)
  * Tema Claro (Light Theme)
  */
 
@@ -37,7 +38,10 @@ import {
   CloudUpload,
   RefreshCw,
   Compass,
-  Award
+  Award,
+  ExternalLink,
+  Check,
+  Share2
 } from 'lucide-react';
 import {
   CRMContactDetail,
@@ -50,14 +54,18 @@ import {
 } from '../../../services/crmService';
 import {
   calculateAstroProfile,
+  calculateFullNatalChart,
+  NatalChartData,
   ASTRO_SIGNS,
   MONTH_NAMES,
   SIGN_SYMBOLS,
+  SIGN_ELEMENTS,
   inferGender,
   cleanPhone
 } from '../../../utils/astroEngine';
+import { AstroChartMandala } from '../../../components/AstroChartMandala';
 
-export type CRMSubTab = 'geral' | 'patota' | 'bussola';
+export type CRMSubTab = 'geral' | 'patota' | 'bussola' | 'mapas';
 
 type SortColumn =
   | 'cadastro'
@@ -95,7 +103,7 @@ export const OperationsCRM: React.FC = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncProgress, setSyncProgress] = useState<{ current: number; total: number } | null>(null);
 
-  // Sub-Aba Ativa: 'geral' | 'patota' | 'bussola'
+  // Sub-Aba Ativa: 'geral' | 'patota' | 'bussola' | 'mapas'
   const [activeSubTab, setActiveSubTab] = useState<CRMSubTab>('geral');
 
   // Filtros
@@ -103,6 +111,7 @@ export const OperationsCRM: React.FC = () => {
   const [genderFilter, setGenderFilter] = useState<'all' | 'Feminino' | 'Masculino'>('all');
   const [patotaFilter, setPatotaFilter] = useState<string>('all');
   const [patotaMilestoneFilter, setPatotaMilestoneFilter] = useState<string>('all');
+  const [patotaWhatsAppFilter, setPatotaWhatsAppFilter] = useState<string>('all');
   const [monthFilter, setMonthFilter] = useState<string>('all');
   const [sunSignFilter, setSunSignFilter] = useState<string>('all');
   const [stateFilter, setStateFilter] = useState<string>('all');
@@ -117,6 +126,9 @@ export const OperationsCRM: React.FC = () => {
 
   // Gaveta Lateral (Prontuário Cósmico)
   const [selectedContact, setSelectedContact] = useState<CRMContactDetail | null>(null);
+
+  // Modal de Visualização da Mandala Astrológica Completa (Astro.com)
+  const [mandalaContact, setMandalaContact] = useState<CRMContactDetail | null>(null);
 
   // Modal Novo / Editar
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -186,23 +198,48 @@ export const OperationsCRM: React.FC = () => {
     const patotaTotal = contacts.filter((c) => c.patotaStatus === 'Ativo' || c.patotaStatus === 'Inativo').length;
     const patotaAtivos = contacts.filter((c) => c.patotaStatus === 'Ativo').length;
     const patotaInativos = contacts.filter((c) => c.patotaStatus === 'Inativo').length;
+    const patotaPendentesLink = contacts.filter(
+      (c) => c.patotaStatus === 'Ativo' && c.patotaWhatsAppStatus === 'Pendente'
+    ).length;
     const patotaAlertas = contacts.filter((c) => {
       if (c.patotaStatus !== 'Ativo') return false;
       const tenure = calculatePatotaTenure(c.clienteDesde, c.apelido || c.nome);
       return Boolean(tenure.milestone);
     }).length;
-    const comMapaCalculado = contacts.filter((c) => Boolean(c.sol && c.ascendente)).length;
+
+    // Critério oficial da Bússola: Patota Ativo + > 1 ano de cadastro + data, horário, cidade e UF completos
+    const bussolaElegiveis = contacts.filter((c) => {
+      if (c.patotaStatus !== 'Ativo') return false;
+      const tenure = calculatePatotaTenure(c.clienteDesde, c.apelido || c.nome);
+      if (tenure.months < 12 && tenure.days < 365) return false;
+      if (!c.dataNascimento || !c.horarioNascimento || !c.cidade || !c.uf) return false;
+      return true;
+    }).length;
+
+    // Critério oficial de Mapas Astrais: todos os contatos com mapa natal calculado
+    const comMapaCalculado = contacts.filter((c) => Boolean(c.sol && c.ascendente && c.dataNascimento)).length;
+
     const aniversariantesMes = contacts.filter(
       (c) => c.mesNumero === currentMonthNumber || c.mesNascimento?.toLowerCase().includes(MONTH_NAMES[currentMonthNumber - 1]?.toLowerCase())
     ).length;
 
-    return { total, patotaTotal, patotaAtivos, patotaInativos, patotaAlertas, comMapaCalculado, aniversariantesMes };
+    return {
+      total,
+      patotaTotal,
+      patotaAtivos,
+      patotaInativos,
+      patotaPendentesLink,
+      patotaAlertas,
+      bussolaElegiveis,
+      comMapaCalculado,
+      aniversariantesMes
+    };
   }, [contacts, currentMonthNumber]);
 
-  // Filtragem e Ordenação contextual por Sub-Aba
+  // Filtragem contextual por Sub-Aba
   const filteredContacts = useMemo(() => {
     return contacts.filter((contact) => {
-      // 1. Filtro da Sub-Aba Patota
+      // 1. Sub-Aba: Patota
       if (activeSubTab === 'patota') {
         const isPatota = contact.patotaStatus === 'Ativo' || contact.patotaStatus === 'Inativo';
         if (!isPatota) return false;
@@ -219,11 +256,25 @@ export const OperationsCRM: React.FC = () => {
             return false;
           }
         }
+
+        if (patotaWhatsAppFilter !== 'all') {
+          const currentStatus = contact.patotaWhatsAppStatus || (contact.patotaStatus === 'Ativo' ? 'Habilitado' : 'Pendente');
+          if (currentStatus !== patotaWhatsAppFilter) return false;
+        }
       }
 
-      // 2. Filtro da Sub-Aba Bússola
+      // 2. Sub-Aba: Bússola (Patota Astral > 1 ano + dados natais completos)
       if (activeSubTab === 'bussola') {
-        // Na aba Bússola, permite visualizar todos ou os que têm mapa
+        if (contact.patotaStatus !== 'Ativo') return false;
+        const tenure = calculatePatotaTenure(contact.clienteDesde, contact.apelido || contact.nome);
+        if (tenure.months < 12 && tenure.days < 365) return false;
+        if (!contact.dataNascimento || !contact.horarioNascimento || !contact.cidade || !contact.uf) return false;
+      }
+
+      // 3. Sub-Aba: Mapas Astrais (Todos com mapa astral calculado)
+      if (activeSubTab === 'mapas') {
+        const hasAstroChart = Boolean(contact.sol && contact.ascendente && contact.dataNascimento);
+        if (!hasAstroChart) return false;
       }
 
       // Busca textual genérica
@@ -248,7 +299,7 @@ export const OperationsCRM: React.FC = () => {
 
       if (genderFilter !== 'all' && contact.genero !== genderFilter) return false;
 
-      // Filtro de Mês de Nascimento (disponível para filtrar, sem a coluna na tabela)
+      // Filtro de Mês de Nascimento (funciona em todas as abas)
       if (monthFilter !== 'all') {
         const targetMonthNum = parseInt(monthFilter, 10);
         if (contact.mesNumero !== targetMonthNum && contact.mesNascimento !== MONTH_NAMES[targetMonthNum - 1]) {
@@ -266,7 +317,18 @@ export const OperationsCRM: React.FC = () => {
 
       return true;
     });
-  }, [contacts, activeSubTab, searchQuery, genderFilter, patotaFilter, patotaMilestoneFilter, monthFilter, sunSignFilter, stateFilter]);
+  }, [
+    contacts,
+    activeSubTab,
+    searchQuery,
+    genderFilter,
+    patotaFilter,
+    patotaMilestoneFilter,
+    patotaWhatsAppFilter,
+    monthFilter,
+    sunSignFilter,
+    stateFilter
+  ]);
 
   const sortedContacts = useMemo(() => {
     return [...filteredContacts].sort((a, b) => {
@@ -295,7 +357,18 @@ export const OperationsCRM: React.FC = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeSubTab, searchQuery, genderFilter, patotaFilter, patotaMilestoneFilter, monthFilter, sunSignFilter, stateFilter, pageSize]);
+  }, [
+    activeSubTab,
+    searchQuery,
+    genderFilter,
+    patotaFilter,
+    patotaMilestoneFilter,
+    patotaWhatsAppFilter,
+    monthFilter,
+    sunSignFilter,
+    stateFilter,
+    pageSize
+  ]);
 
   const toggleSort = (column: SortColumn) => {
     if (sortColumn === column) {
@@ -303,6 +376,54 @@ export const OperationsCRM: React.FC = () => {
     } else {
       setSortColumn(column);
       setSortOrder('asc');
+    }
+  };
+
+  // Alterna o status de Acesso ao WhatsApp na Patota (Pendente / Habilitado)
+  const handleToggleWhatsAppAccess = async (contact: CRMContactDetail) => {
+    const current = contact.patotaWhatsAppStatus || (contact.patotaStatus === 'Ativo' ? 'Habilitado' : 'Pendente');
+    const newStatus = current === 'Habilitado' ? 'Pendente' : 'Habilitado';
+
+    try {
+      const updated: CRMContactDetail = {
+        ...contact,
+        patotaWhatsAppStatus: newStatus
+      };
+      await saveCRMContactDetail(updated);
+      setContacts((prev) => prev.map((c) => (c.id === contact.id ? { ...c, patotaWhatsAppStatus: newStatus } : c)));
+      setNotification({
+        type: 'success',
+        text: `Status do WhatsApp de "${contact.nome}" alterado para "${newStatus}".`
+      });
+    } catch {
+      setNotification({ type: 'error', text: 'Erro ao atualizar status de WhatsApp.' });
+    }
+  };
+
+  // Disparo do Link Oficial da Patota no WhatsApp com marcação automática de Habilitado
+  const handleSendPatotaGroupLink = async (contact: CRMContactDetail) => {
+    const cleanDigits = (contact.whatsapp || '').replace(/\D/g, '');
+    if (!cleanDigits) {
+      alert('Número de WhatsApp não informado para este cadastro.');
+      return;
+    }
+
+    const groupInviteUrl = 'https://chat.whatsapp.com/invite/patota-astral-casa6-oficial';
+    const phoneWithCountry = cleanDigits.startsWith('55') ? cleanDigits : `55${cleanDigits}`;
+    const greeting = `Olá, ${contact.apelido || contact.nome}! ✨\n\nQue alegria ter você com a gente na Patota Astral da Casa 6!\n\nSegue o seu link oficial e exclusivo para você acessar o nosso grupo VIP no WhatsApp:\n👉 ${groupInviteUrl}\n\nQualquer dúvida, conte sempre comigo! Um abraço cósmico com muito carinho da Bianca Tófoli.`;
+
+    window.open(`https://wa.me/${phoneWithCountry}?text=${encodeURIComponent(greeting)}`, '_blank');
+
+    // Marca automaticamente como Habilitado
+    try {
+      const updated: CRMContactDetail = {
+        ...contact,
+        patotaWhatsAppStatus: 'Habilitado'
+      };
+      await saveCRMContactDetail(updated);
+      setContacts((prev) => prev.map((c) => (c.id === contact.id ? { ...c, patotaWhatsAppStatus: 'Habilitado' } : c)));
+    } catch {
+      // ignore
     }
   };
 
@@ -324,7 +445,8 @@ export const OperationsCRM: React.FC = () => {
         'Status',
         'Entrada',
         'Tempo no Grupo',
-        'Alerta de Marco'
+        'Alerta de Marco',
+        'Acesso WhatsApp'
       ];
       rows = sortedContacts.map((c) => {
         const tenure = calculatePatotaTenure(c.clienteDesde, c.apelido || c.nome);
@@ -340,10 +462,11 @@ export const OperationsCRM: React.FC = () => {
           c.patotaStatus,
           c.clienteDesde,
           tenure.formattedText,
-          tenure.milestone?.label || '—'
+          tenure.milestone?.label || '—',
+          c.patotaWhatsAppStatus || (c.patotaStatus === 'Ativo' ? 'Habilitado' : 'Pendente')
         ];
       });
-    } else if (activeSubTab === 'bussola') {
+    } else if (activeSubTab === 'bussola' || activeSubTab === 'mapas') {
       headers = [
         'Cadastro',
         'Nome',
@@ -385,7 +508,7 @@ export const OperationsCRM: React.FC = () => {
         c.meioDoCeu
       ]);
     } else {
-      // Geral
+      // Aba Geral: Apenas Sol, Lua e Ascendente conforme solicitado!
       headers = [
         'Cadastro',
         'Nome',
@@ -401,13 +524,7 @@ export const OperationsCRM: React.FC = () => {
         'UF',
         'Sol',
         'Lua',
-        'Ascendente',
-        'Vênus',
-        'Marte',
-        'Quíron',
-        'Júpiter',
-        'Saturno',
-        'Meio do Céu'
+        'Ascendente'
       ];
       rows = sortedContacts.map((c) => [
         c.cadastro,
@@ -424,13 +541,7 @@ export const OperationsCRM: React.FC = () => {
         c.uf,
         c.sol,
         c.lua,
-        c.ascendente,
-        c.venus,
-        c.marte,
-        c.quiron,
-        c.jupiter,
-        c.saturno,
-        c.meioDoCeu
+        c.ascendente
       ]);
     }
 
@@ -497,6 +608,7 @@ export const OperationsCRM: React.FC = () => {
       meioDoCeu: '',
       patotaStatus: activeSubTab === 'patota' ? 'Ativo' : 'Não Assinante',
       patotaAssinatura: '—',
+      patotaWhatsAppStatus: 'Pendente',
       clienteDesde: new Date().toLocaleDateString('pt-BR'),
       ultimaEntrega: new Date().toLocaleDateString('pt-BR'),
       notes: ''
@@ -511,7 +623,7 @@ export const OperationsCRM: React.FC = () => {
 
   const handleModalBirthChange = (dataNasc: string, horaNasc: string) => {
     if (!editingContact) return;
-    const astro = calculateAstroProfile(dataNasc, horaNasc);
+    const astro = calculateAstroProfile(dataNasc, horaNasc, editingContact.cidade || 'São Paulo', editingContact.uf || 'SP');
     setEditingContact({
       ...editingContact,
       dataNascimento: dataNasc,
@@ -566,6 +678,18 @@ export const OperationsCRM: React.FC = () => {
     }
   };
 
+  // Mapa Natal Completo calculado para o Modal de Visualização da Mandala
+  const activeMandalaChartData: NatalChartData | null = useMemo(() => {
+    if (!mandalaContact || !mandalaContact.dataNascimento) return null;
+    return calculateFullNatalChart(
+      mandalaContact.fullName,
+      mandalaContact.dataNascimento,
+      mandalaContact.horarioNascimento || '12:00',
+      mandalaContact.cidade || 'São Paulo',
+      mandalaContact.uf || 'SP'
+    );
+  }, [mandalaContact]);
+
   return (
     <div className="space-y-6 animate-fadeIn text-[#22205A] relative">
       {/* Cabeçalho do Módulo */}
@@ -578,23 +702,27 @@ export const OperationsCRM: React.FC = () => {
           <h2 className="text-2xl font-heading font-black text-[#22205A] mt-1">
             {activeSubTab === 'geral' && `Planilha Geral (${filteredContacts.length} de ${contacts.length})`}
             {activeSubTab === 'patota' && `Assinantes da Patota (${filteredContacts.length} membros)`}
-            {activeSubTab === 'bussola' && `Bússola & Mapas Natais (${filteredContacts.length} cadastros)`}
+            {activeSubTab === 'bussola' && `Bússola Astral (${filteredContacts.length} membros elegíveis)`}
+            {activeSubTab === 'mapas' && `Mapas Astrais Calculados (${filteredContacts.length} mapas)`}
           </h2>
           <p className="text-xs sm:text-sm text-[#68638C]">
             {activeSubTab === 'geral' && (
-              <>Visualização completa dos cadastros com coluna inicial <strong>Cadastro</strong> (último acesso/serviço) e dados natais calculados.</>
+              <>Visualização limpa com coluna inicial <strong>Cadastro</strong> e pontos essenciais: <strong>Sol ☉, Lua ☽ e Ascendente</strong>.</>
             )}
             {activeSubTab === 'patota' && (
-              <>Gestão de membros do grupo WhatsApp, data de <strong>Entrada</strong>, tempo de permanência e alertas de <strong>1, 3, 6 e 12 meses</strong>.</>
+              <>Gestão de membros do grupo VIP, data de <strong>Entrada</strong>, alertas de tempo e envio do <strong>Link oficial do WhatsApp</strong>.</>
             )}
             {activeSubTab === 'bussola' && (
-              <>Visão astrológica de alta precisão com motor <strong>Astro.com</strong> (Sol, Lua, Ascendente, Vênus, Marte, Quíron, Júpiter, Saturno e MC).</>
+              <>Membros ativos da Patota com mais de <strong>1 ano de jornada</strong> e dados de nascimento completos (data, horário, cidade e UF).</>
+            )}
+            {activeSubTab === 'mapas' && (
+              <>Todos os cadastros com Mapa Natal calculado pelo motor autônomo <strong>Astro.com</strong> com visualizador de Mandala.</>
             )}
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
-          {/* Botão de Sincronização em Massa com Firestore */}
+          {/* Sincronização em Massa com Firestore */}
           <button
             onClick={handleSyncFirestore}
             disabled={isSyncing}
@@ -652,13 +780,13 @@ export const OperationsCRM: React.FC = () => {
         </div>
       )}
 
-      {/* NAVEGAÇÃO DE SUB-ABAS: GERAL | PATOTA | BÚSSOLA */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-[#FAF8F5] p-2 rounded-2xl border border-[#E5E0D8]">
+      {/* NAVEGAÇÃO DAS 4 SUB-ABAS: GERAL | PATOTA | BÚSSOLA | MAPAS ASTRAIS */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 bg-[#FAF8F5] p-2 rounded-2xl border border-[#E5E0D8]">
         <div className="flex flex-wrap items-center gap-2">
           {/* Sub-Aba 1: Geral */}
           <button
             onClick={() => setActiveSubTab('geral')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-heading font-bold text-xs transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-heading font-bold text-xs transition-all cursor-pointer ${
               activeSubTab === 'geral'
                 ? 'bg-[#22205A] text-[#FAF8F5] shadow-sm'
                 : 'bg-white text-[#554F70] hover:bg-[#F3EFEA] border border-[#E5E0D8]'
@@ -678,7 +806,7 @@ export const OperationsCRM: React.FC = () => {
           {/* Sub-Aba 2: Patota */}
           <button
             onClick={() => setActiveSubTab('patota')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-heading font-bold text-xs transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-heading font-bold text-xs transition-all cursor-pointer ${
               activeSubTab === 'patota'
                 ? 'bg-[#D99426] text-white shadow-sm'
                 : 'bg-white text-[#554F70] hover:bg-[#F3EFEA] border border-[#E5E0D8]'
@@ -694,16 +822,21 @@ export const OperationsCRM: React.FC = () => {
               {metrics.patotaTotal}
             </span>
             {metrics.patotaAlertas > 0 && (
-              <span className="flex items-center gap-0.5 text-[10px] bg-rose-500 text-white font-black px-2 py-0.5 rounded-full animate-pulse shadow-xs">
-                🎉 {metrics.patotaAlertas} marco{metrics.patotaAlertas > 1 ? 's' : ''}!
+              <span className="flex items-center gap-0.5 text-[10px] bg-rose-500 text-white font-black px-1.5 py-0.5 rounded-full animate-pulse shadow-xs">
+                🎉 {metrics.patotaAlertas}
+              </span>
+            )}
+            {metrics.patotaPendentesLink > 0 && (
+              <span className="flex items-center gap-0.5 text-[10px] bg-emerald-600 text-white font-bold px-1.5 py-0.5 rounded-full">
+                Link: {metrics.patotaPendentesLink}
               </span>
             )}
           </button>
 
-          {/* Sub-Aba 3: Bússola */}
+          {/* Sub-Aba 3: Bússola (>1 ano Patota + dados completos) */}
           <button
             onClick={() => setActiveSubTab('bussola')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-heading font-bold text-xs transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-heading font-bold text-xs transition-all cursor-pointer ${
               activeSubTab === 'bussola'
                 ? 'bg-[#4B3B82] text-[#FAF8F5] shadow-sm'
                 : 'bg-white text-[#554F70] hover:bg-[#F3EFEA] border border-[#E5E0D8]'
@@ -716,6 +849,26 @@ export const OperationsCRM: React.FC = () => {
                 activeSubTab === 'bussola' ? 'bg-[#D99426] text-white' : 'bg-[#EFECE6] text-[#68638C]'
               }`}
             >
+              {metrics.bussolaElegiveis}
+            </span>
+          </button>
+
+          {/* Sub-Aba 4: Mapas Astrais (Todos com mapa calculado) */}
+          <button
+            onClick={() => setActiveSubTab('mapas')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-heading font-bold text-xs transition-all cursor-pointer ${
+              activeSubTab === 'mapas'
+                ? 'bg-[#1E1B4B] text-[#F0B55E] shadow-sm'
+                : 'bg-white text-[#554F70] hover:bg-[#F3EFEA] border border-[#E5E0D8]'
+            }`}
+          >
+            <Eye className="h-4 w-4 text-[#F0B55E]" />
+            <span>Mapas Astrais</span>
+            <span
+              className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                activeSubTab === 'mapas' ? 'bg-[#F0B55E] text-[#1E1B4B]' : 'bg-[#EFECE6] text-[#68638C]'
+              }`}
+            >
               {metrics.comMapaCalculado}
             </span>
           </button>
@@ -724,15 +877,18 @@ export const OperationsCRM: React.FC = () => {
         {/* Informação contextual */}
         <div className="text-[11px] text-[#68638C] px-2">
           {activeSubTab === 'geral' && (
-            <span>Planilha unificada de todos os clientes cadastrados.</span>
+            <span>Base de todos os clientes com visualização limpa de Sol, Lua e Ascendente.</span>
           )}
           {activeSubTab === 'patota' && (
             <span className="font-semibold text-[#22205A]">
-              Alertas automáticos de permanência (1m, 3m, 6m, 1 ano) com disparo WhatsApp.
+              Compras no site ativam o cliente aqui. Envie o link VIP do WhatsApp com 1 clique!
             </span>
           )}
           {activeSubTab === 'bussola' && (
-            <span>Base para geração das Bússolas Mensais e Mapas Astrais.</span>
+            <span>Membros da Patota há mais de 1 ano com nascimento, horário e cidade preenchidos.</span>
+          )}
+          {activeSubTab === 'mapas' && (
+            <span>Motor nativo Astro.com: clique na ação para abrir a Mandala Astrológica oficial.</span>
           )}
         </div>
       </div>
@@ -741,7 +897,7 @@ export const OperationsCRM: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white border border-[#E5E0D8] rounded-2xl p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[#68638C] uppercase tracking-wider">Total Cadastros</span>
+            <span className="text-xs font-bold text-[#68638C] uppercase tracking-wider">Total Geral</span>
             <div className="p-2 rounded-xl bg-[#FAF8F5] text-[#22205A]">
               <Users className="h-4 w-4" />
             </div>
@@ -763,38 +919,38 @@ export const OperationsCRM: React.FC = () => {
             {metrics.patotaAtivos.toLocaleString('pt-BR')}
           </div>
           <div className="text-[11px] text-[#8C87A3] mt-1">
-            {metrics.patotaAlertas > 0 ? (
-              <span className="text-rose-600 font-bold">🎉 {metrics.patotaAlertas} comemorando marco</span>
+            {metrics.patotaPendentesLink > 0 ? (
+              <span className="text-amber-700 font-bold">📲 {metrics.patotaPendentesLink} pendentes de link VIP</span>
             ) : (
-              'Membros no grupo VIP'
+              'Todos com acesso liberado'
             )}
           </div>
         </div>
 
         <div className="bg-white border border-[#E5E0D8] rounded-2xl p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[#68638C] uppercase tracking-wider">Mapas Natais</span>
+            <span className="text-xs font-bold text-[#68638C] uppercase tracking-wider">Bússola (&gt;1 Ano)</span>
             <div className="p-2 rounded-xl bg-purple-50 text-[#7C3AED]">
               <Compass className="h-4 w-4 text-[#7C3AED]" />
             </div>
           </div>
           <div className="text-2xl font-heading font-black text-[#7C3AED] mt-2">
-            {metrics.comMapaCalculado.toLocaleString('pt-BR')}
+            {metrics.bussolaElegiveis.toLocaleString('pt-BR')}
           </div>
-          <div className="text-[11px] text-[#8C87A3] mt-1">Calculados motor Astro.com</div>
+          <div className="text-[11px] text-[#8C87A3] mt-1">Membros VIP com dados completos</div>
         </div>
 
         <div className="bg-white border border-[#E5E0D8] rounded-2xl p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[#68638C] uppercase tracking-wider">Aniversariantes ({MONTH_NAMES[currentMonthNumber - 1]})</span>
+            <span className="text-xs font-bold text-[#68638C] uppercase tracking-wider">Mapas Gerados</span>
             <div className="p-2 rounded-xl bg-amber-50 text-[#D99426]">
-              <Cake className="h-4 w-4 text-[#D99426]" />
+              <Eye className="h-4 w-4 text-[#D99426]" />
             </div>
           </div>
           <div className="text-2xl font-heading font-black text-[#D99426] mt-2">
-            {metrics.aniversariantesMes.toLocaleString('pt-BR')}
+            {metrics.comMapaCalculado.toLocaleString('pt-BR')}
           </div>
-          <div className="text-[11px] text-[#8C87A3] mt-1">Ações deste mês solar</div>
+          <div className="text-[11px] text-[#8C87A3] mt-1">Motor Astro.com (Swiss Ephemeris)</div>
         </div>
       </div>
 
@@ -827,11 +983,11 @@ export const OperationsCRM: React.FC = () => {
               </select>
             </div>
 
-            {/* Filtros específicos da Aba Patota */}
+            {/* Filtros da Aba Patota */}
             {activeSubTab === 'patota' && (
               <>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[#68638C] font-semibold text-[11px]">Status Patota:</span>
+                  <span className="text-[#68638C] font-semibold text-[11px]">Status:</span>
                   <select
                     value={patotaFilter}
                     onChange={(e) => setPatotaFilter(e.target.value)}
@@ -844,24 +1000,37 @@ export const OperationsCRM: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[#D99426] font-bold text-[11px]">Alertas de Marco:</span>
+                  <span className="text-[#D99426] font-bold text-[11px]">Marcos:</span>
                   <select
                     value={patotaMilestoneFilter}
                     onChange={(e) => setPatotaMilestoneFilter(e.target.value)}
                     className="bg-[#FAF6EE] border border-[#E2D8C7] rounded-lg px-2.5 py-1.5 text-[#22205A] text-xs font-semibold focus:outline-none"
                   >
                     <option value="all">Todos os Membros</option>
-                    <option value="com_marcos">🎉 Apenas com Alertas Ativos</option>
-                    <option value="1_month">🎉 1 Mês de Grupo</option>
-                    <option value="3_months">⭐ 3 Meses de Grupo</option>
-                    <option value="6_months">🌟 6 Meses de Grupo</option>
+                    <option value="com_marcos">🎉 Com Alertas Ativos</option>
+                    <option value="1_month">🎉 1 Mês</option>
+                    <option value="3_months">⭐ 3 Meses</option>
+                    <option value="6_months">🌟 6 Meses</option>
                     <option value="12_months">👑 12 Meses (1 Ano)</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <span className="text-emerald-700 font-bold text-[11px]">Link WhatsApp:</span>
+                  <select
+                    value={patotaWhatsAppFilter}
+                    onChange={(e) => setPatotaWhatsAppFilter(e.target.value)}
+                    className="bg-emerald-50 border border-emerald-200 rounded-lg px-2.5 py-1.5 text-emerald-900 text-xs font-semibold focus:outline-none"
+                  >
+                    <option value="all">Todos</option>
+                    <option value="Pendente">📲 Pendente Enviar Link</option>
+                    <option value="Habilitado">✅ Link Enviado / Habilitado</option>
                   </select>
                 </div>
               </>
             )}
 
-            {/* Filtro por Mês de Nascimento (Mantido como solicitado pelo usuário) */}
+            {/* Filtro por Mês de Nascimento */}
             <div className="flex items-center gap-1.5">
               <span className="text-[#68638C] font-semibold text-[11px]">Mês Nasc.:</span>
               <select
@@ -918,7 +1087,7 @@ export const OperationsCRM: React.FC = () => {
       {/* PLANILHA EXCEL ADAPTATIVA CONFORME A SUB-ABA ATIVA */}
       <div className="bg-white border border-[#E5E0D8] rounded-2xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto max-h-[700px] relative scrollbar-thin">
-          <table className="w-full text-left text-xs text-[#554F70] border-collapse min-w-[1900px]">
+          <table className="w-full text-left text-xs text-[#554F70] border-collapse min-w-[1600px]">
             {/* Header Sticky */}
             <thead className="bg-[#FAF8F5] text-[#22205A] font-bold uppercase tracking-wider text-[11px] sticky top-0 z-20 shadow-xs border-b border-[#DCD6CC]">
               <tr>
@@ -981,7 +1150,7 @@ export const OperationsCRM: React.FC = () => {
                 </th>
 
                 {/* ============================================================ */}
-                {/* COLUNAS ESPECÍFICAS DA ABA 1: GERAL                           */}
+                {/* COLUNAS DA ABA 1: GERAL (APENAS SOL, LUA E ASCENDENTE)       */}
                 {/* ============================================================ */}
                 {activeSubTab === 'geral' && (
                   <>
@@ -1055,73 +1224,32 @@ export const OperationsCRM: React.FC = () => {
                       </div>
                     </th>
 
-                    <th onClick={() => toggleSort('sol')} className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] whitespace-nowrap min-w-[110px]">
+                    {/* Na Geral: apenas Sol, Lua e Ascendente (removido Vênus, Marte, Quíron, etc.) */}
+                    <th onClick={() => toggleSort('sol')} className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] whitespace-nowrap min-w-[120px]">
                       <div className="flex items-center justify-between">
                         <span>Sol ☉</span>
                         {sortColumn === 'sol' && (sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
                       </div>
                     </th>
 
-                    <th onClick={() => toggleSort('lua')} className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] whitespace-nowrap min-w-[110px]">
+                    <th onClick={() => toggleSort('lua')} className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] whitespace-nowrap min-w-[120px]">
                       <div className="flex items-center justify-between">
                         <span>Lua ☽</span>
                         {sortColumn === 'lua' && (sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
                       </div>
                     </th>
 
-                    <th onClick={() => toggleSort('ascendente')} className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] whitespace-nowrap min-w-[120px]">
+                    <th onClick={() => toggleSort('ascendente')} className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] whitespace-nowrap min-w-[130px]">
                       <div className="flex items-center justify-between">
-                        <span>ASC</span>
+                        <span>Ascendente (ASC)</span>
                         {sortColumn === 'ascendente' && (sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
-                      </div>
-                    </th>
-
-                    <th onClick={() => toggleSort('venus')} className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] whitespace-nowrap min-w-[110px]">
-                      <div className="flex items-center justify-between">
-                        <span>Vênus ♀</span>
-                        {sortColumn === 'venus' && (sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
-                      </div>
-                    </th>
-
-                    <th onClick={() => toggleSort('marte')} className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] whitespace-nowrap min-w-[110px]">
-                      <div className="flex items-center justify-between">
-                        <span>Marte ♂</span>
-                        {sortColumn === 'marte' && (sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
-                      </div>
-                    </th>
-
-                    <th onClick={() => toggleSort('quiron')} className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] whitespace-nowrap min-w-[100px]">
-                      <div className="flex items-center justify-between">
-                        <span>Quíron</span>
-                        {sortColumn === 'quiron' && (sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
-                      </div>
-                    </th>
-
-                    <th onClick={() => toggleSort('jupiter')} className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] whitespace-nowrap min-w-[110px]">
-                      <div className="flex items-center justify-between">
-                        <span>Júpiter ♃</span>
-                        {sortColumn === 'jupiter' && (sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
-                      </div>
-                    </th>
-
-                    <th onClick={() => toggleSort('saturno')} className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] whitespace-nowrap min-w-[110px]">
-                      <div className="flex items-center justify-between">
-                        <span>Saturno ♄</span>
-                        {sortColumn === 'saturno' && (sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
-                      </div>
-                    </th>
-
-                    <th onClick={() => toggleSort('meioDoCeu')} className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] whitespace-nowrap min-w-[110px]">
-                      <div className="flex items-center justify-between">
-                        <span>MC</span>
-                        {sortColumn === 'meioDoCeu' && (sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
                       </div>
                     </th>
                   </>
                 )}
 
                 {/* ============================================================ */}
-                {/* COLUNAS ESPECÍFICAS DA ABA 2: PATOTA                         */}
+                {/* COLUNAS DA ABA 2: PATOTA                                     */}
                 {/* ============================================================ */}
                 {activeSubTab === 'patota' && (
                   <>
@@ -1166,7 +1294,7 @@ export const OperationsCRM: React.FC = () => {
                       </div>
                     </th>
 
-                    {/* Entrada (renomeado de Cliente Desde) */}
+                    {/* Entrada */}
                     <th
                       onClick={() => toggleSort('clienteDesde')}
                       className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] whitespace-nowrap min-w-[130px]"
@@ -1177,27 +1305,35 @@ export const OperationsCRM: React.FC = () => {
                       </div>
                     </th>
 
-                    {/* Tempo no Grupo & Alertas de 1m, 3m, 6m, 12m */}
+                    {/* Tempo no Grupo & Alertas */}
                     <th className="py-3 px-3 border-r border-[#EAE5DC] bg-amber-50/70 whitespace-nowrap min-w-[200px]">
                       <div className="flex items-center gap-1.5 text-[#22205A]">
                         <Clock className="h-3.5 w-3.5 text-[#D99426]" />
                         <span>Tempo no Grupo & Alertas</span>
                       </div>
                     </th>
+
+                    {/* Acesso ao WhatsApp (Pendente / Habilitado) */}
+                    <th className="py-3 px-3 border-r border-[#EAE5DC] bg-emerald-50/70 whitespace-nowrap min-w-[160px] text-center">
+                      <div className="flex items-center justify-center gap-1.5 text-emerald-900">
+                        <Send className="h-3.5 w-3.5 text-emerald-700" />
+                        <span>Acesso Grupo VIP</span>
+                      </div>
+                    </th>
                   </>
                 )}
 
                 {/* ============================================================ */}
-                {/* COLUNAS ESPECÍFICAS DA ABA 3: BÚSSOLA                         */}
+                {/* COLUNAS DA ABA 3: BÚSSOLA & ABA 4: MAPAS ASTRAIS              */}
                 {/* ============================================================ */}
-                {activeSubTab === 'bussola' && (
+                {(activeSubTab === 'bussola' || activeSubTab === 'mapas') && (
                   <>
                     <th
                       onClick={() => toggleSort('dataNascimento')}
                       className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] whitespace-nowrap min-w-[120px]"
                     >
                       <div className="flex items-center justify-between">
-                        <span>Data de Nascimento</span>
+                        <span>Data Nasc.</span>
                         {sortColumn === 'dataNascimento' && (sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
                       </div>
                     </th>
@@ -1288,7 +1424,7 @@ export const OperationsCRM: React.FC = () => {
                       </div>
                     </th>
 
-                    <th onClick={() => toggleSort('meioDoCeu')} className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] whitespace-nowrap min-w-[120px]">
+                    <th onClick={() => toggleSort('meioDoCeu')} className="py-3 px-3 border-r border-[#EAE5DC] cursor-pointer hover:bg-[#F3EFEA] whitespace-nowrap min-w-[110px]">
                       <div className="flex items-center justify-between">
                         <span>MC (Meio Céu)</span>
                         {sortColumn === 'meioDoCeu' && (sortOrder === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
@@ -1298,7 +1434,7 @@ export const OperationsCRM: React.FC = () => {
                 )}
 
                 {/* Coluna Fixa: Ações */}
-                <th className="py-3 px-3 text-right sticky right-0 bg-[#FAF8F5] z-10 shadow-xs whitespace-nowrap min-w-[120px]">
+                <th className="py-3 px-3 text-right sticky right-0 bg-[#FAF8F5] z-10 shadow-xs whitespace-nowrap min-w-[140px]">
                   Ações
                 </th>
               </tr>
@@ -1308,6 +1444,7 @@ export const OperationsCRM: React.FC = () => {
             <tbody className="divide-y divide-[#EAE5DC]">
               {paginatedContacts.map((contact) => {
                 const patotaTenure = calculatePatotaTenure(contact.clienteDesde, contact.apelido || contact.nome);
+                const whatsAppAccess = contact.patotaWhatsAppStatus || (contact.patotaStatus === 'Ativo' ? 'Habilitado' : 'Pendente');
 
                 return (
                   <tr
@@ -1353,7 +1490,7 @@ export const OperationsCRM: React.FC = () => {
                     </td>
 
                     {/* ============================================================ */}
-                    {/* LINHAS: ABA GERAL                                            */}
+                    {/* LINHAS: ABA GERAL (APENAS SOL, LUA E ASCENDENTE)             */}
                     {/* ============================================================ */}
                     {activeSubTab === 'geral' && (
                       <>
@@ -1431,13 +1568,6 @@ export const OperationsCRM: React.FC = () => {
                             '—'
                           )}
                         </td>
-
-                        <td className="py-2.5 px-3 border-r border-[#EAE5DC]">{contact.venus || '—'}</td>
-                        <td className="py-2.5 px-3 border-r border-[#EAE5DC]">{contact.marte || '—'}</td>
-                        <td className="py-2.5 px-3 border-r border-[#EAE5DC]">{contact.quiron || '—'}</td>
-                        <td className="py-2.5 px-3 border-r border-[#EAE5DC]">{contact.jupiter || '—'}</td>
-                        <td className="py-2.5 px-3 border-r border-[#EAE5DC]">{contact.saturno || '—'}</td>
-                        <td className="py-2.5 px-3 border-r border-[#EAE5DC]">{contact.meioDoCeu || '—'}</td>
                       </>
                     )}
 
@@ -1471,7 +1601,7 @@ export const OperationsCRM: React.FC = () => {
                           </span>
                         </td>
 
-                        {/* Entrada (renomeado de Cliente Desde) */}
+                        {/* Entrada */}
                         <td className="py-2.5 px-3 border-r border-[#EAE5DC] font-mono font-medium text-[#22205A]">
                           {contact.clienteDesde || contact.dataCadastro || '—'}
                         </td>
@@ -1491,13 +1621,41 @@ export const OperationsCRM: React.FC = () => {
                             )}
                           </div>
                         </td>
+
+                        {/* Acesso ao WhatsApp (Badge clicável com toggle) */}
+                        <td className="py-2.5 px-3 border-r border-[#EAE5DC] text-center bg-emerald-50/20">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleWhatsAppAccess(contact);
+                            }}
+                            title="Clique para alternar status de acesso ao grupo VIP"
+                            className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full cursor-pointer transition-all border ${
+                              whatsAppAccess === 'Habilitado'
+                                ? 'bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200'
+                                : 'bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200 animate-pulse'
+                            }`}
+                          >
+                            {whatsAppAccess === 'Habilitado' ? (
+                              <>
+                                <Check className="h-3 w-3 text-emerald-700" />
+                                <span>No Grupo VIP</span>
+                              </>
+                            ) : (
+                              <>
+                                <AlertCircle className="h-3 w-3 text-amber-700" />
+                                <span>Pendente Enviar Link</span>
+                              </>
+                            )}
+                          </button>
+                        </td>
                       </>
                     )}
 
                     {/* ============================================================ */}
-                    {/* LINHAS: ABA BÚSSOLA                                          */}
+                    {/* LINHAS: ABA BÚSSOLA & ABA MAPAS ASTRAIS                       */}
                     {/* ============================================================ */}
-                    {activeSubTab === 'bussola' && (
+                    {(activeSubTab === 'bussola' || activeSubTab === 'mapas') && (
                       <>
                         <td className="py-2.5 px-3 border-r border-[#EAE5DC] whitespace-nowrap">
                           {contact.dataNascimento || '—'}
@@ -1560,28 +1718,27 @@ export const OperationsCRM: React.FC = () => {
                     {/* Coluna Fixa: Ações */}
                     <td className="py-2.5 px-3 text-right sticky right-0 bg-[#FAF8F5] group-hover:bg-[#F5F2EB] z-10 shadow-xs">
                       <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
-                        {/* Se estiver na Patota, botão rápido de envio com mensagem de marco */}
-                        {activeSubTab === 'patota' && contact.whatsapp && (
+                        {/* Se estiver na Patota: Botão destacado de envio do Link VIP do WhatsApp */}
+                        {activeSubTab === 'patota' && (
                           <button
-                            onClick={() => {
-                              const greeting = patotaTenure.milestone
-                                ? patotaTenure.milestone.greetingMessage
-                                : `Olá, ${contact.apelido || contact.nome}! Tudo bem? Passando para te mandar um abraço cósmico e desejar uma linda jornada na Patota da Casa 6! ✨`;
-                              handleOpenWhatsApp(contact.whatsapp, contact.apelido || contact.nome, greeting);
-                            }}
-                            title={
-                              patotaTenure.milestone
-                                ? `Enviar WhatsApp comemorativo (${patotaTenure.milestone.label})`
-                                : 'Enviar mensagem para este membro'
-                            }
-                            className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold cursor-pointer transition-colors ${
-                              patotaTenure.milestone
-                                ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs animate-pulse'
-                                : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                            }`}
+                            onClick={() => handleSendPatotaGroupLink(contact)}
+                            title="Enviar Link de Convite do Grupo VIP no WhatsApp"
+                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer transition-all bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
                           >
                             <Send className="h-3 w-3" />
-                            <span>{patotaTenure.milestone ? patotaTenure.milestone.label : 'Mensagem'}</span>
+                            <span>Enviar Link VIP</span>
+                          </button>
+                        )}
+
+                        {/* Se estiver em Mapas Astrais ou Bússola: Botão para abrir Mandala Astrológica oficial */}
+                        {(activeSubTab === 'mapas' || activeSubTab === 'bussola') && contact.dataNascimento && (
+                          <button
+                            onClick={() => setMandalaContact(contact)}
+                            title="Visualizar Mandala Astrológica Oficial (Astro.com)"
+                            className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold cursor-pointer transition-all bg-[#22205A] hover:bg-[#1B1948] text-[#F0B55E] shadow-xs"
+                          >
+                            <Compass className="h-3 w-3 text-[#F0B55E]" />
+                            <span>Ver Mapa</span>
                           </button>
                         )}
 
@@ -1693,6 +1850,151 @@ export const OperationsCRM: React.FC = () => {
         </div>
       </div>
 
+      {/* MODAL DE MANDALA E MAPA ASTRAL COMPLETO (MOTOR ASTRO.COM) */}
+      {mandalaContact && activeMandalaChartData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white border border-[#E5E0D8] rounded-3xl w-full max-w-5xl p-6 space-y-6 shadow-2xl max-h-[92vh] overflow-y-auto">
+            {/* Header da Modal */}
+            <div className="flex items-center justify-between border-b border-[#F0EBE1] pb-4">
+              <div>
+                <div className="flex items-center gap-2 text-xs font-bold text-[#D99426] uppercase tracking-wider">
+                  <Compass className="h-4 w-4" />
+                  <span>Motor Nativo Astro.com &bull; Swiss Ephemeris Placidus</span>
+                </div>
+                <h3 className="font-heading text-2xl font-black text-[#22205A] mt-0.5">
+                  Mapa Astral de {mandalaContact.fullName}
+                </h3>
+                <p className="text-xs text-[#68638C]">
+                  {mandalaContact.dataNascimento} às {mandalaContact.horarioNascimento || '12:00'} &bull; {mandalaContact.cidade} - {mandalaContact.uf} ({activeMandalaChartData.universalTime})
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const greeting = `Olá, ${mandalaContact.apelido || mandalaContact.nome}! ✨ Aqui está o resumo do seu mapa astral na Casa 6:\n\n` +
+                      `☉ Sol em ${activeMandalaChartData.sunSign}\n` +
+                      `☽ Lua em ${activeMandalaChartData.moonSign}\n` +
+                      `🧭 Ascendente em ${activeMandalaChartData.ascendantSign}\n` +
+                      `⭐ Meio do Céu em ${activeMandalaChartData.midheavenSign}\n\n` +
+                      `Um abraço cósmico da Bianca Tófoli! 🪐`;
+                    handleOpenWhatsApp(mandalaContact.whatsapp, mandalaContact.apelido || mandalaContact.nome, greeting);
+                  }}
+                  className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer"
+                >
+                  <Send className="h-3.5 w-3.5" />
+                  <span>Enviar no WhatsApp</span>
+                </button>
+
+                <button
+                  onClick={() => setMandalaContact(null)}
+                  className="p-2 text-[#68638C] hover:text-[#22205A] rounded-xl hover:bg-[#FAF8F5] transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Grid: Mandala Astrológica à Esquerda + Posições e Interpretações à Direita */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Coluna da Esquerda: Roda do Zodíaco Astrodienst */}
+              <div className="lg:col-span-7 flex flex-col items-center justify-center p-4 bg-[#FAF8F5] rounded-2xl border border-[#EAE5DC]">
+                <AstroChartMandala chartData={activeMandalaChartData} />
+                <span className="text-[10px] text-[#8C87A3] mt-2">
+                  Mandala oficial estilo Astrodienst (Astro.com) com 12 casas Placidus e orbes suíços.
+                </span>
+              </div>
+
+              {/* Coluna da Direita: Posições Planetárias, Aspectos e Interpretação */}
+              <div className="lg:col-span-5 space-y-4">
+                {/* Destaque da Tríade */}
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-center">
+                    <span className="text-[10px] font-bold uppercase text-rose-800">Sol ☉</span>
+                    <div className="font-heading font-black text-sm text-[#22205A] mt-0.5">
+                      {activeMandalaChartData.sunSign}
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-center">
+                    <span className="text-[10px] font-bold uppercase text-blue-800">Lua ☽</span>
+                    <div className="font-heading font-black text-sm text-[#22205A] mt-0.5">
+                      {activeMandalaChartData.moonSign}
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-center">
+                    <span className="text-[10px] font-bold uppercase text-amber-800">Ascendente</span>
+                    <div className="font-heading font-black text-sm text-[#22205A] mt-0.5">
+                      {activeMandalaChartData.ascendantSign}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tabela dos 13 Corpos Celestes */}
+                <div className="bg-[#FAF8F5] p-3 rounded-xl border border-[#EAE5DC] space-y-2 text-xs">
+                  <div className="flex items-center justify-between border-b border-[#EAE5DC] pb-1.5 font-bold text-[#22205A]">
+                    <span>Planeta / Ponto</span>
+                    <span>Signo & Grau</span>
+                    <span>Casa</span>
+                  </div>
+
+                  <div className="space-y-1 max-h-48 overflow-y-auto scrollbar-thin pr-1 text-[11px]">
+                    {activeMandalaChartData.planets.map((planet) => (
+                      <div key={planet.id} className="flex items-center justify-between py-0.5 border-b border-[#F0EBE1] text-[#443F64]">
+                        <span className="font-semibold text-[#22205A] flex items-center gap-1">
+                          <span>{planet.symbol}</span>
+                          <span>{planet.name}</span>
+                        </span>
+                        <span>
+                          {planet.sign} {planet.signDegree}°{String(planet.signMinute).padStart(2, '0')}'
+                        </span>
+                        <span className="font-bold text-[#D99426]">Casa {planet.house}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Balanço dos 4 Elementos */}
+                <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#EAE5DC] space-y-2 text-xs">
+                  <span className="font-bold text-[#22205A] uppercase text-[11px] block">
+                    Balanço dos 4 Elementos
+                  </span>
+                  <div className="grid grid-cols-4 gap-2 text-center text-[10px] font-bold">
+                    <div className="p-1.5 bg-rose-50 border border-rose-200 text-rose-800 rounded-lg">
+                      Fogo: {activeMandalaChartData.elementsBalance.fogo.percentage}%
+                    </div>
+                    <div className="p-1.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg">
+                      Terra: {activeMandalaChartData.elementsBalance.terra.percentage}%
+                    </div>
+                    <div className="p-1.5 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg">
+                      Ar: {activeMandalaChartData.elementsBalance.ar.percentage}%
+                    </div>
+                    <div className="p-1.5 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg">
+                      Água: {activeMandalaChartData.elementsBalance.agua.percentage}%
+                    </div>
+                  </div>
+                </div>
+
+                {/* Interpretação Acolhedora da Bianca Tófoli */}
+                <div className="p-3.5 bg-purple-50/70 rounded-xl border border-purple-200 text-xs space-y-2">
+                  <span className="font-bold text-[#7C3AED] uppercase tracking-wider text-[11px] flex items-center gap-1">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Essência Solar & Alma
+                  </span>
+                  <p className="text-[#322A5E] leading-relaxed text-[11px]">
+                    {activeMandalaChartData.interpretations.essence}
+                  </p>
+                  <p className="text-[#322A5E] leading-relaxed text-[11px] pt-1 border-t border-purple-200/50">
+                    {activeMandalaChartData.interpretations.emotions}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ABA LATERAL CLARA (PRONTUÁRIO CÓSMICO / CRM) */}
       {selectedContact && (
         <div className="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-white border-l border-[#E5E0D8] shadow-2xl p-6 overflow-y-auto space-y-5 animate-slideLeft">
@@ -1790,19 +2092,17 @@ export const OperationsCRM: React.FC = () => {
                 <div className="text-[10px] text-[#68638C] font-bold uppercase">Quíron</div>
                 <div className="font-bold text-xs text-[#22205A] mt-0.5">{selectedContact.quiron || '—'}</div>
               </div>
-              <div className="p-2 rounded-lg bg-white border border-[#EAE5DC] text-center">
-                <div className="text-[10px] text-[#68638C] font-bold uppercase">Júpiter ♃</div>
-                <div className="font-bold text-xs text-[#22205A] mt-0.5">{selectedContact.jupiter || '—'}</div>
-              </div>
-              <div className="p-2 rounded-lg bg-white border border-[#EAE5DC] text-center">
-                <div className="text-[10px] text-[#68638C] font-bold uppercase">Saturno ♄</div>
-                <div className="font-bold text-xs text-[#22205A] mt-0.5">{selectedContact.saturno || '—'}</div>
-              </div>
-              <div className="p-2 rounded-lg bg-white border border-[#EAE5DC] text-center">
-                <div className="text-[10px] text-[#68638C] font-bold uppercase">MC (Meio Céu)</div>
-                <div className="font-bold text-xs text-[#22205A] mt-0.5">{selectedContact.meioDoCeu || '—'}</div>
-              </div>
             </div>
+
+            {selectedContact.dataNascimento && (
+              <button
+                onClick={() => setMandalaContact(selectedContact)}
+                className="w-full mt-2 py-2 px-3 rounded-xl bg-[#22205A] text-[#F0B55E] font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-[#1B1948] transition-colors shadow-xs"
+              >
+                <Compass className="h-3.5 w-3.5 text-[#F0B55E]" />
+                <span>Abrir Mandala Astrológica Oficial</span>
+              </button>
+            )}
           </div>
 
           {/* Patota Astral & Assinatura com Cálculo de Tempo */}
@@ -1844,6 +2144,12 @@ export const OperationsCRM: React.FC = () => {
               <span>Tempo de Permanência:</span>
               <span className="font-bold text-[#D99426]">
                 {calculatePatotaTenure(selectedContact.clienteDesde, selectedContact.apelido || selectedContact.nome).formattedText}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-[#554F70] pt-1 border-t border-[#EAE5DC]">
+              <span>Acesso ao WhatsApp:</span>
+              <span className="font-bold text-emerald-700">
+                {selectedContact.patotaWhatsAppStatus || (selectedContact.patotaStatus === 'Ativo' ? 'Habilitado' : 'Pendente')}
               </span>
             </div>
           </div>

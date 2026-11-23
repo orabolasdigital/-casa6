@@ -56,6 +56,7 @@ import {
   lookupCRMContactByEmail,
   saveCRMContactRecord
 } from '../../services/formValidation';
+import { saveCRMContactDetail } from '../../services/crmService';
 import { SITE_CONFIG } from '../../config/site';
 import { BirthData, ShippingAddress } from '../../types';
 
@@ -325,6 +326,31 @@ export const MercadoPagoCheckoutModal: React.FC<MercadoPagoCheckoutModalProps> =
       setConfirmedOrderId(result.orderId);
       setConfirmedVoucher(orderVoucher);
       setConfirmedBonus(bonusCode);
+
+      // Se for assinatura da Patota Astral, ativa no CRM na aba Patota com status de WhatsApp pendente para envio do link
+      if (isPatota) {
+        try {
+          await saveCRMContactDetail({
+            nome: firstName.trim(),
+            sobrenome: lastName.trim(),
+            fullName: fullName.trim(),
+            email: cleanEmail,
+            whatsapp: whatsapp.trim(),
+            patotaStatus: 'Ativo',
+            patotaAssinatura: itemTitle.includes('Anual') ? 'Anual' : itemTitle.includes('Semestral') ? 'Semestral' : itemTitle.includes('Trimestral') ? 'Trimestral' : 'Mensal',
+            patotaValor: String(amount),
+            patotaWhatsAppStatus: 'Pendente',
+            clienteDesde: new Date().toLocaleDateString('pt-BR'),
+            cadastro: new Date().toLocaleDateString('pt-BR'),
+            dataNascimento: birthDataPayload ? `${birthDataPayload.birthDay}/${birthDataPayload.birthMonth}/${birthDataPayload.birthYear}` : '',
+            horarioNascimento: birthDataPayload && birthDataPayload.birthHour ? `${birthDataPayload.birthHour}:${birthDataPayload.birthMinute || '00'}` : '',
+            cidade: birthDataPayload?.city || '',
+            uf: birthDataPayload?.state || 'SP'
+          });
+        } catch (crmPatotaErr) {
+          console.warn('[CRM Patota Sync Error]', crmPatotaErr);
+        }
+      }
 
       // (A) Canal Síncrono Aprovado Imediato: Mantém na modal e avança para a Etapa 4
       if (result.status === 'approved') {

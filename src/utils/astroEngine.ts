@@ -386,7 +386,128 @@ export function cleanPhone(ddd?: string, tel?: string): { ddd: string; telefone:
   return { ddd: extractedDdd, telefone: extractedTel, whatsapp: formattedWhatsapp };
 }
 
-export function calculateAstroProfile(birthDateStr?: string, birthTimeStr?: string): {
+// -------------------------------------------------------------
+// TABELA DE COORDENADAS GEOGRÁFICAS & FUSO HORÁRIO BRASILEIRO
+// -------------------------------------------------------------
+
+export const BRAZIL_CAPITALS: Record<string, { lat: number; lng: number; tz: number }> = {
+  'SP': { lat: -23.5505, lng: -46.6333, tz: -3 },
+  'RJ': { lat: -22.9068, lng: -43.1729, tz: -3 },
+  'MG': { lat: -19.9167, lng: -43.9345, tz: -3 },
+  'ES': { lat: -20.3155, lng: -40.3128, tz: -3 },
+  'PR': { lat: -25.4284, lng: -49.2733, tz: -3 },
+  'SC': { lat: -27.5954, lng: -48.5480, tz: -3 },
+  'RS': { lat: -30.0346, lng: -51.2177, tz: -3 },
+  'DF': { lat: -15.7975, lng: -47.8919, tz: -3 },
+  'GO': { lat: -16.6869, lng: -49.2648, tz: -3 },
+  'MT': { lat: -15.6014, lng: -56.0979, tz: -4 },
+  'MS': { lat: -20.4697, lng: -54.6201, tz: -4 },
+  'BA': { lat: -12.9777, lng: -38.5016, tz: -3 },
+  'PE': { lat: -8.0476, lng: -34.8770, tz: -3 },
+  'CE': { lat: -3.7172, lng: -38.5433, tz: -3 },
+  'RN': { lat: -5.7945, lng: -35.2110, tz: -3 },
+  'PB': { lat: -7.1153, lng: -34.8610, tz: -3 },
+  'AL': { lat: -9.6658, lng: -35.7351, tz: -3 },
+  'SE': { lat: -10.9472, lng: -37.0731, tz: -3 },
+  'PI': { lat: -5.0920, lng: -42.8038, tz: -3 },
+  'MA': { lat: -2.5307, lng: -44.3068, tz: -3 },
+  'PA': { lat: -1.4558, lng: -48.4902, tz: -3 },
+  'AM': { lat: -3.1190, lng: -60.0217, tz: -4 },
+  'RO': { lat: -8.7619, lng: -63.9039, tz: -4 },
+  'AC': { lat: -9.9753, lng: -67.8249, tz: -5 },
+  'RR': { lat: 2.8235, lng: -60.6758, tz: -4 },
+  'AP': { lat: 0.0355, lng: -51.0705, tz: -3 },
+  'TO': { lat: -10.1844, lng: -48.3336, tz: -3 }
+};
+
+export const BRAZIL_CITY_COORDINATES: Record<string, { lat: number; lng: number }> = {
+  'pirangi': { lat: -21.0933, lng: -48.6586 },
+  'sao paulo': { lat: -23.5505, lng: -46.6333 },
+  'terra roxa': { lat: -24.1611, lng: -54.0983 },
+  'botucatu': { lat: -22.8858, lng: -48.4450 },
+  'vitoria': { lat: -20.3155, lng: -40.3128 },
+  'santo andre': { lat: -23.6639, lng: -46.5383 },
+  'pedro ii': { lat: -4.4244, lng: -41.4586 },
+  'sao bernardo do campo': { lat: -23.6944, lng: -46.5654 },
+  'guarulhos': { lat: -23.4542, lng: -46.5333 },
+  'concordia': { lat: -27.2336, lng: -52.0236 },
+  'taua': { lat: -6.0028, lng: -40.2931 },
+  'boituva': { lat: -23.2847, lng: -47.6789 },
+  'crato': { lat: -7.2344, lng: -39.4094 },
+  'tupa': { lat: -21.9347, lng: -50.5136 },
+  'itapolis': { lat: -21.5956, lng: -48.8128 },
+  'mogi das cruzes': { lat: -23.5206, lng: -46.1856 },
+  'fortaleza': { lat: -3.7172, lng: -38.5433 },
+  'campinas': { lat: -22.9099, lng: -47.0626 },
+  'porto alegre': { lat: -30.0346, lng: -51.2177 },
+  'marilia': { lat: -22.2139, lng: -49.9458 },
+  'cotia': { lat: -23.6039, lng: -46.9189 },
+  'campos dos goytacazes': { lat: -21.7544, lng: -41.3244 },
+  'recife': { lat: -8.0476, lng: -34.8770 },
+  'nhandeara': { lat: -20.6953, lng: -50.0456 },
+  'mogi': { lat: -23.5206, lng: -46.1856 },
+  'mogi mirim': { lat: -22.4319, lng: -46.9578 },
+  'mogi guacu': { lat: -22.3703, lng: -46.9428 },
+  'mococa': { lat: -21.4678, lng: -47.0050 },
+  'osasco': { lat: -23.5325, lng: -46.7917 },
+  'arcoverde': { lat: -8.4189, lng: -37.0544 },
+  'americana': { lat: -22.7372, lng: -47.3331 },
+  'itacuruba': { lat: -8.7889, lng: -38.6944 },
+  'aracaju': { lat: -10.9472, lng: -37.0731 },
+  'araraquara': { lat: -21.7944, lng: -48.1758 },
+  'sao jose dos campos': { lat: -23.2236, lng: -45.9008 },
+  'jundiai': { lat: -23.1856, lng: -46.8892 },
+  'capivari': { lat: -22.9961, lng: -47.5072 },
+  'barretos': { lat: -20.5572, lng: -48.5678 },
+  'manaus': { lat: -3.1190, lng: -60.0217 },
+  'cosmopolis': { lat: -22.6456, lng: -47.1958 },
+  'tres rios': { lat: -22.1167, lng: -43.2089 },
+  'piracicaba': { lat: -22.7253, lng: -47.6492 },
+  'ribeirao preto': { lat: -21.1775, lng: -47.8103 },
+  'santos': { lat: -23.9619, lng: -46.3322 },
+  'sorocaba': { lat: -23.5017, lng: -47.4581 },
+  'sao caetano do sul': { lat: -23.6228, lng: -46.5550 }
+};
+
+export function getCoordinatesForCity(city = '', state = 'SP'): { lat: number; lng: number; tz: number } {
+  const normState = (state || 'SP').trim().toUpperCase();
+  const defaultStateCoord = BRAZIL_CAPITALS[normState] || BRAZIL_CAPITALS['SP'];
+
+  const normCity = (city || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+
+  if (normCity && BRAZIL_CITY_COORDINATES[normCity]) {
+    return {
+      lat: BRAZIL_CITY_COORDINATES[normCity].lat,
+      lng: BRAZIL_CITY_COORDINATES[normCity].lng,
+      tz: defaultStateCoord.tz
+    };
+  }
+
+  return defaultStateCoord;
+}
+
+export function isBrazilianDST(year: number, month: number, day: number, uf = 'SP'): boolean {
+  const normUf = (uf || 'SP').trim().toUpperCase();
+  const dstStates = ['SP', 'RJ', 'MG', 'ES', 'PR', 'SC', 'RS', 'GO', 'DF', 'MT', 'MS'];
+  if (!dstStates.includes(normUf)) return false;
+  if (year < 1985 || year > 2019) return false;
+
+  if (month === 11 || month === 12 || month === 1) return true;
+  if (month === 10 && day >= 15) return true;
+  if (month === 2 && day <= 17) return true;
+  return false;
+}
+
+export function calculateAstroProfile(
+  birthDateStr?: string,
+  birthTimeStr?: string,
+  city = 'São Paulo',
+  state = 'SP'
+): {
   idade?: number;
   mesNascimento: string;
   mesNumero?: number;
@@ -425,24 +546,14 @@ export function calculateAstroProfile(birthDateStr?: string, birthTimeStr?: stri
   }
 
   const { day, month, year } = parsedDate;
-  const hour = parsedTime ? parsedTime.hour : 12;
-  const minute = parsedTime ? parsedTime.minute : 0;
-
   const idade = calculateAge(day, month, year);
   const mesNascimento = MONTH_NAMES[month - 1] || '';
   const mesNumero = month;
   const diaNascimento = String(day).padStart(2, '0');
   const anoNascimento = String(year);
 
-  const sol = getSunSign(day, month);
-  const ascendente = getAscendant(sol, hour, minute);
-  const lua = getMoonSign(year, month, day);
-  const venus = getVenusSign(year, month, day);
-  const marte = getMarsSign(year, month, day);
-  const jupiter = getJupiterSign(year, month, day);
-  const saturno = getSaturnSign(year, month, day);
-  const quiron = getChironSign(year, month, day);
-  const meioDoCeu = getMidheaven(ascendente);
+  // Calcula com o motor completo e preciso estilo Astro.com
+  const chart = calculateFullNatalChart('Cliente', birthDateStr || '', birthTimeStr || '12:00', city, state);
 
   return {
     idade,
@@ -450,15 +561,15 @@ export function calculateAstroProfile(birthDateStr?: string, birthTimeStr?: stri
     mesNumero,
     diaNascimento,
     anoNascimento,
-    sol,
-    ascendente,
-    lua,
-    venus,
-    marte,
-    quiron,
-    jupiter,
-    saturno,
-    meioDoCeu
+    sol: chart.sunSign,
+    ascendente: chart.ascendantSign,
+    lua: chart.moonSign,
+    venus: chart.planets.find(p => p.id === 'venus')?.sign || '',
+    marte: chart.planets.find(p => p.id === 'mars')?.sign || '',
+    quiron: chart.planets.find(p => p.id === 'chiron')?.sign || '',
+    jupiter: chart.planets.find(p => p.id === 'jupiter')?.sign || '',
+    saturno: chart.planets.find(p => p.id === 'saturn')?.sign || '',
+    meioDoCeu: chart.midheavenSign
   };
 }
 
@@ -549,31 +660,32 @@ export function calculateFullNatalChart(
 
   const age = calculateAge(day, month, year);
 
-  // Fuso Horário padrão Brasil: UTC-3
-  const timezoneOffset = -3;
-  const utHour = hour - timezoneOffset + minute / 60;
-  const universalTimeStr = `${String(Math.floor(utHour) % 24).padStart(2, '0')}:${String(minute).padStart(2, '0')} UT`;
+  // 1. Coordenadas Geográficas Reais & Fuso Horário Local
+  const coords = getCoordinatesForCity(city, state);
+  const isDST = isBrazilianDST(year, month, day, state);
+  const effectiveTz = isDST ? coords.tz + 1 : coords.tz; // Horário de Verão Brasileiro (UTC-2 nos estados elegíveis)
+  const utHour = hour - effectiveTz + minute / 60;
+  const utNormHour = ((Math.floor(utHour) % 24) + 24) % 24;
+  const universalTimeStr = `${String(utNormHour).padStart(2, '0')}:${String(minute).padStart(2, '0')} UT`;
 
-  // 1. Dia Juliano e Época J2000.0 (Astrodienst Formula)
+  // 2. Dia Juliano e Época J2000.0 (Astrodienst Formula)
   const jd = calcJulianDay(year, month, day, utHour);
   const t = (jd - 2451545.0) / 36525; // Séculos Julianos desde J2000.0
   const d = jd - 2451545.0; // Dias desde J2000.0
 
-  // 2. Obliqüidade da Eclíptica (ε)
+  // 3. Obliqüidade da Eclíptica (ε)
   const eps = (23.439291 - 0.0130042 * t) * (Math.PI / 180);
 
-  // 3. Tempo Sideral de Greenwich e Local (LST / RAMC)
-  // Latitude de São Paulo: -23.5505, Longitude: -46.6333 (-3.1089 horas)
-  const geoLongitude = -46.6333;
+  // 4. Tempo Sideral de Greenwich e Local (LST / RAMC) usando a Longitude real da Cidade
   let gmst = 280.46061837 + 360.98564736629 * d + 0.000387933 * t * t;
   gmst = normDeg(gmst);
-  const ramc = normDeg(gmst + geoLongitude);
+  const ramc = normDeg(gmst + coords.lng);
   const lstHours = ramc / 15;
   const siderealTimeStr = `${String(Math.floor(lstHours)).padStart(2, '0')}h ${String(Math.floor((lstHours % 1) * 60)).padStart(2, '0')}m`;
 
-  // 4. Meio do Céu (MC) e Ascendente (AC) Placidus Astro.com
+  // 5. Meio do Céu (MC) e Ascendente (AC) Placidus Astro.com com Latitude e RAMC reais
   const ramcRad = ramc * (Math.PI / 180);
-  const geoLatRad = (-23.5505 * Math.PI) / 180;
+  const geoLatRad = (coords.lat * Math.PI) / 180;
 
   // MC = atan(tan(RAMC) / cos(eps))
   let mcLong = Math.atan2(Math.sin(ramcRad), Math.cos(ramcRad) * Math.cos(eps)) * (180 / Math.PI);

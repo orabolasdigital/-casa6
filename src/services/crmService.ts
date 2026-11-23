@@ -50,6 +50,7 @@ export interface CRMContactDetail {
   patotaStatus: 'Ativo' | 'Inativo' | 'Não Assinante';
   patotaAssinatura: 'Mensal' | 'Trimestral' | 'Semestral' | 'Anual' | 'Bonificado' | '—';
   patotaValor?: string;
+  patotaWhatsAppStatus?: 'Pendente' | 'Habilitado';
   clienteDesde: string; // Data que a pessoa entrou na Patota (grupo de WhatsApp)
   ultimaEntrega: string; // Último cadastro / entrega realizada
   dataCadastro: string; // Compatibilidade legada
@@ -276,6 +277,7 @@ export function normalizeContact(contact: any): CRMContactDetail {
     patotaStatus: contact.patotaStatus || 'Não Assinante',
     patotaAssinatura: contact.patotaAssinatura || '—',
     patotaValor: contact.patotaValor || '',
+    patotaWhatsAppStatus: contact.patotaWhatsAppStatus || (contact.patotaStatus === 'Ativo' ? 'Habilitado' : 'Pendente'),
     clienteDesde,
     ultimaEntrega,
     dataCadastro: clienteDesde,
@@ -416,6 +418,7 @@ export async function saveCRMContactDetail(contact: Partial<CRMContactDetail>): 
     patotaStatus: contact.patotaStatus || 'Não Assinante',
     patotaAssinatura: contact.patotaAssinatura || '—',
     patotaValor: contact.patotaValor || '',
+    patotaWhatsAppStatus: contact.patotaWhatsAppStatus || (contact.patotaStatus === 'Ativo' ? 'Habilitado' : 'Pendente'),
     clienteDesde,
     ultimaEntrega,
     dataCadastro: clienteDesde,
