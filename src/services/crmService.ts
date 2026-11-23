@@ -69,6 +69,116 @@ export interface CRMContactDetail {
   updatedAt: string;
 }
 
+export interface PatotaMilestone {
+  type: '1_month' | '3_months' | '6_months' | '12_months';
+  label: string;
+  badgeClass: string;
+  greetingMessage: string;
+}
+
+export interface PatotaTenureInfo {
+  months: number;
+  days: number;
+  formattedText: string;
+  milestone: PatotaMilestone | null;
+}
+
+export function calculatePatotaTenure(entradaStr?: string, apelidoOrNome = 'querida(o)'): PatotaTenureInfo {
+  if (!entradaStr || entradaStr.trim() === '' || entradaStr === '—') {
+    return {
+      months: 0,
+      days: 0,
+      formattedText: '—',
+      milestone: null
+    };
+  }
+
+  let entryDate: Date | null = null;
+  const parts = entradaStr.split(/[\/\-\.]/);
+
+  if (parts.length === 3) {
+    if (parts[0].length === 4) {
+      entryDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    } else {
+      entryDate = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+    }
+  } else if (parts.length === 2) {
+    if (parts[0].length === 4 && parts[1].length === 4) {
+      entryDate = new Date(parseInt(parts[0], 10), 0, 1);
+    } else if (parts[0].length <= 2 && parts[1].length === 4) {
+      entryDate = new Date(parseInt(parts[1], 10), parseInt(parts[0], 10) - 1, 1);
+    }
+  }
+
+  if (!entryDate || isNaN(entryDate.getTime())) {
+    return {
+      months: 0,
+      days: 0,
+      formattedText: entradaStr,
+      milestone: null
+    };
+  }
+
+  const now = new Date();
+  const diffTime = now.getTime() - entryDate.getTime();
+  const diffDays = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+
+  const yearsDiff = now.getFullYear() - entryDate.getFullYear();
+  const monthsDiff = (yearsDiff * 12) + (now.getMonth() - entryDate.getMonth());
+  const effectiveMonths = Math.max(0, monthsDiff);
+
+  let formattedText = '';
+  if (effectiveMonths < 1) {
+    formattedText = `${diffDays} dia${diffDays === 1 ? '' : 's'}`;
+  } else if (effectiveMonths < 12) {
+    formattedText = `${effectiveMonths} m${effectiveMonths === 1 ? 'ês' : 'eses'}`;
+  } else {
+    const y = Math.floor(effectiveMonths / 12);
+    const m = effectiveMonths % 12;
+    formattedText = m > 0 ? `${y} ano${y > 1 ? 's' : ''} e ${m} m${m === 1 ? 'ês' : 'eses'}` : `${y} ano${y > 1 ? 's' : ''}`;
+  }
+
+  let milestone: PatotaMilestone | null = null;
+
+  if (effectiveMonths === 1 || (diffDays >= 25 && diffDays <= 38)) {
+    milestone = {
+      type: '1_month',
+      label: '🎉 1 Mês',
+      badgeClass: 'bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold',
+      greetingMessage: `Olá, ${apelidoOrNome}! 🌟 Passando para comemorar seu primeiro mês com a gente na Patota da Casa 6! Como você está se sentindo na nossa comunidade? Conta comigo para o que precisar!`
+    };
+  } else if (effectiveMonths === 3 || (diffDays >= 80 && diffDays <= 105)) {
+    milestone = {
+      type: '3_months',
+      label: '⭐ 3 Meses',
+      badgeClass: 'bg-amber-100 text-amber-800 border border-amber-300 font-bold',
+      greetingMessage: `Olá, ${apelidoOrNome}! 💫 Parabéns pelos seus 3 meses na Patota da Casa 6! Sua presença e energia diária no nosso grupo são muito especiais. Um abraço cósmico com muito carinho!`
+    };
+  } else if (effectiveMonths === 6 || (diffDays >= 170 && diffDays <= 195)) {
+    milestone = {
+      type: '6_months',
+      label: '🌟 6 Meses',
+      badgeClass: 'bg-indigo-100 text-indigo-800 border border-indigo-300 font-bold',
+      greetingMessage: `Olá, ${apelidoOrNome}! 🔮 Você completou 6 meses de caminhada com a gente na Patota da Casa 6! Metade de um ciclo solar completo! Sou muito grata pela sua confiança. Vamos juntas rumo aos próximos passos!`
+    };
+  } else if (effectiveMonths % 12 === 0 && effectiveMonths >= 12) {
+    const anos = effectiveMonths / 12;
+    milestone = {
+      type: '12_months',
+      label: `👑 ${anos} Ano${anos > 1 ? 's' : ''}`,
+      badgeClass: 'bg-purple-100 text-purple-900 border border-purple-300 font-black shadow-xs',
+      greetingMessage: `Olá, ${apelidoOrNome}! 🎂👑 Parabéns por completar ${anos} ano${anos > 1 ? 's' : ''} conosco na Patota da Casa 6! Sua fidelidade e carinho inspiram muito o nosso trabalho. Que o céu continue iluminando cada passo do seu caminho!`
+    };
+  }
+
+  return {
+    months: effectiveMonths,
+    days: diffDays,
+    formattedText,
+    milestone
+  };
+}
+
 const LOCAL_STORAGE_CRM_KEY = 'casa6_crm_master_contacts_v3';
 
 // Normaliza o contato para garantir que idade e campos derivados estejam sempre frescos
@@ -106,6 +216,33 @@ export function normalizeContact(contact: any): CRMContactDetail {
   const ultimaEntrega = contact.ultimaEntrega || contact.ultimoAcesso || '—';
   const cadastro = contact.cadastro || contact.ultimoAcesso || contact.dataCadastro || '14/03/2026';
 
+  let sol = contact.sol || '';
+  let lua = contact.lua || '';
+  let ascendente = contact.ascendente || '';
+  let venus = contact.venus || '';
+  let marte = contact.marte || '';
+  let quiron = contact.quiron || '';
+  let jupiter = contact.jupiter || '';
+  let saturno = contact.saturno || '';
+  let meioDoCeu = contact.meioDoCeu || '';
+
+  if (parsedDate && (!sol || !ascendente || !venus)) {
+    try {
+      const astro = calculateAstroProfile(dataNascimento, contact.horarioNascimento || '12:00');
+      sol = sol || astro.sol || '';
+      lua = lua || astro.lua || '';
+      ascendente = ascendente || astro.ascendente || '';
+      venus = venus || astro.venus || '';
+      marte = marte || astro.marte || '';
+      quiron = quiron || astro.quiron || '';
+      jupiter = jupiter || astro.jupiter || '';
+      saturno = saturno || astro.saturno || '';
+      meioDoCeu = meioDoCeu || astro.meioDoCeu || '';
+    } catch {
+      // fallback gracioso
+    }
+  }
+
   return {
     id: contact.id || `crm_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
     cadastro,
@@ -127,15 +264,15 @@ export function normalizeContact(contact: any): CRMContactDetail {
     horarioNascimento: contact.horarioNascimento || '',
     cidade: contact.cidade || contact.city || '',
     uf: (contact.uf || contact.state || '').toUpperCase(),
-    sol: contact.sol || '',
-    lua: contact.lua || '',
-    ascendente: contact.ascendente || '',
-    venus: contact.venus || '',
-    marte: contact.marte || '',
-    quiron: contact.quiron || '',
-    jupiter: contact.jupiter || '',
-    saturno: contact.saturno || '',
-    meioDoCeu: contact.meioDoCeu || '',
+    sol,
+    lua,
+    ascendente,
+    venus,
+    marte,
+    quiron,
+    jupiter,
+    saturno,
+    meioDoCeu,
     patotaStatus: contact.patotaStatus || 'Não Assinante',
     patotaAssinatura: contact.patotaAssinatura || '—',
     patotaValor: contact.patotaValor || '',
