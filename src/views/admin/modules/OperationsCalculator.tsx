@@ -1,7 +1,7 @@
 /**
  * @license
  * Casa 6 — Bianca Tofoli
- * Módulo: Calculadora Astral & Gerador de Mapa Astral Estilo Astrolink
+ * Módulo: Calculadora Astral & Gerador de Mapa Natal Padrão Astro.com
  * Tema Claro (Light Theme) para Operação e Análise Astrológica Profissional
  */
 
@@ -132,7 +132,7 @@ export const OperationsCalculator: React.FC = () => {
     setSelectedPlanetDetail(calculated.planets[0] || null);
     setNotification({
       type: 'success',
-      text: `Mapa Astral de "${clientName}" gerado com sucesso no padrão Astrolink!`
+      text: `Mapa Natal de "${clientName}" gerado com sucesso no padrão fidedigno Astro.com!`
     });
   };
 
@@ -261,10 +261,10 @@ Bianca Tófoli — Casa 6`);
                 <span>Operações &bull; Calculadora Astral &bull; Mapa Natal</span>
               </div>
               <h2 className="text-2xl font-heading font-black text-[#22205A] mt-1">
-                Motor de Geração de Mapa Astral (Astrolink Pro)
+                Motor de Geração de Mapa Natal
               </h2>
               <p className="text-xs sm:text-sm text-[#68638C]">
-                Mandala circular vetorial interativa, balanço de elementos, matriz de aspectos, posições exatas e interpretações personalizadas.
+                Cálculo astronômico de alta precisão baseado no motor fidedigno do Astro.com (Swiss Ephemeris): mandala geocêntrica vetorial, sistema Placidus, posições exatas em graus e minutos, balanço de elementos e matriz de aspectos.
               </p>
             </div>
 
