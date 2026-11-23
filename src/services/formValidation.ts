@@ -13,15 +13,27 @@
 
 import { db, isFirebaseReady } from './firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { inferGender, cleanPhone } from '../utils/astroEngine';
 
 export interface CRMContact {
   id: string;
   firstName: string;
   lastName: string;
   fullName: string;
+  nome?: string;
+  sobrenome?: string;
+  apelido?: string;
+  genero?: 'Feminino' | 'Masculino';
   email: string;
   whatsapp: string;
+  ddd?: string;
+  telefone?: string;
   cpf?: string;
+  cidade?: string;
+  uf?: string;
+  patotaStatus?: 'Ativo' | 'Inativo' | 'Não Assinante';
+  patotaAssinatura?: string;
+  dataCadastro?: string;
   lastSource?: string;
   updatedAt: string;
   createdAt: string;
@@ -276,14 +288,30 @@ export async function lookupCRMContactByEmail(email: string): Promise<CRMContact
 
 export async function saveCRMContactRecord(contact: Omit<CRMContact, 'id' | 'createdAt' | 'updatedAt'>): Promise<CRMContact> {
   const cleanEmail = contact.email.trim().toLowerCase();
-  const docId = cleanEmail.replace(/[^a-z0-9]/g, '_');
+  const docId = cleanEmail ? cleanEmail.replace(/[^a-z0-9]/g, '_') : `crm_${Date.now()}`;
   const now = new Date().toISOString();
+  const firstName = contact.firstName || contact.fullName?.split(' ')[0] || 'Cliente';
+  const lastName = contact.lastName || contact.fullName?.split(' ').slice(1).join(' ') || '';
+  const fullName = contact.fullName || `${firstName} ${lastName}`.trim();
+  const phoneInfo = cleanPhone('', contact.whatsapp);
 
   const fullContact: CRMContact = {
     ...contact,
     id: docId,
     email: cleanEmail,
-    fullName: `${contact.firstName} ${contact.lastName}`.trim(),
+    firstName,
+    lastName,
+    nome: firstName,
+    sobrenome: lastName,
+    fullName,
+    apelido: contact.apelido || firstName,
+    genero: contact.genero || inferGender(firstName),
+    whatsapp: phoneInfo.whatsapp || contact.whatsapp,
+    ddd: phoneInfo.ddd,
+    telefone: phoneInfo.telefone,
+    patotaStatus: contact.patotaStatus || 'Não Assinante',
+    patotaAssinatura: contact.patotaAssinatura || '—',
+    dataCadastro: contact.dataCadastro || new Date().toLocaleDateString('pt-BR'),
     createdAt: now,
     updatedAt: now
   };
