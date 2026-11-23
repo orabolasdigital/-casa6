@@ -91,7 +91,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
       id: 'combo-mapa-roda-revolucao',
       roman: 'IV',
       category: 'COMBOS',
-      title: 'Combo Anual',
+      title: 'Combo Astral',
       fullTitle: 'Mapa Natal + Roda Astrológica + Revolução Solar',
       subtitle: 'Pacote completo: Mapa Natal, Roda Astrológica e previsões da Revolução Solar para seu ano.',
       iconUrl: 'https://static.wixstatic.com/media/02c8e0_591c1874c36d498bb9a584c02efe3fe7~mv2.png',
@@ -833,13 +833,13 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
       <section className="pt-6 sm:pt-10 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8 bg-[#F4EFE6] border-t border-[#E2DCCF] space-y-12 sm:space-y-16 relative">
         <div className="mx-auto max-w-7xl space-y-12 sm:space-y-16 relative z-10">
 
-          {/* BANNER 1: YOUTUBE (FUNDO RUBI CÓSMICO, VÍDEO NA ESQUERDA, TEXTO E BOTÃO NA DIREITA) */}
+          {/* BANNER 1: YOUTUBE (FUNDO ROXO PADRÃO CÓSMICO, VÍDEO NA ESQUERDA, TEXTO E BOTÃO NA DIREITA) */}
           <div className="relative pt-4 sm:pt-6">
-            <div className="relative rounded-3xl bg-gradient-to-r from-[#7D0B17] via-[#9E121E] to-[#5C0610] border border-white/20 shadow-[0_24px_60px_rgba(125,11,23,0.25)] p-6 sm:p-8 lg:p-10 xl:p-12 min-h-[220px] sm:min-h-[230px] lg:min-h-[240px] flex flex-col justify-center overflow-visible text-white">
+            <div className="relative rounded-3xl bg-gradient-to-r from-[#22205A] via-[#2B2566] to-[#1D1B48] border border-white/20 shadow-[0_24px_60px_rgba(34,32,90,0.25)] p-6 sm:p-8 lg:p-10 xl:p-12 min-h-[220px] sm:min-h-[230px] lg:min-h-[240px] flex flex-col justify-center overflow-visible text-white">
               
-              {/* Fundo Cósmico Animado: Galáxia Espiral Rubi, Nebulosa Escura e Feixes Estelares */}
+              {/* Fundo Cósmico Animado: Galáxia Espiral Roxo Cósmico, Nebulosa e Feixes Estelares */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl select-none">
-                <div className="absolute -inset-10 bg-radial from-[#C41C2B]/30 via-transparent to-transparent opacity-75 animate-pulse duration-[7000ms]" />
+                <div className="absolute -inset-10 bg-radial from-[#372B69]/40 via-transparent to-transparent opacity-75 animate-pulse duration-[7000ms]" />
 
                 <div className="absolute -right-16 -bottom-16 w-88 h-88 opacity-25">
                   <div className="absolute inset-0 rounded-full border border-white/20 animate-celestial-orbit-slow" />
@@ -867,7 +867,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                   <div className="rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-black/40">
                     <img
                       src="https://static.wixstatic.com/media/02c8e0_d34c417ab4f148fcaf82c0354538ae59~mv2.png"
-                      alt="Canal da Bianca no YouTube — Podcast"
+                      alt="Canal da Bianca Tófoli no YouTube — Podcast"
                       className="w-64 sm:w-80 md:w-[370px] lg:w-[410px] xl:w-[450px] 2xl:w-[470px] h-auto object-cover block rounded-xl sm:rounded-2xl transition-transform duration-500 hover:scale-[1.02]"
                       draggable={false}
                     />
@@ -877,7 +877,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onOpenBooking, onNavigate })
                 {/* Conteúdo: Título Unificado, Texto e Botão */}
                 <div className="flex-1 flex flex-col justify-center space-y-3.5 text-white text-center lg:text-left">
                   <h3 className="font-heading text-2xl sm:text-3xl lg:text-3xl xl:text-4xl font-bold tracking-tight text-white leading-tight">
-                    Acompanhe o canal da Bianca no YouTube!
+                    Acompanhe o canal da Bianca Tófoli no YouTube!
                   </h3>
 
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-5 pt-1">
