@@ -207,8 +207,9 @@ export const OperationsCRM: React.FC = () => {
       return Boolean(tenure.milestone);
     }).length;
 
-    // Critério oficial da Bússola: Patota Ativo + > 1 ano de cadastro + data, horário, cidade e UF completos
+    // Critério oficial da Bússola: Assinante Bússola OU (Patota Ativo + > 1 ano de cadastro + data, horário, cidade e UF completos)
     const bussolaElegiveis = contacts.filter((c) => {
+      if (c.tags?.includes('Assinante Bússola')) return true;
       if (c.patotaStatus !== 'Ativo') return false;
       const tenure = calculatePatotaTenure(c.clienteDesde, c.apelido || c.nome);
       if (tenure.months < 12 && tenure.days < 365) return false;
@@ -263,12 +264,15 @@ export const OperationsCRM: React.FC = () => {
         }
       }
 
-      // 2. Sub-Aba: Bússola (Patota Astral > 1 ano + dados natais completos)
+      // 2. Sub-Aba: Bússola (Assinante Bússola ou Patota Astral > 1 ano + dados natais completos)
       if (activeSubTab === 'bussola') {
-        if (contact.patotaStatus !== 'Ativo') return false;
-        const tenure = calculatePatotaTenure(contact.clienteDesde, contact.apelido || contact.nome);
-        if (tenure.months < 12 && tenure.days < 365) return false;
-        if (!contact.dataNascimento || !contact.horarioNascimento || !contact.cidade || !contact.uf) return false;
+        const isBussolaSubscriber = contact.tags?.includes('Assinante Bússola');
+        if (!isBussolaSubscriber) {
+          if (contact.patotaStatus !== 'Ativo') return false;
+          const tenure = calculatePatotaTenure(contact.clienteDesde, contact.apelido || contact.nome);
+          if (tenure.months < 12 && tenure.days < 365) return false;
+          if (!contact.dataNascimento || !contact.horarioNascimento || !contact.cidade || !contact.uf) return false;
+        }
       }
 
       // 3. Sub-Aba: Mapas Astrais (Todos com mapa astral calculado)
@@ -1463,7 +1467,17 @@ export const OperationsCRM: React.FC = () => {
 
                     {/* Nome */}
                     <td className="py-2.5 px-3 border-r border-[#EAE5DC] font-bold text-[#22205A]">
-                      {contact.nome}
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span>{contact.nome}</span>
+                        {contact.tags?.includes('Assinante Bússola') && (
+                          <span
+                            title="Assinante Oficial da Bússola"
+                            className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[9px] font-bold bg-[#FAF2E6] text-[#D99426] border border-[#E9D4B5] rounded-md whitespace-nowrap"
+                          >
+                            🧭 Bússola
+                          </span>
+                        )}
+                      </div>
                     </td>
 
                     {/* Sobrenome */}
