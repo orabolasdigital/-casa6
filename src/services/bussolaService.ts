@@ -15,8 +15,9 @@ export interface AstrologicalTransitMonth {
   ano: number;
   mes: number;
   competencia: string; // ex: '11/2026', '12/2026'
-  primeiraQuinzena: string;
-  segundaQuinzena: string;
+  interpretacaoMes: string; // Interpretação oficial do Céu do Mês da Bianca
+  primeiraQuinzena?: string;
+  segundaQuinzena?: string;
   aspectosRaw: string;
 }
 
@@ -33,8 +34,9 @@ export interface BussolaItem {
   lua: string;
   ascendente: string;
   casaAtivada?: number;
-  focoPrimeiraQuinzena: string;
-  focoSegundaQuinzena: string;
+  focoMensal: string; // Foco astrológico do mês unificado
+  focoPrimeiraQuinzena?: string;
+  focoSegundaQuinzena?: string;
   cuidados: string; // Exatamente 3 linhas sem hífens
   diasAstrais: string;
   diasAtencao: string;
@@ -152,11 +154,17 @@ export function getBussolaItemsList(competencia?: string, tipo?: BussolaType): B
     all = (bussolaTextosBaseData as any[]).map((t, idx) => ({
       ...t,
       tipo: t.tipo || 'pessoal',
-      gerarStatus: t.gerarStatus || 'gerado'
+      gerarStatus: t.gerarStatus || 'gerado',
+      focoMensal: t.focoMensal || (t.focoPrimeiraQuinzena && t.focoSegundaQuinzena ? `${t.focoPrimeiraQuinzena} ${t.focoSegundaQuinzena}` : t.focoPrimeiraQuinzena || '')
     })) as BussolaItem[];
     if (typeof window !== 'undefined') {
       localStorage.setItem(LOCAL_STORAGE_ITENS, JSON.stringify(all));
     }
+  } else {
+    all = all.map((item) => ({
+      ...item,
+      focoMensal: item.focoMensal || (item.focoPrimeiraQuinzena && item.focoSegundaQuinzena ? `${item.focoPrimeiraQuinzena} ${item.focoSegundaQuinzena}` : item.focoPrimeiraQuinzena || '')
+    }));
   }
 
   return all.filter((item) => {
@@ -236,8 +244,7 @@ export function generateBussolaContentForClient(
   const primaryTransitSign = extractPrimarySignFromTransit(transit.primeiraQuinzena || transit.aspectosRaw);
   const casaAtivada = calculateBussolaHouse(asc, primaryTransitSign);
 
-  let foco1 = '';
-  let foco2 = '';
+  let focoMensal = '';
   let cuidados = '';
   let diasAstrais = '';
   let diasAtencao = '';
@@ -246,26 +253,23 @@ export function generateBussolaContentForClient(
   let palavraOrdem = PALAVRAS_DE_ORDEM[Math.abs((contact.nome.length + casaAtivada) % PALAVRAS_DE_ORDEM.length)];
 
   if (tipo === 'pessoal') {
-    foco1 = `${apelido}, a primeira quinzena chega destrancando as pendências na sua Casa ${casaAtivada}. O que estava engasgado na sua garganta ganha palavras firmes e acolhimento. Seu Ascendente em ${asc} quer ordem, enquanto a Lua em ${lua} precisa aprender a não engolir sapos para agradar os outros. Respeite o ritmo do seu corpo físico e confie na sua verdade sem pedir desculpas.`;
-    foco2 = `A partir do dia vinte e dois, o céu ilumina as suas prioridades e pede aconchego na rotina. A Lua Cheia movimenta demandas e você vai precisar de calma com o seu Sol em ${sol}. Não adianta querer abraçar o mundo e resolver o problema de todo mundo na marra. Foque em fazer o feijão com arroz bem feito, feche o computador no horário e cuide da sua paz.`;
+    focoMensal = `${apelido}, este mês chega destrancando as principais pendências da sua Casa ${casaAtivada}. O que estava engasgado na sua garganta ganha palavras firmes, discernimento e acolhimento. Seu Ascendente em ${asc} busca ordem na rotina, enquanto a sua Lua em ${lua} precisa aprender a não engolir sapos só para manter uma falsa harmonia ao redor. Os movimentos celestes do mês iluminam as suas prioridades reais e exigem presença consciente no seu próprio ritmo. Com o seu Sol em ${sol}, pare de tentar abraçar o mundo ou resolver a vida de todo mundo na marra: cuide da sua estrutura diária, honre os seus limites e faça da sua paz inegociável.`;
     cuidados = `Não engula incômodos na rotina apenas para evitar conflitos na casa.\nEvite assumir tarefas extras dos outros achando que dá conta de tudo.\nPare de se chicotear exigindo perfeição em cada detalhe do dia a dia.`;
     diasAstrais = `13 e 22/11: Acordos saem e a energia física se renova. Mande a mensagem pendente.`;
     diasAtencao = `09 e 24/11: Tensão nas conversas e mente acelerada. Saia de fininho da confusão.`;
     direcionamento = `Mande aquela mensagem clara resolvendo uma pendência antiga de conversa.\nOrganize uma gaveta ou armário que estava virando depósito de bagunça.\nSepare pelo menos trinta minutos à noite para ficar offline e em silêncio.`;
     perguntaDiario = `O que você tem tanto medo de perder quando tenta controlar tudo ao seu redor em vez de respirar e confiar no seu próprio valor?`;
   } else if (tipo === 'amorosa') {
-    foco1 = `${apelido}, a primeira quinzena joga um holofote transparente nas suas relações e acordos afetivos. Com a movimentação na Casa ${casaAtivada}, não dá mais para empurrar mágoas debaixo do tapete. Sua Lua em ${lua} busca segurança genuína, enquanto o Sol em ${sol} pede lealdade aos seus valores. Hora de abrir o peito e ter conversas francas com quem divide a vida com você.`;
-    foco2 = `Na segunda quinzena, o céu ativa o equilíbrio entre a sua individualidade e a entrega a dois. A Lua Cheia transborda sentimentos e pede clareza de limites. Com seu Ascendente em ${asc}, evite transformar pequenos desgastes em tempestades. O amor saudável não exige que você se anule para ser escolhida; construa presença com afeto e escuta atenta.`;
+    focoMensal = `${apelido}, o céu deste mês joga um holofote transparente nas suas relações e na verdade dos seus acordos afetivos. Com a forte ativação na Casa ${casaAtivada}, não dá mais para empurrar desconfortos para debaixo do tapete. Sua Lua em ${lua} busca segurança e reciprocidade genuína, enquanto o Sol em ${sol} pede lealdade aos seus valores mais profundos. O momento pede coragem para abrir o coração em conversas francas e sem joguinhos. Com seu Ascendente em ${asc}, evite transformar pequenos desgastes em tempestades: o amor maduro não exige que você se anule para ser escolhida, mas sim que você construa intimidade com presença, respeito e escuta real.`;
     cuidados = `Não transforme conversas de alinhamento afetivo em tribunais de acusação.\nCuidado para não projetar no parceiro inseguranças que são apenas suas.\nPare de aceitar migalhas de atenção só por medo da solidão ou do vazio.`;
-    diasAstrais = `14 e 23/11: Harmonia a dois e diálogos curativos. Proponha um jantar leve.`;
+    diasAstrais = `14 e 23/11: Harmonia a dois e diálogos curativos. Proponha um momento a dois.`;
     diasAtencao = `08 e 25/11: Clima inflamado nas trocas e suscetibilidade. Respire antes de responder.`;
     direcionamento = `Fale uma necessidade emocional sua com delicadeza e sem tom de cobrança.\nFaça um gesto de afeto despretensioso para quem caminha ao seu lado.\nReserve uma noite da semana para cuidar exclusivamente da sua autoestima.`;
     perguntaDiario = `Quanto do que você cobra na relação é uma necessidade real de parceria e quanto é apenas carência disfarçada de controle?`;
     palavraOrdem = 'Acolhimento';
   } else {
     // profissional
-    foco1 = `${apelido}, o mês começa exigindo ordem cirúrgica na sua carreira e na entrega de valor. A ativação na Casa ${casaAtivada} destrava negociações e traz clareza para posicionar o seu trabalho. Com o Sol em ${sol} e o Ascendente em ${asc}, você tem autoridade natural; pare de se contentar com pouco por receio de incomodar. Apresente seus projetos com firmeza e postura madura.`;
-    foco2 = `A segunda quinzena coloca a sua capacidade de liderança e organização à prova. Demandas aumentam e Marte exige foco nos processos práticos. Sua Lua em ${lua} pede um ambiente onde você se sinta respeitada. Não misture vaidade com trabalho: faça acordos claros, formalize o que for prometido e não gaste energia tentando convencer quem não quer ouvir.`;
+    focoMensal = `${apelido}, este mês exige ordem cirúrgica, maturidade estratégica e clareza na entrega do seu valor profissional. A ativação direta na sua Casa ${casaAtivada} destrava negociações emperradas e traz o momento ideal para reposicionar os seus serviços e projetos. Com o Sol em ${sol} e o Ascendente em ${asc}, você carrega uma autoridade natural; pare de se apequenar ou aceitar remunerações injustas por mero receio de incomodar. Sua Lua em ${lua} exige que você construa um território de trabalho onde seja genuinamente respeitada. Faça combinados formais, organize o seu cronograma com disciplina e canalize sua energia para onde há retorno concreto.`;
     cuidados = `Evite disputas de ego no ambiente de trabalho para provar que tem razão.\nNão assuma responsabilidades executivas de terceiros sem a devida remuneração.\nContenha a pressa ansiosa de querer ver todos os resultados para ontem.`;
     diasAstrais = `12 e 26/11: Portas profissionais abertas e metas alinhadas. Agende a reunião chave.`;
     diasAtencao = `10 e 24/11: Sobrecarga na equipe e cobranças pesadas. Mantenha a cabeça fria.`;
@@ -289,8 +293,9 @@ export function generateBussolaContentForClient(
     lua,
     ascendente: asc,
     casaAtivada,
-    focoPrimeiraQuinzena: foco1,
-    focoSegundaQuinzena: foco2,
+    focoMensal,
+    focoPrimeiraQuinzena: focoMensal,
+    focoSegundaQuinzena: focoMensal,
     cuidados,
     diasAstrais,
     diasAtencao,
@@ -499,13 +504,8 @@ export function renderBussolaMobileHTML(item: BussolaItem): string {
 
   <div class="content">
     <div class="box-branca" style="margin-top: 4px;">
-      <div class="box-title-gold">1ª QUINZENA</div>
-      <p style="margin: 0;">${item.focoPrimeiraQuinzena}</p>
-    </div>
-
-    <div class="box-branca">
-      <div class="box-title-gold">2ª QUINZENA</div>
-      <p style="margin: 0;">${item.focoSegundaQuinzena}</p>
+      <div class="box-title-gold">FOCO ASTROLÓGICO DO MÊS</div>
+      <p style="margin: 0; line-height: 1.55; text-align: justify;">${item.focoMensal || item.focoPrimeiraQuinzena}</p>
     </div>
 
     <h2 class="section-title-serif">Cuidados & Pontos de Atenção</h2>
@@ -567,13 +567,11 @@ export function formatBussolaWhatsAppMessage(item: BussolaItem): string {
 *Mês:* ${item.competencia}
 *Consulente:* ${item.nomeCliente} (${item.apelidoCliente})
 *Tríade:* Sol em ${item.sol} | Ascendente em ${item.ascendente} | Lua em ${item.lua}
+${item.casaAtivada ? `*Casa Ativada:* Casa ${item.casaAtivada}` : ''}
 
 ━━━━━━━━━━━━━━━━━━━━
-☀️ *1ª QUINZENA:*
-${item.focoPrimeiraQuinzena}
-
-🌙 *2ª QUINZENA:*
-${item.focoSegundaQuinzena}
+✨ *FOCO ASTROLÓGICO DO MÊS:*
+${item.focoMensal || item.focoPrimeiraQuinzena}
 
 ⚠️ *CUIDADOS & PONTOS DE ATENÇÃO:*
 ${item.cuidados}

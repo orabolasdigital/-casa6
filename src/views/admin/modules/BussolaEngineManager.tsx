@@ -75,6 +75,7 @@ export const BussolaEngineManager: React.FC = () => {
     ano: 2026,
     mes: 11,
     competencia: '11/2026',
+    interpretacaoMes: '',
     primeiraQuinzena: '',
     segundaQuinzena: '',
     aspectosRaw: ''
@@ -161,7 +162,8 @@ export const BussolaEngineManager: React.FC = () => {
     const payload: AstrologicalTransitMonth = {
       ...editingTransit,
       competencia: comp,
-      aspectosRaw: `PRIMEIRA QUINZENA:\n${editingTransit.primeiraQuinzena}\n\nSEGUNDA QUINZENA:\n${editingTransit.segundaQuinzena}`
+      interpretacaoMes: editingTransit.interpretacaoMes || editingTransit.aspectosRaw || '',
+      aspectosRaw: editingTransit.aspectosRaw || editingTransit.interpretacaoMes || ''
     };
 
     saveBussolaTransit(payload);
@@ -594,34 +596,33 @@ export const BussolaEngineManager: React.FC = () => {
                 </div>
               </div>
 
-              {/* Primeira Quinzena */}
+              {/* Interpretação Oficial do Mês (Céu por Bianca Tofoli) */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-[#22205A] flex items-center justify-between">
-                  <span>Aspectos da Primeira Quinzena (Dias 01 a 15)</span>
-                  <span className="text-[11px] text-[#D99426]">Lua Nova, planetas diretos/retrógrados</span>
+                  <span>Interpretação Astrológica do Mês (Céu Oficial da Bianca)</span>
+                  <span className="text-[11px] text-[#D99426]">Texto base e visão do céu para alimentar o gerador</span>
                 </label>
                 <textarea
                   rows={6}
                   required
-                  placeholder="Ex: 09/11: Lua Nova em Escorpião (16°) — Início de ciclo focado em transformação profunda..."
-                  value={editingTransit.primeiraQuinzena}
-                  onChange={(e) => setEditingTransit({ ...editingTransit, primeiraQuinzena: e.target.value })}
-                  className="w-full bg-[#FAF8F5] border border-[#DCD6CC] focus:border-[#F0B55E] rounded-xl p-3 text-xs text-[#22205A] font-mono leading-relaxed resize-y"
+                  placeholder="Descreva a leitura energética do mês, o tom astrológico geral, as viradas de chave e o clima coletivo que servirá de base para a tradução nas casas de cada cliente..."
+                  value={editingTransit.interpretacaoMes || editingTransit.primeiraQuinzena || editingTransit.aspectosRaw || ''}
+                  onChange={(e) => setEditingTransit({ ...editingTransit, interpretacaoMes: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#DCD6CC] focus:border-[#F0B55E] rounded-xl p-3 text-xs text-[#22205A] leading-relaxed resize-y"
                 />
               </div>
 
-              {/* Segunda Quinzena */}
+              {/* Eventos e Datas Importantes do Mês */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-[#22205A] flex items-center justify-between">
-                  <span>Aspectos da Segunda Quinzena (Dias 16 ao fim do mês)</span>
-                  <span className="text-[11px] text-[#D99426]">Ingresso Solar, Lua Cheia, aspectos marcantes</span>
+                  <span>Datas, Ingressos Planetários e Fases Lunares</span>
+                  <span className="text-[11px] text-[#D99426]">Lua Nova, Lua Cheia, mudanças de signos e aspectos</span>
                 </label>
                 <textarea
-                  rows={6}
-                  required
-                  placeholder="Ex: 22/11: Sol entra em Sagitário (Ingresso Solar) — Virada de chave energética expandindo a busca por sentido..."
-                  value={editingTransit.segundaQuinzena}
-                  onChange={(e) => setEditingTransit({ ...editingTransit, segundaQuinzena: e.target.value })}
+                  rows={4}
+                  placeholder="Ex: 09/11: Lua Nova em Escorpião | 22/11: Sol entra em Sagitário | 27/11: Lua Cheia em Gêmeos..."
+                  value={editingTransit.aspectosRaw || editingTransit.segundaQuinzena || ''}
+                  onChange={(e) => setEditingTransit({ ...editingTransit, aspectosRaw: e.target.value })}
                   className="w-full bg-[#FAF8F5] border border-[#DCD6CC] focus:border-[#F0B55E] rounded-xl p-3 text-xs text-[#22205A] font-mono leading-relaxed resize-y"
                 />
               </div>
@@ -677,7 +678,7 @@ export const BussolaEngineManager: React.FC = () => {
                       </span>
                     </div>
                   </div>
-                  <p className="text-xs text-[#554F70] line-clamp-2">{t.focoPrimeiraQuinzena}</p>
+                  <p className="text-xs text-[#554F70] line-clamp-2">{t.focoMensal || t.focoPrimeiraQuinzena}</p>
                 </div>
               ))}
             </div>
@@ -756,31 +757,25 @@ export const BussolaEngineManager: React.FC = () => {
             </div>
 
             <form onSubmit={handleSaveEditedItem} className="p-6 overflow-y-auto space-y-4 text-xs">
-              {/* Foco 1ª Quinzena */}
+              {/* Foco Astrológico Mensal */}
               <div className="space-y-1">
                 <label className="font-bold text-[#22205A] flex justify-between">
-                  <span>1. Foco da 1ª Quinzena</span>
-                  <span className="text-[11px] font-mono text-[#D99426]">{editingItem.focoPrimeiraQuinzena.length}/400 chars</span>
+                  <span>1. Foco Astrológico do Mês (Visão Mensal Integrada)</span>
+                  <span className="text-[11px] font-mono text-[#D99426]">
+                    {(editingItem.focoMensal || editingItem.focoPrimeiraQuinzena || '').length} caracteres
+                  </span>
                 </label>
                 <textarea
-                  rows={3}
-                  value={editingItem.focoPrimeiraQuinzena}
-                  onChange={(e) => setEditingItem({ ...editingItem, focoPrimeiraQuinzena: e.target.value })}
-                  className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl p-3 text-[#22205A]"
-                />
-              </div>
-
-              {/* Foco 2ª Quinzena */}
-              <div className="space-y-1">
-                <label className="font-bold text-[#22205A] flex justify-between">
-                  <span>2. Foco da 2ª Quinzena</span>
-                  <span className="text-[11px] font-mono text-[#D99426]">{editingItem.focoSegundaQuinzena.length}/400 chars</span>
-                </label>
-                <textarea
-                  rows={3}
-                  value={editingItem.focoSegundaQuinzena}
-                  onChange={(e) => setEditingItem({ ...editingItem, focoSegundaQuinzena: e.target.value })}
-                  className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl p-3 text-[#22205A]"
+                  rows={5}
+                  value={editingItem.focoMensal || editingItem.focoPrimeiraQuinzena || ''}
+                  onChange={(e) => setEditingItem({
+                    ...editingItem,
+                    focoMensal: e.target.value,
+                    focoPrimeiraQuinzena: e.target.value,
+                    focoSegundaQuinzena: e.target.value
+                  })}
+                  className="w-full bg-[#FAF8F5] border border-[#DCD6CC] rounded-xl p-3 text-[#22205A] leading-relaxed"
+                  placeholder="Orientação e foco astrológico mensal personalizado para o consulente..."
                 />
               </div>
 

@@ -1,0 +1,809 @@
+ACASA6 - MANUAL OPERACIONAL DE PRODUTOS
+
+
+04 - Ficha Técnica: Bússola Pessoal
+
+Este documento reúne todas as informações comerciais, ferramentas, fluxos operacionais, regras de qualidade e anexos técnicos necessários para produzir e entregar a Bússola Pessoal de ponta a ponta com autonomia.
+
+
+1. Identificação Geral
+
+Campo
+
+Especificação
+
+Código / Arquivo
+
+04 - 04_Ficha_Tecnica_Bussola_Pessoal
+
+Nome do Produto
+
+Bússola Pessoal
+
+Linha de Produto
+
+Linha Bússola
+
+Status
+
+Ativo (entregável mensal exclusivo para assinantes ativos da Patota Astral)
+
+Periodicidade
+
+Mensal
+
+Preço e Planos
+
+R$ 47,00/mês (plano mensal) | [A confirmar: valor do plano anual e plataforma de cobrança]
+
+Formato da Entrega
+
+PDF de 1 página adaptado para leitura em celular (mobile)
+
+Canal de Entrega
+
+WhatsApp (envio individual)
+
+Prazo / Janela de Entrega
+
+[A definir: ex. até o dia X de cada mês]
+
+Responsável pelo Conteúdo Astrológico
+
+Bianca Tofoli (mapeamento dos trânsitos oficiais do mês e validação)
+
+Responsável pela Operação e Automação
+
+Caio Paiva ou operador substituto (conferência da base, execução da Skill, revisão na planilha, geração dos PDFs no Colab e disparo)
+
+
+2. Ferramentas, Arquivos e Acessos
+
+Planilha Mestre: CRM acasa6
+
+Aba &quot;Trânsitos Astrológicos&quot;: fonte oficial dos eventos e datas do mês foco (coluna &quot;Aspectos Importantes&quot;).
+
+Aba &quot;Cadastro Astrológico&quot;: base de clientes com Nome, Apelido, Telefone, Sol, Lua, Ascendente, PATOTA Status (&quot;Ativo&quot; ou &quot;Inativo&quot;), PATOTA Assinatura e Última Entrega.
+
+Aba &quot;Base Textos Mensais&quot;: destino onde os textos gerados são gravados por competência (formato MM/AAAA), com a coluna &quot;GERAR&quot; usada no fluxo de produção dos PDFs.
+
+Skill de IA: gerador-bussola-pessoal (apoiada pelos arquivos de referência linguagem_bianca.md, guias_casas.md e guia_persona_astrologica.md).
+
+Gerador de PDF (Python / Google Colab): notebook Patota Astral_Bussoa Pessoal.
+
+Pasta de Saída no Google Drive: Meu Drive &gt; 03_Bianca Tofoli &gt; BT_acasa6_Patota Astral &gt; AAAA.MM (criada automaticamente pelo script conforme a competência informada, ex: 2026.11).
+
+Padrão de Nomenclatura dos Arquivos: PrimeiroNome_UltimoNome_Bussola.pdf (gerado automaticamente a partir do campo Nome Cliente).
+
+
+3. Passo a Passo Operacional (How To)
+
+Preenchimento dos Trânsitos Oficiais (Bianca): abrir o CRM acasa6, acessar a aba &quot;Trânsitos Astrológicos&quot; e inserir na linha do mês de competência todos os eventos astrológicos relevantes na coluna &quot;Aspectos Importantes&quot;, cobrindo primeira e segunda quinzena.
+
+Conferência da Base Ativa (Operação): na aba &quot;Cadastro Astrológico&quot; do CRM acasa6, verificar se todos os assinantes vigentes da Patota Astral estão com PATOTA Status igual a &quot;Ativo&quot; e se os campos Sol, Lua e Ascendente estão preenchidos corretamente.
+
+Geração de Textos via Skill (Operação): acionar a Skill &quot;gerador-bussola-pessoal&quot; informando o mês de competência exato no formato MM/AAAA (ex: 12/2026). A Skill executa a varredura completa dos trânsitos oficiais, filtra apenas assinantes com status Ativo, calcula a Casa ativada no mês a partir do Ascendente de cada assinante (usando exclusivamente Sol, Lua e Ascendente), redige os 8 campos no tom de voz da acasa6 e grava os resultados na aba &quot;Base Textos Mensais&quot; deixando a coluna &quot;GERAR&quot; em branco.
+
+Revisão Editorial e Técnica na Planilha (Operação): na aba &quot;Base Textos Mensais&quot;, conferir se todos os assinantes ativos foram gerados, se nenhum campo ultrapassou o limite de caracteres (evitando quebra de layout na página única), se &quot;Cuidados&quot; e &quot;PassosPraticos&quot; possuem exatamente 3 linhas sem hífens, bullets ou números, e se não há linguagem determinista ou jargão proibido.
+
+Geração dos PDFs no Google Colab (Operação): preparar a coluna &quot;Gerar&quot; na aba &quot;Base Textos Mensais&quot; preenchendo a coluna &quot;Gerar&quot; com a letra &quot;S&quot; nas linhas que devem ser processadas, executar o notebook Patota Astral_Bussoa Pessoal no Google Colab, informar a competência no formato MM/AAAA quando solicitado e autorizar o acesso ao Google Drive.
+
+Conferência Visual (Operação): abrir uma amostra dos PDFs gerados no celular para validar margens, tipografia, alinhamento e ausência de cortes de texto.
+
+Entrega e Registro no CRM (Operação): enviar o PDF individualmente para cada assinante via WhatsApp usando a mensagem padrão e atualizar a coluna &quot;Última Entrega&quot; na aba &quot;Cadastro Astrológico&quot;.
+
+
+3.1. Regras de Tamanho e Formatação dos Campos (Aba Base Textos Mensais)
+
+Campo
+
+Limite / Estrutura
+
+Observação Operacional
+
+Foco da 1ª Quinzena
+
+360 a 400 caracteres
+
+Análise da primeira quinzena cruzando trânsitos oficiais com Sol, Lua, Ascendente e Casa ativada.
+
+Foco da 2ª Quinzena
+
+360 a 400 caracteres
+
+Análise da segunda quinzena cruzando trânsitos oficiais com Sol, Lua, Ascendente e Casa ativada.
+
+Cuidado e Pontos de Atenção
+
+Exatamente 3 linhas, 60 a 70 caracteres cada
+
+Alertas comportamentais diretos. Proibido usar hífens, bullets ou números.
+
+Dias Astrais
+
+50 a 80 caracteres
+
+Datas individuais de fluxo extraídas da tabela oficial com destrave prático (sem determinismos).
+
+Dias de Atenção
+
+50 a 80 caracteres
+
+Datas individuais de cautela extraídas da tabela oficial com ação de recolhimento.
+
+Direcionamento Prático
+
+Exatamente 3 linhas, 60 a 75 caracteres cada
+
+Três ações físicas e executáveis na rotina. Proibido usar hífens ou bullets.
+
+Pergunta para o Diário
+
+120 a 160 caracteres
+
+Pergunta reflexiva e profunda alinhada ao momento do mês.
+
+Palavra de Ordem
+
+Exatamente 1 palavra
+
+Substantivo forte de âncora para o mês.
+
+Nota: O script também lê obrigatoriamente as colunas: Competencia, Gerar (valor &quot;S&quot;), Nome Cliente, Apelido Cliente, Sol, Ascendente e Lua.
+
+
+3.2. Contingências e Mensagem Padrão de Entrega
+
+Assinante sem horário de nascimento ou Ascendente cadastrado: [A definir procedimento padrão].
+
+Novo assinante entrando no meio do mês: [A definir se recebe a Bússola do mês vigente ou apenas do mês seguinte].
+
+Falha na execução do Google Colab: verificar autorização de acesso ao Google Drive/Sheets na conta conectada e confirmar se os nomes das abas e colunas no CRM acasa6 não foram alterados.
+
+Template de Mensagem no WhatsApp: [A inserir texto padrão de envio].
+
+
+4. Anexos Técnicos (Backup Operacional)
+
+
+4.1. Anexo A - Instruções Completas da Skill gerador-bussola-pessoal
+
+Arquivos de suporte obrigatórios anexados à Skill: linguagem_bianca.md, guias_casas.md e guia_persona_astrologica.md.
+
+
+1. BASE DE CONTEÚDO E DIRETRIZES DE PERSONA (NÃO NEGOCIÁVEL)
+
+Antes de redigir qualquer linha, consulte obrigatoriamente os arquivos anexados:
+
+linguagem_bianca.md: Tom de voz de irmã mais velha, acolhimento real, pé no chão, autodeboche amoroso e respeito estrito ao Dicionário Proibido. Proibido soar como horóscopo de internet ou manual corporativo. Atenção ao vocabulário: Proibido uso de termos clínicos ou laudos formais (ex: &quot;saúde estomacal&quot;, &quot;fadiga mental&quot;). Use sempre termos viscerais e da conversa de cozinha (ex: &quot;vai acabar com uma gastrite&quot;, &quot;cabeça pilhada&quot;, &quot;com o estômago revirado&quot;).
+
+guias_casas.md: Descritivo e foco temático oficial das 12 Casas astrológicas.
+
+⚠️ TRAVAS DE INTEGRIDADE E ANTI-ALUCINAÇÃO:
+
+É estritamente proibido inventar trânsitos, datas ou eventos celestes. Todo o conteúdo deve ser obrigatoriamente cruzado com os dados reais do mapa natal das assinantes da Patota Astral e com as informações de trânsitos astrológicos presentes na aba Trânsitos Astrológicos da planilha CRM acasa6.
+
+Considere exclusivamente Sol, Lua e Ascendente das assinantes ativas e ignore todos os outros aspectos astrológicos delas para essa análise.
+
+REGRA ANTI-DETERMINISMOS (NÃO NEGOCIÁVEL): É estritamente proibido o uso de linguagem determinista ou previsões fechadas (ex: &quot;o dinheiro volta&quot;, &quot;você vai conseguir um emprego&quot;). Use sempre construções de inclinação, potencial e cenário (ex: &quot;ganha espaço para&quot;, &quot;pode voltar a fluir&quot;, &quot;abre portas para&quot;). A astrologia da acasa6 aponta o clima e as tendências, mas o livre-arbítrio é soberano.
+
+
+2. FLUXO OPERACIONAL E TÉCNICO
+
+A execução deve seguir rigorosamente esta ordem lógica:
+
+Definição da Competência: Confirme o mês de competência exato (MM/AAAA, ex: 11/2026).
+
+Leitura e Varredura Completa dos Trânsitos Oficiais: Acesse a aba Trânsitos Astrológicos do CRM e faça uma varredura completa de absolutamente todos os eventos da coluna &quot;Aspectos Importantes&quot; da linha do mês de competência (da primeira à última data, dividindo a leitura entre a primeira quinzena e a segunda quinzena). Nenhum evento do mês de competência pode ficar de fora.
+
+Filtro de Clientes Ativas: Acesse a base de clientes do CRM e selecione apenas as assinantes com status Ativo na Patota Astral.
+
+Cruzamento Astrológico e Cálculo da Casa do Mês (REGRA INEGOCIÁVEL):
+
+Cálculo Matemático da Casa: Conte os signos do zodíaco a partir do Signo do Ascendente da assinante (que ocupa obrigatoriamente a Casa 1) no sentido anti-horário até chegar ao signo do trânsito principal do mês.
+
+Cruzamento Individual de Datas: As datas dos campos DiasAstrais e DiasAtencao nunca devem ser repetidas de forma genérica para todas as clientes. Cada evento celeste da tabela oficial deve ser avaliado individualmente em relação à Casa que ele ativa no mapa da assinante para definir se aquela data específica atua como um dia de fluxo (DiasAstrais) ou de tensão/cautela (DiasAtencao).
+
+Direcionamento de cada casa astrológica: Consulte o guias_casas.md para extrair o foco temático a ser trabalhado em cada Casa.
+
+Redação na Voz da Marca: Escreva os campos aplicando a persona da acasa6 (vulnerabilidade, causos do território humano e acolhimento prático em linguagem coloquial, sem determinismos).
+
+Escrita e Formatação: Grave os resultados na aba Base Textos Mensais preenchendo a competência em formato MM/AAAA e deixando o campo &quot;GERAR&quot; em branco.
+
+
+3. ESTRUTURA DOS CAMPOS E REGRAS DE OURO DE FORMATAÇÃO
+
+Respeite estritamente as regras de preenchimento e formatação:
+
+FocoPrimeiraQuinzena (360 a 400 caracteres): Análise orientada da PRIMEIRA quinzena do mês, conectando os principais aspectos astrológicos do período ao trio Sol/Ascendente/Lua da assinante e à Casa que está sendo ativada pelos respectivos aspectos astrológicos, escrita com o tom acolhedor e coloquial da marca.
+
+FocoSegundaQuinzena (360 a 400 caracteres): Análise orientada da SEGUNDA quinzena do mês, conectando os principais aspectos astrológicos do período ao trio Sol/Ascendente/Lua da assinante e à Casa que está sendo ativada pelos respectivos aspectos astrológicos, escrita com o tom acolhedor e coloquial da marca.
+
+Cuidados (EXATAMENTE 3 linhas, de 60 a 70 caracteres cada): Alertas comportamentais secos e diretos ligados aos aspectos astrológicos mapeados nos itens 1 e 2 ⚠️ Proibido uso de hífens, bullets ou números nas linhas.
+
+DiasAstrais (50 a 80 caracteres): Datas de fluxo favoráveis extraídas da tabela oficial cruzada com a Casa ativada da cliente, acompanhadas do destrave prático correspondente (sem determinismos).
+
+DiasAtencao (50 a 80 caracteres): Datas de pausa e cautela baseadas nos trânsitos tensos do período cruzados com o mapa da cliente, acompanhadas da ação de recolhimento.
+
+PassosPraticos (EXATAMENTE 3 linhas, de 60 a 75 caracteres cada): Três ações físicas e executáveis para a rotina. ⚠️ Proibido uso de hífens ou bullets.
+
+PerguntaDiario (120 a 160 caracteres): Pergunta reflexiva, profunda e desconfortável alinhada ao momento.
+
+PalavraOrdem (EXATAMENTE 1 palavra): Um substantivo forte de âncora para o mês.
+
+
+4.2. Anexo B - Código Python do Gerador de PDF (Google Colab)
+
+
+
+# ==============================================================================
+
+# SCRIPT DE PRODUÇÃO FINAL: BÚSSOLA PESSOAL CASA 6 (ESTÁVEL E CORRIGIDO)
+
+# ==============================================================================
+
+!pip install -q xhtml2pdf gspread google-auth pandas pillow
+
+
+
+import os
+
+from PIL import Image, ImageDraw
+
+from google.colab import auth
+
+from google.colab import drive
+
+import gspread
+
+from google.auth import default
+
+from xhtml2pdf import pisa
+
+
+
+# 1. Pede a competência
+
+COMPETENCIA_ALVO = input(&quot;Digite a competência (ex: 11/2026): &quot;).strip()
+
+
+
+# 2. Autenticação e Drive
+
+print(&quot;\n[1/4] Autenticando usuário e montando o Google Drive...&quot;)
+
+auth.authenticate_user()
+
+drive.mount('/content/drive')
+
+
+
+creds, _ = default()
+
+gc = gspread.authorize(creds)
+
+sh = gc.open(&quot;CRM acasa6&quot;)
+
+
+
+print(&quot;\n[2/4] Lendo a planilha CRM acasa6...&quot;)
+
+sheet_textos = sh.worksheet(&quot;Base Textos Mensais&quot;)
+
+todos_registros = sheet_textos.get_all_records()
+
+
+
+# Função original e segura para buscar dados na linha
+
+def pegar_dado(cliente, *chaves):
+
+    for chave in chaves:
+
+        if chave in cliente and str(cliente[chave]).strip() != &quot;&quot;:
+
+            return str(cliente[chave]).strip()
+
+    return &quot;&quot;
+
+
+
+# Filtra exatamente como na versão estável que funcionava
+
+registros_mes = [
+
+    r for r in todos_registros
+
+    if str(r.get(&quot;Competencia&quot;, &quot;&quot;)).strip() == COMPETENCIA_ALVO
+
+    and str(r.get(&quot;Gerar&quot;, &quot;&quot;)).strip().upper() == &quot;S&quot;
+
+]
+
+
+
+print(f&quot;[INFO] Total de membros filtrados para geração em {COMPETENCIA_ALVO}: {len(registros_mes)}&quot;)
+
+
+
+if len(registros_mes) &gt; 0:
+
+    # 3. Criação da Logo Oficial
+
+    print(&quot;\n[3/4] Gerando os elementos visuais da marca...&quot;)
+
+    simbolo_img = Image.new(&quot;RGBA&quot;, (120, 100), (0, 0, 0, 0))
+
+    draw = ImageDraw.Draw(simbolo_img)
+
+
+
+    draw.ellipse([30, 20, 90, 80], outline=&quot;white&quot;, width=2)
+
+    draw.ellipse([32, 35, 70, 73], fill=&quot;#F0B55E&quot;)
+
+
+
+    draw.ellipse([18, 15, 22, 19], fill=&quot;#F0B55E&quot;)
+
+    draw.ellipse([26, 8, 30, 12], fill=&quot;#F0B55E&quot;)
+
+    draw.ellipse([36, 12, 40, 16], fill=&quot;#F0B55E&quot;)
+
+
+
+    logo_path = &quot;/content/logo_casa6_icone.png&quot;
+
+    simbolo_img.save(logo_path)
+
+
+
+    # 4. Ajuste da Pasta de Destino (Formato Ano.Mês, ex: 2026.11)
+
+    mes, ano = COMPETENCIA_ALVO.split('/')
+
+    pasta_destino = f&quot;/content/drive/MyDrive/03_Bianca Tofoli/BT_acasa6_Patota Astral/{ano}.{mes}&quot;
+
+    os.makedirs(pasta_destino, exist_ok=True)
+
+
+
+    print(f&quot;\n[4/4] Iniciando a geração em lote na pasta: {ano}.{mes}\n&quot;)
+
+
+
+    for cliente in registros_mes:
+
+        nome_completo = str(cliente.get(&quot;Nome Cliente&quot;, &quot;&quot;)).strip()
+
+        apelido = str(cliente.get(&quot;Apelido Cliente&quot;, &quot;&quot;)).strip()
+
+
+
+        partes_nome = nome_completo.split()
+
+        if len(partes_nome) &gt; 1:
+
+            nome_cabecalho = f&quot;{partes_nome[0]} {partes_nome[-1]}&quot;
+
+        else:
+
+            nome_cabecalho = partes_nome[0] if partes_nome else &quot;Cliente&quot;
+
+
+
+        if apelido and apelido.lower() != 'nan' and apelido != &quot;&quot;:
+
+            nome_corpo = apelido
+
+        else:
+
+            nome_corpo = partes_nome[0] if partes_nome else &quot;Cliente&quot;
+
+
+
+        print(f&quot;Gerando Bússola para: {nome_cabecalho} (Corpo: {nome_corpo})...&quot;)
+
+
+
+        # Tratamento exato com o nome real da coluna na planilha
+
+        cuidados_raw = str(cliente.get(&quot;Cuidado e Pontos de Atenção&quot;, &quot;&quot;))
+
+        cuidados_linhas = cuidados_raw.split('\n')
+
+        cuidados_html = &quot;&quot;.join([f&quot;&lt;li style='margin-bottom: 6px;'&gt;{linha.replace('• ', '').replace('- ', '')}&lt;/li&gt;&quot; for linha in cuidados_linhas if linha.strip()])
+
+
+
+        # Tratamento de Direcionamento Prático
+
+        direcionamento_raw = str(cliente.get(&quot;Direcionamento Prático&quot;, &quot;&quot;))
+
+        direcionamento_linhas = direcionamento_raw.split('\n')
+
+        direcionamento_html = &quot;&quot;.join([f&quot;&lt;p style='margin-bottom: 6px;'&gt;{linha}&lt;/p&gt;&quot; for linha in direcionamento_linhas if linha.strip()])
+
+
+
+        # Mapeamento estrito com os nomes reais da planilha
+
+        bloco1         = str(cliente.get(&quot;Foco da 1ª Quinzena&quot;, &quot;&quot;))
+
+        bloco2         = str(cliente.get(&quot;Foco da 2ª Quinzena&quot;, &quot;&quot;))
+
+        sol            = str(cliente.get(&quot;Sol&quot;, &quot;&quot;)).upper()
+
+        asc            = str(cliente.get(&quot;Ascendente&quot;, &quot;&quot;)).upper()
+
+        lua            = str(cliente.get(&quot;Lua&quot;, &quot;&quot;)).upper()
+
+        dias_astrais   = str(cliente.get(&quot;Dias Astrais&quot;, &quot;&quot;))
+
+        dias_atencao   = str(cliente.get(&quot;Dias de Atenção&quot;, &quot;&quot;))
+
+        pergunta_diario= str(cliente.get(&quot;Pergunta para o Diário&quot;, &quot;&quot;))
+
+        palavra_ordem  = str(cliente.get(&quot;Palavra de Ordem&quot;, &quot;&quot;))
+
+
+
+        # Layout com as correções visuais e de altura aplicadas
+
+        html_content = f&quot;&quot;&quot;
+
+        &lt;!DOCTYPE html&gt;
+
+        &lt;html lang=&quot;pt-BR&quot;&gt;
+
+        &lt;head&gt;
+
+        &lt;meta charset=&quot;UTF-8&quot;&gt;
+
+        &lt;style&gt;
+
+            @page {{
+
+                size: 440px 1800px;
+
+                margin: 0;
+
+                background-color: #F4EFE6;
+
+            }}
+
+
+
+            body {{
+
+                font-family: Helvetica, sans-serif;
+
+                color: #282566;
+
+                font-size: 13.5px;
+
+                line-height: 1.45;
+
+                background-color: #F4EFE6;
+
+                margin: 0; padding: 0;
+
+            }}
+
+
+
+            /* Topo / Header */
+
+            .header {{
+
+                background-color: #282566;
+
+                color: #FFFFFF;
+
+                padding: 45px 25px 40px 25px;
+
+            }}
+
+
+
+            .header-table {{ width: 100%; border-collapse: collapse; }}
+
+            .header-text-col {{ width: 70%; vertical-align: top; }}
+
+            .header-logo-col {{ width: 30%; vertical-align: middle; text-align: right; }}
+
+
+
+            .marca-topo {{
+
+                color: #F0B55E; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; margin-bottom: 0px;
+
+            }}
+
+
+
+            .cliente-nome {{
+
+                font-family: Times-Roman, serif;
+
+                font-size: 40px;
+
+                margin: 14px 0 12px 0;
+
+                font-weight: normal;
+
+                color: #ffffff;
+
+                line-height: 1.1;
+
+            }}
+
+
+
+            .subtitulo {{ font-size: 13px; color: #ffffff; }}
+
+
+
+            .logo-img {{ height: 55px; vertical-align: middle; margin-top: 10px; }}
+
+
+
+            /* Tríade Alinhada à Esquerda */
+
+            .triade {{
+
+                background-color: #E6E3F1; color: #282566; text-align: left; padding: 12px 25px;
+
+                font-size: 11px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase;
+
+                width: 100%; display: block;
+
+            }}
+
+
+
+            /* Conteúdo Principal */
+
+            .content {{ padding: 25px; }}
+
+
+
+            .section-title-serif {{ font-family: Times-Roman, serif; font-size: 21px; color: #282566; margin: 0 0 12px 0; }}
+
+            .section-title-green {{
+
+                font-size: 11px; color: #8C987F; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin: 20px 0 10px 0;
+
+            }}
+
+
+
+            p {{ margin: 0 0 10px 0; text-align: justify; }}
+
+
+
+            /* Caixas */
+
+            .box-branca {{
+
+                background-color: #ffffff; border: 1px solid #d5d8cc; border-radius: 8px; padding: 16px; margin-bottom: 12px;
+
+            }}
+
+            .box-title-gold {{ color: #F0B55E; font-size: 10.5px; font-weight: bold; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }}
+
+            .box-title-padrao {{ color: #F0B55E; font-size: 10.5px; font-weight: bold; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }}
+
+
+
+            ul {{ margin: 0; padding-left: 20px; }}
+
+            li {{ text-align: justify; line-height: 1.45; }}
+
+
+
+            /* Pergunta e Palavra */
+
+            .box-pergunta {{
+
+                background-color: #f7e6cd; color: #282566; font-weight: bold; padding: 18px; border-radius: 6px; margin: 20px 0; text-align: justify; font-size: 13px; line-height: 1.5;
+
+            }}
+
+            .box-final {{
+
+                background-color: #282566; border: 2px solid #F0B55E; border-radius: 8px; text-align: center; padding: 30px 15px; margin-top: 10px;
+
+            }}
+
+            .palavra-label {{ font-family: Times-Roman, serif; font-size: 20px; color: #ffffff; margin-bottom: 15px; }}
+
+
+
+            .palavra-destaque {{
+
+                font-family: Times-Italic, serif;
+
+                font-size: 46px;
+
+                color: #F0B55E;
+
+                font-style: italic;
+
+                letter-spacing: 1px;
+
+            }}
+
+
+
+            /* Rodapé Centralizado e Espaçado */
+
+            .footer-marca {{
+
+                text-align: center;
+
+                font-size: 9.5px;
+
+                color: #8c8e82;
+
+                text-transform: uppercase;
+
+                letter-spacing: 1.5px;
+
+                margin-top: 30px;
+
+                margin-bottom: 15px;
+
+            }}
+
+        &lt;/style&gt;
+
+        &lt;/head&gt;
+
+        &lt;body&gt;
+
+            &lt;div class=&quot;header&quot;&gt;
+
+                &lt;table class=&quot;header-table&quot;&gt;
+
+                    &lt;tr&gt;
+
+                        &lt;td class=&quot;header-text-col&quot;&gt;
+
+                            &lt;div class=&quot;marca-topo&quot;&gt;CASA 6 • PATOTA ASTRAL&lt;/div&gt;
+
+                            &lt;h1 class=&quot;cliente-nome&quot;&gt;{nome_cabecalho}&lt;/h1&gt;
+
+                            &lt;div class=&quot;subtitulo&quot;&gt;Bússola Pessoal • {COMPETENCIA_ALVO}&lt;/div&gt;
+
+                        &lt;/td&gt;
+
+                        &lt;td class=&quot;header-logo-col&quot;&gt;
+
+                            &lt;img src=&quot;{logo_path}&quot; class=&quot;logo-img&quot;&gt;
+
+                        &lt;/td&gt;
+
+                    &lt;/tr&gt;
+
+                &lt;/table&gt;
+
+            &lt;/div&gt;
+
+
+
+            &lt;div class=&quot;triade&quot;&gt;
+
+                SOL: {sol} &amp;nbsp;&amp;nbsp;|&amp;nbsp;&amp;nbsp; ASC: {asc} &amp;nbsp;&amp;nbsp;|&amp;nbsp;&amp;nbsp; LUA: {lua}
+
+            &lt;/div&gt;
+
+
+
+            &lt;div class=&quot;content&quot;&gt;
+
+                &lt;div class=&quot;box-branca&quot; style=&quot;margin-top: 5px;&quot;&gt;
+
+                    &lt;div class=&quot;box-title-gold&quot;&gt;1ª QUINZENA&lt;/div&gt;
+
+                    &lt;p style=&quot;margin: 0;&quot;&gt;{bloco1}&lt;/p&gt;
+
+                &lt;/div&gt;
+
+
+
+                &lt;div class=&quot;box-branca&quot;&gt;
+
+                    &lt;div class=&quot;box-title-padrao&quot;&gt;2ª QUINZENA&lt;/div&gt;
+
+                    &lt;p style=&quot;margin: 0;&quot;&gt;{bloco2}&lt;/p&gt;
+
+                &lt;/div&gt;
+
+
+
+                &lt;h2 class=&quot;section-title-serif&quot; style=&quot;margin-top: 28px;&quot;&gt;Cuidados &amp; Pontos de Atenção&lt;/h2&gt;
+
+                &lt;ul&gt;
+
+                    {cuidados_html}
+
+                &lt;/ul&gt;
+
+
+
+                &lt;div class=&quot;box-branca&quot; style=&quot;margin-top: 15px;&quot;&gt;
+
+                    &lt;div class=&quot;box-title-padrao&quot;&gt;DIAS ASTRAIS&lt;/div&gt;
+
+                    &lt;p style=&quot;margin: 0;&quot;&gt;{dias_astrais}&lt;/p&gt;
+
+                &lt;/div&gt;
+
+
+
+                &lt;div class=&quot;box-branca&quot;&gt;
+
+                    &lt;div class=&quot;box-title-padrao&quot;&gt;DIAS DE ATENÇÃO&lt;/div&gt;
+
+                    &lt;p style=&quot;margin: 0;&quot;&gt;{dias_atencao}&lt;/p&gt;
+
+                &lt;/div&gt;
+
+
+
+                &lt;div class=&quot;section-title-green&quot;&gt;DIRECIONAMENTO PRÁTICO&lt;/div&gt;
+
+                {direcionamento_html}
+
+
+
+                &lt;div class=&quot;box-pergunta&quot;&gt;
+
+                    {pergunta_diario}
+
+                &lt;/div&gt;
+
+
+
+                &lt;div class=&quot;box-final&quot;&gt;
+
+                    &lt;div class=&quot;palavra-label&quot;&gt;A sua principal chave do mês se resume&lt;br&gt;em&lt;/div&gt;
+
+                    &lt;div class=&quot;palavra-destaque&quot;&gt;{palavra_ordem}&lt;/div&gt;
+
+                &lt;/div&gt;
+
+
+
+                &lt;div class=&quot;footer-marca&quot;&gt;CASA 6 • DIRECIONAMENTO E PRÁTICA NA ROTINA&lt;/div&gt;
+
+            &lt;/div&gt;
+
+        &lt;/body&gt;
+
+        &lt;/html&gt;
+
+        &quot;&quot;&quot;
+
+
+
+        nome_arquivo = f&quot;{nome_cabecalho.replace(' ', '_')}_Bussola.pdf&quot;
+
+        caminho_pdf = os.path.join(pasta_destino, nome_arquivo)
+
+
+
+        with open(caminho_pdf, &quot;w+b&quot;) as pdf_file:
+
+            pisa.CreatePDF(html_content, dest=pdf_file)
+
+
+
+    print(f&quot;\n[SUCESSO TOTAL] Lote concluído! Todos os PDFs gerados e salvos em: {pasta_destino}&quot;)
+
+else:
+
+    print(f&quot;\n[AVISO] Nenhum registro marcado com 'S' na coluna Gerar foi encontrado para {COMPETENCIA_ALVO}.&quot;)
+
+
